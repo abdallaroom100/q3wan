@@ -1,0 +1,223 @@
+.newsSection {
+  padding: 40px 0;
+  background: linear-gradient(135deg, #f8f9fa 60%, #e0f7fa 100%);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  font-size: 2.7rem;
+  font-weight: 900;
+  color: #222;
+  margin-bottom: 38px;
+  letter-spacing: 1.5px;
+  font-family: 'Cairo', 'Tajawal', Arial, sans-serif;
+  position: relative;
+}
+
+.titleText {
+  font-size: 2.3rem;
+  font-weight: 900;
+  color: #3A3D6C;
+  font-family: 'Cairo', 'Tajawal', Arial, sans-serif;
+  letter-spacing: 2px;
+  padding: 0 18px;
+  position: relative;
+  z-index: 2;
+  text-shadow: 0 2px 8px #e0e3f7;
+}
+
+.line {
+  display: inline-block;
+  width: 70px;
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #bfa046 0%, #fff 60%, #bfa046 100%);
+  box-shadow: 0 2px 8px #e0e3f7;
+  margin: 0 4px;
+}
+
+.cards {
+  display: flex;
+  gap: 32px;
+  flex-wrap: nowrap;
+  justify-content: center;
+}
+
+.centerTitle {
+  text-align: center !important;
+}
+
+.centerCardTitle {
+  text-align: center !important;
+}
+
+.centerCardText {
+  text-align: center !important;
+}
+
+.card {
+  background: rgba(255,255,255,0.92);
+  border-radius: 32px;
+  box-shadow: 0 8px 32px 0 rgba(0,184,148,0.13), 0 2px 8px 0 rgba(0,0,0,0.09);
+  border: none;
+  overflow: hidden;
+  width: 370px;
+  min-width: 260px;
+  transition: box-shadow 0.18s, border-color 0.18s;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  position: relative;
+  backdrop-filter: blur(2.5px);
+  padding-bottom: 0;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 7px;
+  height: 100%;
+  background:  #3A3D6C;
+  border-radius: 0 12px 12px 0;
+  z-index: 2;
+  opacity: 0.85;
+}
+
+.cardImg {
+  width: 100%;
+  height: 320px;
+  object-fit: cover;
+  object-position: center;
+  border-bottom: none;
+  background: #f0f0f0;
+  z-index: 1;
+  border-top-left-radius: 32px;
+  border-top-right-radius: 32px;
+}
+
+.badge {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  background: #3A3D6C;
+  color: #fff;
+  font-size: 0.98rem;
+  font-weight: bold;
+  padding: 5px 18px;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px 0 rgba(0,184,148,0.10);
+  z-index: 10;
+  letter-spacing: 1px;
+  font-family: 'Cairo', 'Tajawal', Arial, sans-serif;
+}
+
+.cardContent {
+  padding: 28px 22px 22px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+  z-index: 3;
+  background: transparent;
+}
+
+.cardTitle {
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: #222;
+  margin: 0 0 8px 0;
+  text-align: center;
+  line-height: 1.6;
+  letter-spacing: 0.5px;
+  font-family: 'Cairo', 'Tajawal', Arial, sans-serif;
+}
+
+.cardText {
+  font-size: 1.08rem;
+  color: #444;
+  text-align: center;
+  margin: 0;
+  line-height: 1.7;
+  font-family: 'Cairo', 'Tajawal', Arial, sans-serif;
+}
+
+.cardButton {
+  margin-top: 12px;
+  align-self: flex-end;
+  background: linear-gradient(90deg, #00b894 60%, #00cec9 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px 0 8px 0;
+  padding: 8px 22px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 8px 0 rgba(0,184,148,0.10);
+  transition: background 0.2s, transform 0.2s;
+  font-family: 'Cairo', 'Tajawal', Arial, sans-serif;
+}
+
+.cardButton:hover {
+  background: linear-gradient(90deg, #00cec9 60%, #00b894 100%);
+  transform: scale(1.07);
+}
+
+.card:hover {
+  box-shadow: 0 8px 32px 0 rgba(0,184,148,0.13), 0 2px 8px 0 rgba(0,0,0,0.10);
+  border-color: #00b89433;
+}
+
+.waveSvg {
+  display: none !important;
+}
+
+@media (max-width: 900px) {
+  .cards {
+    flex-wrap: wrap;
+    gap: 24px;
+    align-items: center;
+    justify-content: center;
+  }
+  .card {
+    width: 100%;
+    max-width: 420px;
+  }
+  .cardImg {
+    height: 260px;
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+  }
+  .badge {
+    top: 12px;
+    left: 12px;
+    font-size: 0.92rem;
+    padding: 4px 14px;
+    border-radius: 12px;
+  }
+}
+
+@media (max-width: 700px) {
+  .sectionTitle {
+    font-size: 1.5rem;
+    gap: 8px;
+  }
+  .titleText {
+    font-size: 1.1rem;
+    padding: 0 6px;
+  }
+  .line {
+    width: 28px;
+    height: 2.5px;
+  }
+} 

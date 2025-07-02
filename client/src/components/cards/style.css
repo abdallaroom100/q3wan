@@ -1,0 +1,184 @@
+.elementor-element {
+    width: 100%;
+    position: relative;
+    padding: 0 !important;
+}
+
+.elementor-element-2b5cd58 {
+    padding: 20px;
+}
+
+.elementor-element-3a867cb {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.elementor-element[data-settings*="background_background"] {
+    text-align: center;
+    background-image: linear-gradient(184deg, #ffffff 31%, #54b74e8f 92%);
+    max-width: 400px;
+    height: fit-content;
+    border-radius: 15px;
+    padding: 20px;
+   
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.elementor-element[data-settings*="background_background"]:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.elementor-widget-container img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+}
+
+.elementor-widget-container img:hover {
+    transform: scale(1.02);
+}
+
+.elementor-heading-title {
+    color: #333;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    text-align: right;
+    position: relative;
+    padding-bottom: 10px;
+    text-align: center;
+} 
+
+
+
+.elementor-icon-list-items {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.elementor-icon-list-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    text-align: right;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
+
+.elementor-icon-list-item:hover {
+    background-color: rgba(76, 175, 80, 0.1);
+}
+
+.elementor-icon-list-icon {
+    margin-left: 10px;
+    color: #4CAF50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    background: rgba(76, 175, 80, 0.1);
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+}
+
+.elementor-icon-list-item:hover .elementor-icon-list-icon {
+    transform: scale(1.1);
+}
+
+.elementor-icon-list-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.elementor-icon-list-text {
+    color: #005C00;
+    font-size: 18px;
+    font-weight: bold;
+
+}
+
+/* Additional styles from plugins */
+.elementor-widget.elementor-icon-list--layout-inline .elementor-widget-container {
+    overflow: hidden;
+}
+
+.elementor-widget .elementor-icon-list-items.elementor-inline-items {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.elementor-widget .elementor-icon-list-items.elementor-inline-items .elementor-inline-item {
+    display: inline-flex;
+}
+
+.elementor-widget .elementor-icon-list-items.elementor-inline-items .elementor-icon-list-item {
+    display: inline-flex;
+}
+
+.elementor-widget .elementor-icon-list-items.elementor-inline-items .elementor-icon-list-item:after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 1em;
+    width: 1px;
+    background-color: currentColor;
+}
+
+.elementor-widget.elementor-align-center .elementor-icon-list-item,
+.elementor-widget.elementor-align-center .elementor-icon-list-item a {
+    justify-content: center;
+}
+
+.elementor-widget.elementor-align-right .elementor-icon-list-item,
+.elementor-widget.elementor-align-right .elementor-icon-list-item a {
+    justify-content: flex-start;
+}
+
+.elementor-widget.elementor-align-right .elementor-icon-list-items {
+    justify-content: flex-start;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .elementor-element-3a867cb {
+        grid-template-columns: 1fr;
+    }
+    
+    .elementor-heading-title {
+        font-size: 20px;
+    }
+    
+    .elementor-icon-list-text {
+        font-size: 14px;
+    }
+
+    .elementor-element[data-settings*="background_background"] {
+        padding: 15px;
+    }
+}
+
+/* Animation for cards */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.elementor-element[data-settings*="background_background"] {
+    animation: fadeIn 0.5s ease-out forwards;
+}

@@ -1,0 +1,577 @@
+.wrapper {
+  max-width: 1020px;
+  margin: 40px auto;
+  margin-top: 0;
+  padding: 32px 16px;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+  direction: rtl;
+  position: relative;
+ 
+}
+
+.progressBarWrapper {
+  position: absolute;
+  right: -220px;
+  top: 32px;
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  height: 320px;
+  align-items: flex-end;
+}
+
+.progressBarTrack {
+  background: #e5e7eb;
+  width: 8px;
+  height: 300px;
+  border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+  margin: 0 auto;
+}
+
+.progressBarFill {
+  background: linear-gradient(180deg, #4a5a7a 60%, #8dc26f 100%);
+  width: 100%;
+  border-radius: 6px;
+  transition: height 0.5s cubic-bezier(.4,2,.6,1);
+  position: absolute;
+  bottom: 0;
+}
+
+.progressSteps {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 220px;
+  margin-right: 0;
+  margin-bottom: 32px;
+}
+
+.progressLine {
+  position: absolute;
+  right: 20px;
+  top: 16px;
+  width: 8px;
+  background: #4a5a7a;
+  border-radius: 6px;
+  z-index: 0;
+  transition: height 0.5s cubic-bezier(.4,2,.6,1);
+}
+
+.progressStep {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  height: 40px;
+  position: relative;
+}
+
+.progressCircle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 3px solid #b0b4c1;
+  background: #fff;
+  color: #b0b4c1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: bold;
+  transition: all 0.3s;
+}
+
+.progressCircle.active,
+.progressCircle.completed {
+  background: #4a5a7a;
+  border-color: #4a5a7a;
+  color: #fff;
+}
+
+.stepLabel {
+  font-size: 16px;
+  color: #b0b4c1;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.progressCircle.active + .stepLabel,
+.progressCircle.completed + .stepLabel {
+  color: #4a5a7a;
+  font-weight: bold;
+}
+
+.progressConnector,
+.stepConnector {
+  width: 4px;
+  height: 32px;
+  background: #b0b4c1;
+  margin: 0 16px;
+  border-radius: 2px;
+  align-self: center;
+  transition: background 0.3s;
+}
+
+.stepConnector.completed {
+  background: #4a5a7a;
+}
+
+.card {
+  background: #f9fafb;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  padding: 32px 20px 24px 20px;
+  margin-bottom: 16px;
+  animation: fadeIn 0.5s;
+  position: relative;
+}
+.title {
+  text-align: center;
+  color: #4a5a7a;
+  font-size: 1.5rem;
+  margin-bottom: 24px;
+  letter-spacing: 1px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px 24px;
+}
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.inputGroup label {
+  color: #4a5a7a;
+  font-size: 15px;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+.inputGroup input,
+.inputGroup select {
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 7px;
+  font-size: 15px;
+  background: #fff;
+  transition: border 0.2s;
+}
+.inputGroup input:focus,
+.inputGroup select:focus {
+  border: 1.5px solid #4a5a7a;
+  outline: none;
+}
+.radioGroup {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+}
+.buttonRow {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 32px;
+}
+.navBtn {
+  background: #4a5a7a;
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  padding: 10px 28px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.navBtn:hover {
+  background: #8dc26f;
+}
+.submitBtn {
+  background: linear-gradient(90deg, #4a5a7a 60%, #8dc26f 100%);
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  padding: 10px 32px;
+  font-size: 17px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.08);
+  transition: background 0.2s;
+}
+.submitBtn:hover {
+  background: linear-gradient(90deg, #8dc26f 60%, #4a5a7a 100%);
+}
+
+.animatedStep {
+  min-height: 320px;
+  position: relative;
+}
+.slideInRight {
+  animation: slideInRight 0.5s cubic-bezier(.4,2,.6,1);
+}
+.slideInLeft {
+  animation: slideInLeft 0.5s cubic-bezier(.4,2,.6,1);
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(60px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-60px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (max-width: 600px) {
+  .wrapper {
+    padding: 8px 2px;
+  }
+  .card {
+    padding: 16px 4px 12px 4px;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .buttonRow {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+  .companionHeader {
+    grid-template-columns: 1fr 120px;
+    font-size: 12px;
+    padding: 4px 0;
+  }
+  .companionRow {
+    grid-template-columns: 1fr 120px;
+    font-size: 12px;
+    gap: 4px;
+    padding: 4px 0;
+  }
+  .companionRow input,
+  .companionRow select {
+    font-size: 12px;
+    padding: 4px 6px;
+    width: 100%;
+  }
+  .deleteBtn {
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+  }
+}
+
+.addBtn {
+  background: #eaf6e7;
+  color: #4a5a7a;
+  border: none;
+  border-radius: 7px;
+  padding: 8px 18px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-bottom: 6px;
+  transition: background 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.addBtn:hover {
+  background: #8dc26f22;
+}
+
+.companionTable {
+  margin: 12px 0 0 0;
+  border-radius: 10px;
+  background: #f3f4f6;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  padding: 10px 0 0 0;
+}
+.companionHeader {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  background: #e5e7eb;
+  color: #4a5a7a;
+  font-weight: bold;
+  font-size: 15px;
+  border-radius: 8px 8px 0 0;
+  padding: 8px 0;
+  text-align: center;
+}
+.companionRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #e5e7eb;
+  background: #fff;
+  font-size: 15px;
+}
+.companionRow:last-child {
+  border-bottom: none;
+}
+.companionRow input {
+  padding: 6px 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #f9fafb;
+  transition: border 0.2s;
+}
+.companionRow input:focus {
+  border: 1.5px solid #4a5a7a;
+  outline: none;
+}
+.deleteBtn {
+  background: #ffebee;
+  color: #c62828;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+.deleteBtn:hover {
+  background: #ffcdd2;
+}
+.houseDeleteBtn {
+  background: #fff3e0;
+  color: #e65100;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  transition: background 0.2s;
+  z-index: 2;
+}
+.houseDeleteBtn:hover {
+  background: #ffe0b2;
+}
+
+.progressStepsHorizontal {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: 24px;
+  gap: 0;
+}
+
+.progressStepHorizontal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 70px;
+}
+
+.stepConnectorHorizontal {
+  height: 4px;
+  width: 32px;
+  background: #b0b4c1;
+  align-self: center;
+  border-radius: 2px;
+  margin: 0 2px;
+  transition: background 0.3s;
+}
+
+.stepConnectorHorizontal.completed {
+  background: #4a5a7a;
+}
+
+@media (max-width: 991px) {
+  .progressSteps {
+    display: none !important;
+  }
+  .progressStepsHorizontal {
+    display: flex !important;
+  }
+  .wrapper{
+    margin:0 !important;
+    border-radius: 0 !important;
+  
+  }
+}
+@media (max-width: 600px) {
+   .card {
+    padding-inline: 15px !important;
+   }
+  .progressSteps {
+    display: none !important;
+  }
+  .progressStepsHorizontal {
+    gap: 0 !important;
+    justify-content: space-around !important;
+   
+  }
+.progressCircle {
+  width: 60px !important;
+  height: 60px !important;
+}
+  
+}
+@media (max-width: 900px) {
+ 
+.progressCircle {
+  width: 60px !important;
+  height: 60px !important;
+}
+  
+}
+
+@media (min-width: 991px) {
+  .progressStepsHorizontal {
+    display: none !important;
+  }
+ 
+}
+
+.dateRow {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.dateRow select,
+.dateRow input[type="date"] {
+  min-width: 90px;
+  flex: 1 1 90px;
+  max-width: 150px;
+}
+@media (max-width: 600px) {
+  .dateRow {
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+  .dateRow select,
+  .dateRow input[type="date"] {
+    min-width: 70px;
+    max-width: 100px;
+    font-size: 13px;
+    padding: 6px 6px;
+  }
+}
+
+.incomeSourcesRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+.incomeSource {
+  background: #f3f4f6;
+  border-radius: 10px;
+  padding: 12px 18px;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  transition: background 0.2s, box-shadow 0.2s, border 0.2s;
+  border: 1.5px solid #e5e7eb;
+  min-width: 140px;
+  position: relative;
+}
+.incomeSource.active {
+  background: #e0f7fa;
+  border: 1.5px solid #4a5a7a;
+  box-shadow: 0 2px 8px rgba(76,175,80,0.10);
+}
+.incomeSource:hover {
+  background: #e6f2ff;
+}
+.incomeAmountInput {
+  margin-right: 8px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #b0b4c1;
+  font-size: 14px;
+  width: 90px;
+  transition: box-shadow 0.2s;
+  animation: fadeInInput 0.3s;
+}
+@keyframes fadeInInput {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.companionsScrollBox {
+  max-height: 500px;
+  overflow-y: auto;
+  padding: 16px 8px;
+  border-radius: 10px;
+  border: 1.5px solid #e5e7eb;
+  background: #f8f9fa;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+@media (max-width: 700px) {
+  .companionsScrollBox {
+    max-height: 350px;
+    min-width: 0;
+    width: 100%;
+    padding: 8px 2px;
+  }
+  .card {
+    width: 100%;
+    min-width: 0;
+    padding: 16px 6px 12px 6px;
+    margin-bottom: 12px;
+  }
+  .grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px 0 !important;
+  }
+  .inputGroup {
+    width: 100%;
+    min-width: 0;
+    font-size: 14px;
+    gap: 4px;
+  }
+  .inputGroup label {
+    font-size: 13px;
+  }
+  .inputGroup input,
+  .inputGroup select {
+    font-size: 14px;
+    padding: 7px 8px;
+  }
+  .dateRow select,
+  .dateRow input[type="date"] {
+    min-width: 60px;
+    max-width: 100%;
+    font-size: 13px;
+    padding: 5px 4px;
+  }
+} 
