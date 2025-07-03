@@ -41,7 +41,10 @@ const Header = () => {
       className=" flex justify-between items-center !gap-1 md:gap-6  lg:!px-10 px-4  "
     >
       <button className="logo cursor-pointer" onClick={() => history("/")}>
-        <img src="img/logo.png" className="logo" alt="شعار الجمعية" />
+        <picture>
+       <source srcSet="img/logo.webp"  type="image/webp"/>
+        <img loading="lazy" src="img/logo.webp" className="logo" alt="شعار الجمعية" />
+        </picture>
       </button>
 
       <div className="menu-toggle" id="menu-toggle" onClick={toggleMenu}>

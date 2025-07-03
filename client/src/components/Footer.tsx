@@ -8,7 +8,7 @@ const Footer = () => {
     <footer className="footer">
       <div className="footer-container">
         <div className="footer-logo">
-          <img className='bg-white ' style={{filter:"none",margin:"0 0"}} src="/img/logo.png" alt="شعار الجمعية" />
+          <img className='bg-white ' style={{filter:"none",margin:"0 0"}} src="/img/logo.webp" loading='lazy' alt="شعار الجمعية" />
           <p> مبرة القعوان الخيرية<br />عطاء يستمر</p>
         </div>
 
