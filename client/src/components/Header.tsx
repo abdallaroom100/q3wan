@@ -51,7 +51,7 @@ const Header = () => {
         <i className={isMenuOpen ? "ri-close-line" : "ri-menu-line"}></i>
       </div>
       <nav id="navbar" className={isMenuOpen ? "open" : ""}>
-        <ul>
+        <ul className="hidden md:block">
           <li>
             <a href="#home" className="active">
               الرئيسية

@@ -4,182 +4,9 @@ import styles from "./BeneficiaryDetails.module.css";
 import { Beneficiary, RequestHistory } from "../Dashboard/types";
 import { useGetCurrentReportData } from "../Dashboard/hooks/useGetCurrentReportData";
 import { MoonLoader } from "react-spinners";
+import Select from 'react-select';
 
-// بيانات تجريبية - في المستقبل ستأتي من API
-const mockBeneficiaries: Beneficiary[] = [
-  {
-    id: "1",
-    firstName: "أحمد",
-    secondName: "محمد",
-    thirdName: "علي",
-    lastName: "الصمد",
-    fullName: "أحمد محمد علي الصمد",
-    email: "ahmad@email.com",
-    identityNumber: "1030304050",
-    nationality: "سعودي",
-    gender: "ذكر",
-    phone: "0501234567",
-    birthDate: "15/03/1985",
-    dateType: "ميلادي",
-    maritalStatus: "متزوج",
-    idImagePath: "/img/logo.png",
-    cityOfResidence: "الرياض",
-    district: "حي الياسمين",
-    housingType: "ملك",
-    jobStatus: "موظف",
-    healthStatus: "سليم",
-    bankName: "البنك الأهلي السعودي",
-    ibanImage: "/img/logo.png",
-    numberOfFacilities: 2,
-    numberOfMales: 1,
-    housemates: [
-      {
-        name: "أسماء علي الصمد",
-        birthDate: "20/05/1990",
-        identityNumber: "1030304051",
-        gender: "أنثى",
-        kinship: "زوجة",
-        studyLevel: "جامعي",
-        healthStatus: "سليم",
-        dateType: "ميلادي"
-      },
-      {
-        name: "سالم محمد الصمد",
-        birthDate: "10/08/2015",
-        identityNumber: "1030304052",
-        gender: "ذكر",
-        kinship: "ابن",
-        studyLevel: "ابتدائي",
-        healthStatus: "سليم",
-        dateType: "ميلادي"
-      }
-    ],
-    incomeSources: [
-      {
-        sourceType: "راتب وظيفي",
-        sourceAmount: "8000",
-        sourceImage: "/img/logo.png"
-      },
-      {
-        sourceType: "عمل إضافي",
-        sourceAmount: "2000",
-        sourceImage: "/img/logo.png"
-      }
-    ],
-    requestDate: "12 يونيو 2025",
-    status: "pending",
-    companions: "أسماء علي - زوجة، سالم محمد - ابن"
-  },
-  {
-    id: "2",
-    firstName: "نورة",
-    secondName: "عبدالله",
-    thirdName: "محمد",
-    lastName: "العنزي",
-    fullName: "نورة عبدالله محمد العنزي",
-    email: "noura@email.com",
-    identityNumber: "1076543210",
-    nationality: "سعودية",
-    gender: "أنثى",
-    phone: "0551234567",
-    birthDate: "22/07/1988",
-    dateType: "ميلادي",
-    maritalStatus: "متزوجة",
-    idImagePath: "/img/logo.png",
-    cityOfResidence: "جدة",
-    district: "حي الشاطئ",
-    housingType: "إيجار",
-    rentAmount: "3000",
-    rentContractFile: "/img/logo.png",
-    jobStatus: "عاطل",
-    healthStatus: "غير سليم",
-    disabilityType: "مريض",
-    bankName: "بنك الراجحي",
-    ibanImage: "/img/logo.png",
-    numberOfFacilities: 3,
-    numberOfMales: 2,
-    housemates: [
-      {
-        name: "محمد العنزي",
-        birthDate: "05/01/1985",
-        identityNumber: "1076543211",
-        gender: "ذكر",
-        kinship: "زوج",
-        studyLevel: "جامعي",
-        healthStatus: "سليم",
-        dateType: "ميلادي"
-      },
-      {
-        name: "فاطمة العنزي",
-        birthDate: "15/09/2012",
-        identityNumber: "1076543212",
-        gender: "أنثى",
-        kinship: "ابنة",
-        studyLevel: "متوسط",
-        healthStatus: "سليم",
-        dateType: "ميلادي"
-      }
-    ],
-    incomeSources: [
-      {
-        sourceType: "مساعدة اجتماعية",
-        sourceAmount: "1500",
-        sourceImage: "/img/logo.png"
-      }
-    ],
-    requestDate: "06 يونيو 2025",
-    status: "rejected",
-    companions: "محمد العنزي - زوج، فاطمة العنزي - ابنة"
-  },
-  {
-    id: "3",
-    firstName: "سعاد",
-    secondName: "علي",
-    thirdName: "عبدالله",
-    lastName: "المطيري",
-    fullName: "سعاد علي عبدالله المطيري",
-    email: "suaad@email.com",
-    identityNumber: "1099931122",
-    nationality: "سعودية",
-    gender: "أنثى",
-    phone: "0533334444",
-    birthDate: "30/11/1992",
-    dateType: "ميلادي",
-    maritalStatus: "متزوجة",
-    idImagePath: "/img/logo.png",
-    cityOfResidence: "الدمام",
-    district: "حي الشاطئ",
-    housingType: "ملك",
-    jobStatus: "موظف",
-    healthStatus: "سليم",
-    bankName: "البنك السعودي الفرنسي",
-    ibanImage: "/img/logo.png",
-    numberOfFacilities: 1,
-    numberOfMales: 1,
-    housemates: [
-      {
-        name: "عبدالله المطيري",
-        birthDate: "12/04/1988",
-        identityNumber: "1099931123",
-        gender: "ذكر",
-        kinship: "زوج",
-        studyLevel: "جامعي",
-        healthStatus: "سليم",
-        dateType: "ميلادي"
-      }
-    ],
-    incomeSources: [
-      {
-        sourceType: "راتب وظيفي",
-        sourceAmount: "6000",
-        sourceImage: "/img/logo.png"
-      }
-    ],
-    requestDate: "10 يونيو 2025",
-    status: "approved",
-    companions: "عبدالله المطيري - زوج"
-  }
-];
+
 
 const mockRequestHistory: RequestHistory[] = [
   {
@@ -225,11 +52,13 @@ const BeneficiaryDetailsPage = () => {
    const {error,loading,reportDetails} = useGetCurrentReportData(id || "")
   const navigate = useNavigate();
   const [beneficiary, setBeneficiary] = useState<Beneficiary | null>(null);
+  const [editedBeneficiary, setEditedBeneficiary] = useState<Beneficiary | null>(null);
   // const [loading, setLoading] = useState(true);
   const [printing, setPrinting] = useState(false);
   // Popup state
   const [popupImage, setPopupImage] = useState<string | null>(null);
   const isMobile = useIsMobile();
+  const [editingField, setEditingField] = useState<string | null>(null);
 
   // دالة لتحويل بيانات reportDetails إلى Beneficiary
   const mapReportDetailsToBeneficiary = (data: any): Beneficiary => {
@@ -257,7 +86,7 @@ const BeneficiaryDetailsPage = () => {
       familyCardFile: data.familyCardFile || "",
       jobStatus: data.jobStatus || "",
       healthStatus: data.healthStatus || "",
-      disabilityType: data.disabilityType || "",
+      disabilityType: (data.disabilityType === 'مريض' || data.disabilityType === 'ذوي احتياجات خاصة') ? data.disabilityType : undefined,
       bankName: data.bankName || "",
       ibanImage: data.ibanImage || "",
       numberOfFacilities: data.numberOfFacilities || 0,
@@ -269,8 +98,9 @@ const BeneficiaryDetailsPage = () => {
         gender: h.gender || "",
         kinship: h.kinship || "",
         studyLevel: h.studyLevel || "",
+        studyGrade: h.studyGrade ?? "",
         healthStatus: h.healthStatus || "",
-        disabilityType: h.disabilityType || "",
+        disabilityType: (h.disabilityType === 'مريض' || h.disabilityType === 'ذوي احتياجات خاصة') ? h.disabilityType : undefined,
         dateType: h.dateType || "ميلادي",
       })),
       incomeSources: (data.incomeSources || []).map((s: any) => ({
@@ -286,7 +116,9 @@ const BeneficiaryDetailsPage = () => {
 
   useEffect(() => {
     if (reportDetails) {
-      setBeneficiary(mapReportDetailsToBeneficiary(reportDetails));
+      const mapped = mapReportDetailsToBeneficiary(reportDetails);
+      setBeneficiary(mapped);
+      setEditedBeneficiary(mapped); // initialize edited state
     }
   }, [reportDetails]);
 
@@ -329,6 +161,115 @@ const BeneficiaryDetailsPage = () => {
     if (decision === 'رفض') return styles.statusRejected;
     return styles.statusPending;
   };
+
+  // Helper to update editedBeneficiary fields
+  const handleEditChange = (field: keyof Beneficiary, value: any) => {
+    if (!editedBeneficiary) return;
+    setEditedBeneficiary({ ...editedBeneficiary, [field]: value });
+  };
+
+  // Editable fields list
+  const editableFields: (keyof Beneficiary)[] = [
+    'firstName', 'secondName', 'thirdName', 'lastName', 'identityNumber', 'phone', 'gender', 'birthDate',
+    'maritalStatus', 'nationality', 'cityOfResidence', 'jobStatus', 'healthStatus', 'disabilityType',
+    'district', 'rentAmount', 'bankName', 'housemates'
+  ];
+
+  // Compare only editable fields
+  const hasEdits = beneficiary && editedBeneficiary && editableFields.some(
+    field => JSON.stringify(beneficiary[field]) !== JSON.stringify(editedBeneficiary[field])
+  );
+
+  // قائمة البنوك السعودية
+  const saudiBanks = [
+    "الأهلي السعودي",
+    "الراجحي",
+    "الرياض",
+    "البلاد",
+    "الجزيرة",
+    "الإنماء",
+    "سامبا",
+    "العربي الوطني",
+    "السعودي الفرنسي",
+    "ساب",
+    "الخليج الدولي",
+    "بنك الاستثمار",
+    "بنك التنمية",
+    "بنك الخليج الدولي",
+    "بنك الأول"
+  ];
+
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  // Validation function
+  const validateEdits = () => {
+    if (!editedBeneficiary) return 'حدث خطأ في البيانات.';
+    // الأسماء الأربعة
+    if (!editedBeneficiary.firstName) return 'الاسم الأول مطلوب.';
+    if (!editedBeneficiary.secondName) return 'الاسم الثاني مطلوب.';
+    if (!editedBeneficiary.thirdName) return 'الاسم الثالث مطلوب.';
+    if (!editedBeneficiary.lastName) return 'اسم العائلة مطلوب.';
+    // رقم الهوية
+    if (!/^[0-9]{10}$/.test(editedBeneficiary.identityNumber)) return 'رقم الهوية يجب أن يكون 10 أرقام.';
+    // رقم الجوال
+    if (!/^[0-9]{9}$/.test(editedBeneficiary.phone)) return 'رقم الجوال يجب أن يكون 9 أرقام.';
+    // الجنس
+    if (!editedBeneficiary.gender) return 'الجنس مطلوب.';
+    // تاريخ الميلاد
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(editedBeneficiary.birthDate)) return 'تاريخ الميلاد يجب أن يكون بالشكل yyyy-mm-dd';
+    // الحالة الاجتماعية
+    if (!editedBeneficiary.maritalStatus) return 'الحالة الاجتماعية مطلوبة.';
+    // الحالة الصحية
+    if (!editedBeneficiary.healthStatus) return 'الحالة الصحية مطلوبة.';
+    // نوع الإعاقة إذا كان غير سليم
+    if (editedBeneficiary.healthStatus === 'غير سليم' && !editedBeneficiary.disabilityType) return 'نوع الإعاقة مطلوب إذا كانت الحالة الصحية غير سليم.';
+    // المدينة
+    if (!editedBeneficiary.cityOfResidence) return 'المدينة مطلوبة.';
+    // الحي
+    if (!editedBeneficiary.district) return 'الحي مطلوب.';
+    // مبلغ الإيجار إذا كان نوع السكن إيجار
+    if (beneficiary?.housingType === 'إيجار' && !editedBeneficiary.rentAmount) return 'مبلغ الإيجار مطلوب.';
+    // البنك
+    if (!saudiBanks.includes(editedBeneficiary.bankName || '')) return 'يرجى اختيار اسم البنك من القائمة.';
+    return null;
+  };
+
+  const handleSaveEdits = () => {
+    const error = validateEdits();
+    if (error) {
+      setSaveError(error);
+      return;
+    }
+    setSaveError(null);
+    // TODO: send editedBeneficiary to backend
+    alert('تم حفظ التعديلات!');
+    setBeneficiary(editedBeneficiary);
+  };
+
+  const genderOptions = [
+    { value: 'ذكر', label: 'ذكر' },
+    { value: 'أنثى', label: 'أنثى' }
+  ];
+  const healthStatusOptions = [
+    { value: 'سليم', label: 'سليم' },
+    { value: 'غير سليم', label: 'غير سليم' }
+  ];
+  const disabilityTypeOptions = [
+    { value: 'مريض', label: 'مريض' },
+    { value: 'ذوي احتياجات خاصة', label: 'ذوي احتياجات خاصة' }
+  ];
+  const maritalStatusOptions = [
+    { value: 'أعزب', label: 'أعزب' },
+    { value: 'متزوج', label: 'متزوج' },
+    { value: 'مطلق', label: 'مطلق' },
+    { value: 'أرمل', label: 'أرمل' }
+  ];
+  const bankOptions = saudiBanks.map(b => ({ value: b, label: b }));
+
+  const jobStatusOptions = [
+    { value: 'موظف', label: 'موظف' },
+    { value: 'عاطل', label: 'عاطل' }
+  ];
 
   if (loading) {
     return (
@@ -428,62 +369,691 @@ const BeneficiaryDetailsPage = () => {
             {/* بيانات المستفيد */}
             <div className={styles.detailsInfo}>
               <div className={styles.infoGrid}>
-                <div className={styles.infoItem}>
-                  <span className={styles.infoLabel}>الاسم الكامل</span>
-                  <span className={styles.infoValue}>{beneficiary.fullName}</span>
+                {/* firstName */}
+                <div className={styles.infoItem} style={{ position: 'relative' }}>
+                  <span className={styles.infoLabel}>الاسم الأول</span>
+                  <span
+                    className={styles.infoValue}
+                    style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}
+                    onMouseEnter={e => {
+                      const icon = e.currentTarget.querySelector('.edit-icon') as HTMLElement;
+                      if (icon) icon.style.visibility = 'visible';
+                    }}
+                    onMouseLeave={e => {
+                      const icon = e.currentTarget.querySelector('.edit-icon') as HTMLElement;
+                      if (icon) icon.style.visibility = 'hidden';
+                    }}
+                  >
+                    {editingField === 'firstName' ? (
+                      <input
+                        type="text"
+                        value={editedBeneficiary?.firstName || ''}
+                        autoFocus
+                        onChange={e => handleEditChange('firstName', e.target.value)}
+                        onBlur={() => setEditingField(null)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') setEditingField(null);
+                        }}
+                        className={styles.editInput}
+                      />
+                    ) : (
+                      <span className={styles.editableField}>{editedBeneficiary?.firstName}</span>
+                    )}
+                    <span
+                      className={`edit-icon ${styles.editIcon}`}
+                      style={{
+                        marginRight: 8,
+                        cursor: 'pointer',
+                        visibility: 'hidden',
+                        position: 'static',
+                        display: 'inline-block',
+                      }}
+                      onClick={() => setEditingField('firstName')}
+                    >
+                      ✏️
+                    </span>
+                  </span>
                 </div>
-                <div className={styles.infoItem}>
+                {/* secondName */}
+                <div className={styles.infoItem} style={{ position: 'relative' }}>
+                  <span className={styles.infoLabel}>الاسم الثاني</span>
+                  <span
+                    className={styles.infoValue}
+                    style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}
+                    onMouseEnter={e => {
+                      const icon = e.currentTarget.querySelector('.edit-icon') as HTMLElement;
+                      if (icon) icon.style.visibility = 'visible';
+                    }}
+                    onMouseLeave={e => {
+                      const icon = e.currentTarget.querySelector('.edit-icon') as HTMLElement;
+                      if (icon) icon.style.visibility = 'hidden';
+                    }}
+                  >
+                    {editingField === 'secondName' ? (
+                      <input
+                        type="text"
+                        value={editedBeneficiary?.secondName || ''}
+                        autoFocus
+                        onChange={e => handleEditChange('secondName', e.target.value)}
+                        onBlur={() => setEditingField(null)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') setEditingField(null);
+                        }}
+                        className={styles.editInput}
+                      />
+                    ) : (
+                      <span className={styles.editableField}>{editedBeneficiary?.secondName}</span>
+                    )}
+                    <span
+                      className={`edit-icon ${styles.editIcon}`}
+                      style={{
+                        marginRight: 8,
+                        cursor: 'pointer',
+                        visibility: 'hidden',
+                        position: 'static',
+                        display: 'inline-block',
+                      }}
+                      onClick={() => setEditingField('secondName')}
+                    >
+                      ✏️
+                    </span>
+                  </span>
+                </div>
+                {/* thirdName */}
+                <div className={styles.infoItem} style={{ position: 'relative' }}>
+                  <span className={styles.infoLabel}>الاسم الثالث</span>
+                  <span
+                    className={styles.infoValue}
+                    style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}
+                    onMouseEnter={e => {
+                      const icon = e.currentTarget.querySelector('.edit-icon') as HTMLElement;
+                      if (icon) icon.style.visibility = 'visible';
+                    }}
+                    onMouseLeave={e => {
+                      const icon = e.currentTarget.querySelector('.edit-icon') as HTMLElement;
+                      if (icon) icon.style.visibility = 'hidden';
+                    }}
+                  >
+                    {editingField === 'thirdName' ? (
+                      <input
+                        type="text"
+                        value={editedBeneficiary?.thirdName || ''}
+                        autoFocus
+                        onChange={e => handleEditChange('thirdName', e.target.value)}
+                        onBlur={() => setEditingField(null)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') setEditingField(null);
+                        }}
+                        className={styles.editInput}
+                      />
+                    ) : (
+                      <span className={styles.editableField}>{editedBeneficiary?.thirdName}</span>
+                    )}
+                    <span
+                      className={`edit-icon ${styles.editIcon}`}
+                      style={{
+                        marginRight: 8,
+                        cursor: 'pointer',
+                        visibility: 'hidden',
+                        position: 'static',
+                        display: 'inline-block',
+                      }}
+                      onClick={() => setEditingField('thirdName')}
+                    >
+                      ✏️
+                    </span>
+                  </span>
+                </div>
+                {/* lastName */}
+                <div className={styles.infoItem} style={{ position: 'relative' }}>
+                  <span className={styles.infoLabel}>الاسم الأخير</span>
+                  <span
+                    className={styles.infoValue}
+                    style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}
+                    onMouseEnter={e => {
+                      const icon = e.currentTarget.querySelector('.edit-icon') as HTMLElement;
+                      if (icon) icon.style.visibility = 'visible';
+                    }}
+                    onMouseLeave={e => {
+                      const icon = e.currentTarget.querySelector('.edit-icon') as HTMLElement;
+                      if (icon) icon.style.visibility = 'hidden';
+                    }}
+                  >
+                    {editingField === 'lastName' ? (
+                      <input
+                        type="text"
+                        value={editedBeneficiary?.lastName || ''}
+                        autoFocus
+                        onChange={e => handleEditChange('lastName', e.target.value)}
+                        onBlur={() => setEditingField(null)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') setEditingField(null);
+                        }}
+                        className={styles.editInput}
+                      />
+                    ) : (
+                      <span className={styles.editableField}>{editedBeneficiary?.lastName}</span>
+                    )}
+                    <span
+                      className={`edit-icon ${styles.editIcon}`}
+                      style={{
+                        marginRight: 8,
+                        cursor: 'pointer',
+                        visibility: 'hidden',
+                        position: 'static',
+                        display: 'inline-block',
+                      }}
+                      onClick={() => setEditingField('lastName')}
+                    >
+                      ✏️
+                    </span>
+                  </span>
+                </div>
+                {/* identityNumber */}
+                <div className={styles.infoItem} style={{ position: 'relative' }}>
                   <span className={styles.infoLabel}>رقم الهوية</span>
-                  <span className={styles.infoValue}>{beneficiary.identityNumber}</span>
+                  <span
+                    className={styles.infoValue}
+                    style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}
+                    onMouseEnter={e => {
+                      const icon = e.currentTarget.querySelector('.edit-icon') as HTMLElement;
+                      if (icon) icon.style.visibility = 'visible';
+                    }}
+                    onMouseLeave={e => {
+                      const icon = e.currentTarget.querySelector('.edit-icon') as HTMLElement;
+                      if (icon) icon.style.visibility = 'hidden';
+                    }}
+                  >
+                    {editingField === 'identityNumber' ? (
+                      <input
+                        type="text"
+                        value={editedBeneficiary?.identityNumber || ''}
+                        autoFocus
+                        onChange={e => handleEditChange('identityNumber', e.target.value)}
+                        onBlur={() => setEditingField(null)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') setEditingField(null);
+                        }}
+                        className={styles.editInput}
+                      />
+                    ) : (
+                      <span className={styles.editableField}>{editedBeneficiary?.identityNumber}</span>
+                    )}
+                    <span
+                      className={`edit-icon ${styles.editIcon}`}
+                      style={{
+                        marginRight: 8,
+                        cursor: 'pointer',
+                        visibility: 'hidden',
+                        position: 'static',
+                        display: 'inline-block',
+                      }}
+                      onClick={() => setEditingField('identityNumber')}
+                    >
+                      ✏️
+                    </span>
+                  </span>
                 </div>
-                <div className={styles.infoItem}>
-                  <span className={styles.infoLabel}>الجنسية</span>
-                  <span className={styles.infoValue}>{beneficiary.nationality}</span>
-                </div>
-                <div className={styles.infoItem}>
-                  <span className={styles.infoLabel}>الجنس</span>
-                  <span className={styles.infoValue}>{beneficiary.gender}</span>
-                </div>
-                <div className={styles.infoItem}>
+                {/* phone */}
+                <div className={styles.infoItem} style={{ position: 'relative' }}>
                   <span className={styles.infoLabel}>رقم الجوال</span>
-                  <span className={styles.infoValue}>
-                    <a href={`tel:${beneficiary.phone}`} className={styles.fileLink}>
-                      <span className={styles.linkIcon}>📞</span>
-                      {beneficiary.phone}
-                    </a>
+                  <span
+                    className={styles.infoValue}
+                    style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}
+                    onMouseEnter={e => {
+                      const icon = e.currentTarget.querySelector('.edit-icon') as HTMLElement;
+                      if (icon) icon.style.visibility = 'visible';
+                    }}
+                    onMouseLeave={e => {
+                      const icon = e.currentTarget.querySelector('.edit-icon') as HTMLElement;
+                      if (icon) icon.style.visibility = 'hidden';
+                    }}
+                  >
+                    {editingField === 'phone' ? (
+                      <input
+                        type="text"
+                        value={editedBeneficiary?.phone || ''}
+                        autoFocus
+                        onChange={e => handleEditChange('phone', e.target.value)}
+                        onBlur={() => setEditingField(null)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') setEditingField(null);
+                        }}
+                        className={styles.editInput}
+                      />
+                    ) : (
+                      <a href={`tel:${editedBeneficiary?.phone}`} className={styles.fileLink}>
+                        <span className={styles.linkIcon}>📞</span>
+                        <span className={styles.editableField}>{editedBeneficiary?.phone}</span>
+                      </a>
+                    )}
+                    <span
+                      className={`edit-icon ${styles.editIcon}`}
+                      style={{
+                        marginRight: 8,
+                        cursor: 'pointer',
+                        visibility: 'hidden',
+                        position: 'static',
+                        display: 'inline-block',
+                      }}
+                      onClick={() => setEditingField('phone')}
+                    >
+                      ✏️
+                    </span>
                   </span>
                 </div>
-                <div className={styles.infoItem}>
-                  <span className={styles.infoLabel}>البريد الإلكتروني</span>
-                  <span className={styles.infoValue}>
-                    <a href={`mailto:${beneficiary.email}`} className={styles.fileLink}>
-                      <span className={styles.linkIcon}>📧</span>
-                      {beneficiary.email}
-                    </a>
+                {/* gender */}
+                <div className={styles.infoItem} style={{ position: 'relative' }}>
+                  <span className={styles.infoLabel}>الجنس</span>
+                  <span
+                    className={styles.infoValue}
+                    style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}
+                    onMouseEnter={e => {
+                      const icon = e.currentTarget.querySelector('.edit-icon') as HTMLElement;
+                      if (icon) icon.style.visibility = 'visible';
+                    }}
+                    onMouseLeave={e => {
+                      const icon = e.currentTarget.querySelector('.edit-icon') as HTMLElement;
+                      if (icon) icon.style.visibility = 'hidden';
+                    }}
+                  >
+                    {editingField === 'gender' ? (
+                      <Select
+                        options={genderOptions}
+                        value={genderOptions.find(opt => opt.value === editedBeneficiary?.gender)}
+                        onChange={option => handleEditChange('gender', option?.value)}
+                        onBlur={() => setEditingField(null)}
+                        classNamePrefix="customSelect"
+                        autoFocus
+                        menuPlacement="auto"
+                        styles={{
+                          control: (base) => ({
+                            ...base,
+                            borderRadius: 8,
+                            borderColor: '#b0c4de',
+                            minHeight: 44,
+                            fontSize: 16,
+                            fontWeight: 500,
+                            background: '#f0f6ff',
+                            color: '#374151',
+                            boxShadow: 'none',
+                            '&:hover': { borderColor: 'rgb(58, 61, 108)' }
+                          }),
+                          option: (base, state) => ({
+                            ...base,
+                            background: state.isSelected
+                              ? '#e8f2ff'
+                              : state.isFocused
+                              ? '#d1e7ff'
+                              : '#fff',
+                            color: '#374151',
+                            fontSize: 16,
+                            fontWeight: 500,
+                            direction: 'rtl',
+                            textAlign: 'right',
+                            cursor: 'pointer',
+                          }),
+                          menu: (base) => ({
+                            ...base,
+                            borderRadius: 8,
+                            zIndex: 9999,
+                            direction: 'rtl',
+                            textAlign: 'right'
+                          })
+                        }}
+                        isRtl
+                        placeholder="اختر"
+                      />
+                    ) : (
+                      <span className={styles.editableField}>{editedBeneficiary?.gender}</span>
+                    )}
+                    <span
+                      className={`edit-icon ${styles.editIcon}`}
+                      style={{
+                        marginRight: 8,
+                        cursor: 'pointer',
+                        visibility: 'hidden',
+                        position: 'static',
+                        display: 'inline-block',
+                      }}
+                      onClick={() => setEditingField('gender')}
+                    >
+                      ✏️
+                    </span>
                   </span>
                 </div>
-                <div className={styles.infoItem}>
+                {/* birthDate */}
+                <div className={styles.infoItem} style={{ position: 'relative' }}>
                   <span className={styles.infoLabel}>تاريخ الميلاد</span>
-                  <span className={styles.infoValue}>{formatDate(beneficiary.birthDate)} ({beneficiary.dateType})</span>
+                  <span
+                    className={styles.infoValue}
+                    style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}
+                    onMouseEnter={e => {
+                      const icon = e.currentTarget.querySelector('.edit-icon') as HTMLElement;
+                      if (icon) icon.style.visibility = 'visible';
+                    }}
+                    onMouseLeave={e => {
+                      const icon = e.currentTarget.querySelector('.edit-icon') as HTMLElement;
+                      if (icon) icon.style.visibility = 'hidden';
+                    }}
+                  >
+                    {editingField === 'birthDate' ? (
+                      <input
+                        type="text"
+                        value={editedBeneficiary?.birthDate || ''}
+                        autoFocus
+                        onChange={e => handleEditChange('birthDate', e.target.value)}
+                        onBlur={() => setEditingField(null)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') setEditingField(null);
+                        }}
+                        className={styles.editInput}
+                      />
+                    ) : (
+                      <span className={styles.editableField}>{formatDate(editedBeneficiary?.birthDate || '')} ({editedBeneficiary?.dateType})</span>
+                    )}
+                    <span
+                      className={`edit-icon ${styles.editIcon}`}
+                      style={{
+                        marginRight: 8,
+                        cursor: 'pointer',
+                        visibility: 'hidden',
+                        position: 'static',
+                        display: 'inline-block',
+                      }}
+                      onClick={() => setEditingField('birthDate')}
+                    >
+                      ✏️
+                    </span>
+                  </span>
                 </div>
-                <div className={styles.infoItem}>
-                  <span className={styles.infoLabel}>الحالة الاجتماعية</span>
-                  <span className={styles.infoValue}>{beneficiary.maritalStatus}</span>
-                </div>
-                <div className={styles.infoItem}>
-                  <span className={styles.infoLabel}>المهنة</span>
-                  <span className={styles.infoValue}>{beneficiary.jobStatus}</span>
-                </div>
-                <div className={styles.infoItem}>
+                {/* healthStatus */}
+                <div className={styles.infoItem} style={{ position: 'relative' }}>
                   <span className={styles.infoLabel}>الحالة الصحية</span>
-                  <span className={styles.infoValue}>{beneficiary.healthStatus}</span>
+                  <span
+                    className={styles.infoValue}
+                    style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}
+                    onMouseEnter={e => {
+                      const icon = e.currentTarget.querySelector('.edit-icon') as HTMLElement;
+                      if (icon) icon.style.visibility = 'visible';
+                    }}
+                    onMouseLeave={e => {
+                      const icon = e.currentTarget.querySelector('.edit-icon') as HTMLElement;
+                      if (icon) icon.style.visibility = 'hidden';
+                    }}
+                  >
+                    {editingField === 'healthStatus' ? (
+                      <Select
+                        options={healthStatusOptions}
+                        value={healthStatusOptions.find(opt => opt.value === editedBeneficiary?.healthStatus)}
+                        onChange={option => handleEditChange('healthStatus', option?.value)}
+                        onBlur={() => setEditingField(null)}
+                        classNamePrefix="customSelect"
+                        autoFocus
+                        menuPlacement="auto"
+                        styles={{
+                          control: (base) => ({
+                            ...base,
+                            borderRadius: 8,
+                            borderColor: '#b0c4de',
+                            minHeight: 44,
+                            fontSize: 16,
+                            fontWeight: 500,
+                            background: '#f0f6ff',
+                            color: '#374151',
+                            boxShadow: 'none',
+                            '&:hover': { borderColor: 'rgb(58, 61, 108)' }
+                          }),
+                          option: (base, state) => ({
+                            ...base,
+                            background: state.isSelected
+                              ? '#e8f2ff'
+                              : state.isFocused
+                              ? '#d1e7ff'
+                              : '#fff',
+                            color: '#374151',
+                            fontSize: 16,
+                            fontWeight: 500,
+                            direction: 'rtl',
+                            textAlign: 'right',
+                            cursor: 'pointer',
+                          }),
+                          menu: (base) => ({
+                            ...base,
+                            borderRadius: 8,
+                            zIndex: 9999,
+                            direction: 'rtl',
+                            textAlign: 'right'
+                          })
+                        }}
+                        isRtl
+                        placeholder="اختر"
+                      />
+                    ) : (
+                      <span className={styles.editableField}>{editedBeneficiary?.healthStatus}</span>
+                    )}
+                    <span
+                      className={`edit-icon ${styles.editIcon}`}
+                      style={{
+                        marginRight: 8,
+                        cursor: 'pointer',
+                        visibility: 'hidden',
+                        position: 'static',
+                        display: 'inline-block',
+                      }}
+                      onClick={() => setEditingField('healthStatus')}
+                    >
+                      ✏️
+                    </span>
+                  </span>
                 </div>
-                {beneficiary.disabilityType && (
-                  <div className={styles.infoItem}>
+                {/* disabilityType */}
+                {editedBeneficiary?.healthStatus === 'غير سليم' && (
+                  <div className={styles.infoItem} style={{ position: 'relative' }}>
                     <span className={styles.infoLabel}>نوع الإعاقة</span>
-                    <span className={styles.infoValue}>{beneficiary.disabilityType}</span>
+                    <span
+                      className={styles.infoValue}
+                      style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}
+                      onMouseEnter={e => {
+                        const icon = e.currentTarget.querySelector('.edit-icon') as HTMLElement;
+                        if (icon) icon.style.visibility = 'visible';
+                      }}
+                      onMouseLeave={e => {
+                        const icon = e.currentTarget.querySelector('.edit-icon') as HTMLElement;
+                        if (icon) icon.style.visibility = 'hidden';
+                      }}
+                    >
+                      {editingField === 'disabilityType' ? (
+                        <Select
+                          options={disabilityTypeOptions}
+                          value={disabilityTypeOptions.find(opt => opt.value === editedBeneficiary?.disabilityType)}
+                          onChange={option => handleEditChange('disabilityType', option?.value)}
+                          onBlur={() => setEditingField(null)}
+                          classNamePrefix="customSelect"
+                          autoFocus
+                          menuPlacement="auto"
+                          styles={{
+                            control: (base) => ({
+                              ...base,
+                              borderRadius: 8,
+                              borderColor: '#b0c4de',
+                              minHeight: 44,
+                              fontSize: 16,
+                              fontWeight: 500,
+                              background: '#f0f6ff',
+                              color: '#374151',
+                              boxShadow: 'none',
+                              '&:hover': { borderColor: 'rgb(58, 61, 108)' }
+                            }),
+                            option: (base, state) => ({
+                              ...base,
+                              background: state.isSelected
+                                ? '#e8f2ff'
+                                : state.isFocused
+                                ? '#d1e7ff'
+                                : '#fff',
+                              color: '#374151',
+                              fontSize: 16,
+                              fontWeight: 500,
+                              direction: 'rtl',
+                              textAlign: 'right',
+                              cursor: 'pointer',
+                            }),
+                            menu: (base) => ({
+                              ...base,
+                              borderRadius: 8,
+                              zIndex: 9999,
+                              direction: 'rtl',
+                              textAlign: 'right'
+                            })
+                          }}
+                          isRtl
+                          placeholder="اختر"
+                        />
+                      ) : (
+                        <span className={styles.editableField}>{editedBeneficiary?.disabilityType}</span>
+                      )}
+                      <span
+                        className={`edit-icon ${styles.editIcon}`}
+                        style={{
+                          marginRight: 8,
+                          cursor: 'pointer',
+                          visibility: 'hidden',
+                          position: 'static',
+                          display: 'inline-block',
+                        }}
+                        onClick={() => setEditingField('disabilityType')}
+                      >
+                        ✏️
+                      </span>
+                    </span>
                   </div>
                 )}
+                {/* maritalStatus */}
+                <div className={styles.infoItem} style={{ position: 'relative' }}>
+                  <span className={styles.infoLabel}>الحالة الاجتماعية</span>
+                  <span
+                    className={styles.infoValue}
+                    style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}
+                    onMouseEnter={e => {
+                      const icon = e.currentTarget.querySelector('.edit-icon') as HTMLElement;
+                      if (icon) icon.style.visibility = 'visible';
+                    }}
+                    onMouseLeave={e => {
+                      const icon = e.currentTarget.querySelector('.edit-icon') as HTMLElement;
+                      if (icon) icon.style.visibility = 'hidden';
+                    }}
+                  >
+                    {editingField === 'maritalStatus' ? (
+                      <Select
+                        options={maritalStatusOptions}
+                        value={maritalStatusOptions.find(opt => opt.value === editedBeneficiary?.maritalStatus)}
+                        onChange={option => handleEditChange('maritalStatus', option?.value)}
+                        onBlur={() => setEditingField(null)}
+                        classNamePrefix="customSelect"
+                        autoFocus
+                        menuPlacement="auto"
+                        styles={{
+                          control: (base) => ({
+                            ...base,
+                            borderRadius: 8,
+                            borderColor: '#b0c4de',
+                            minHeight: 44,
+                            fontSize: 16,
+                            fontWeight: 500,
+                            background: '#f0f6ff',
+                            color: '#374151',
+                            boxShadow: 'none',
+                            '&:hover': { borderColor: 'rgb(58, 61, 108)' }
+                          }),
+                          option: (base, state) => ({
+                            ...base,
+                            background: state.isSelected
+                              ? '#e8f2ff'
+                              : state.isFocused
+                              ? '#d1e7ff'
+                              : '#fff',
+                            color: '#374151',
+                            fontSize: 16,
+                            fontWeight: 500,
+                            direction: 'rtl',
+                            textAlign: 'right',
+                            cursor: 'pointer',
+                          }),
+                          menu: (base) => ({
+                            ...base,
+                            borderRadius: 8,
+                            zIndex: 9999,
+                            direction: 'rtl',
+                            textAlign: 'right'
+                          })
+                        }}
+                        isRtl
+                        placeholder="اختر"
+                      />
+                    ) : (
+                      <span className={styles.editableField}>{editedBeneficiary?.maritalStatus}</span>
+                    )}
+                    <span
+                      className={`edit-icon ${styles.editIcon}`}
+                      style={{
+                        marginRight: 8,
+                        cursor: 'pointer',
+                        visibility: 'hidden',
+                        position: 'static',
+                        display: 'inline-block',
+                      }}
+                      onClick={() => setEditingField('maritalStatus')}
+                    >
+                      ✏️
+                    </span>
+                  </span>
+                </div>
+                {/* nationality */}
+                <div className={styles.infoItem} style={{ position: 'relative' }}>
+                  <span className={styles.infoLabel}>الجنسية</span>
+                  <span
+                    className={styles.infoValue}
+                    style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}
+                    onMouseEnter={e => {
+                      const icon = e.currentTarget.querySelector('.edit-icon') as HTMLElement;
+                      if (icon) icon.style.visibility = 'visible';
+                    }}
+                    onMouseLeave={e => {
+                      const icon = e.currentTarget.querySelector('.edit-icon') as HTMLElement;
+                      if (icon) icon.style.visibility = 'hidden';
+                    }}
+                  >
+                    {editingField === 'nationality' ? (
+                      <input
+                        type="text"
+                        value={editedBeneficiary?.nationality || ''}
+                        autoFocus
+                        onChange={e => handleEditChange('nationality', e.target.value)}
+                        onBlur={() => setEditingField(null)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') setEditingField(null);
+                        }}
+                        className={styles.editInput}
+                      />
+                    ) : (
+                      <span className={styles.editableField}>{editedBeneficiary?.nationality}</span>
+                    )}
+                    <span
+                      className={`edit-icon ${styles.editIcon}`}
+                      style={{
+                        marginRight: 8,
+                        cursor: 'pointer',
+                        visibility: 'hidden',
+                        position: 'static',
+                        display: 'inline-block',
+                      }}
+                      onClick={() => setEditingField('nationality')}
+                    >
+                      ✏️
+                    </span>
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -499,25 +1069,148 @@ const BeneficiaryDetailsPage = () => {
           </div>
           <div className={styles.detailsInfo}>
             <div className={styles.infoGrid}>
-              <div className={styles.infoItem}>
+              {/* Editable cityOfResidence */}
+              <div className={styles.infoItem} style={{ position: 'relative' }}>
                 <span className={styles.infoLabel}>المدينة</span>
-                <span className={styles.infoValue}>{beneficiary.cityOfResidence}</span>
+                <span
+                  className={styles.infoValue}
+                  style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}
+                  onMouseEnter={e => {
+                    const icon = e.currentTarget.querySelector('.edit-icon') as HTMLElement;
+                    if (icon) icon.style.visibility = 'visible';
+                  }}
+                  onMouseLeave={e => {
+                    const icon = e.currentTarget.querySelector('.edit-icon') as HTMLElement;
+                    if (icon) icon.style.visibility = 'hidden';
+                  }}
+                >
+                  {editingField === 'cityOfResidence' ? (
+                    <input
+                      type="text"
+                      value={editedBeneficiary?.cityOfResidence || ''}
+                      autoFocus
+                      onChange={e => handleEditChange('cityOfResidence', e.target.value)}
+                      onBlur={() => setEditingField(null)}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') setEditingField(null);
+                      }}
+                      className={styles.editInput}
+                    />
+                  ) : (
+                    <span className={styles.editableField}>{editedBeneficiary?.cityOfResidence}</span>
+                  )}
+                  <span
+                    className={`edit-icon ${styles.editIcon}`}
+                    style={{
+                      marginRight: 8,
+                      cursor: 'pointer',
+                      visibility: 'hidden',
+                      position: 'static',
+                      display: 'inline-block',
+                    }}
+                    onClick={() => setEditingField('cityOfResidence')}
+                  >
+                    ✏️
+                  </span>
+                </span>
               </div>
-              <div className={styles.infoItem}>
+              {/* Editable district */}
+              <div className={styles.infoItem} style={{ position: 'relative' }}>
                 <span className={styles.infoLabel}>الحي</span>
-                <span className={styles.infoValue}>{beneficiary.district}</span>
+                <span
+                  className={styles.infoValue}
+                  style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}
+                  onMouseEnter={e => {
+                    const icon = e.currentTarget.querySelector('.edit-icon') as HTMLElement;
+                    if (icon) icon.style.visibility = 'visible';
+                  }}
+                  onMouseLeave={e => {
+                    const icon = e.currentTarget.querySelector('.edit-icon') as HTMLElement;
+                    if (icon) icon.style.visibility = 'hidden';
+                  }}
+                >
+                  {editingField === 'district' ? (
+                    <input
+                      type="text"
+                      value={editedBeneficiary?.district || ''}
+                      autoFocus
+                      onChange={e => handleEditChange('district', e.target.value)}
+                      onBlur={() => setEditingField(null)}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') setEditingField(null);
+                      }}
+                      className={styles.editInput}
+                    />
+                  ) : (
+                    <span className={styles.editableField}>{editedBeneficiary?.district}</span>
+                  )}
+                  <span
+                    className={`edit-icon ${styles.editIcon}`}
+                    style={{
+                      marginRight: 8,
+                      cursor: 'pointer',
+                      visibility: 'hidden',
+                      position: 'static',
+                      display: 'inline-block',
+                    }}
+                    onClick={() => setEditingField('district')}
+                  >
+                    ✏️
+                  </span>
+                </span>
               </div>
-              <div className={styles.infoItem}>
+              {/* housingType read-only */}
+              <div className={styles.infoItem} style={{ position: 'relative' }}>
                 <span className={styles.infoLabel}>نوع السكن</span>
                 <span className={styles.infoValue}>{beneficiary.housingType}</span>
               </div>
               {beneficiary.housingType === "إيجار" && (
-                <div className={styles.infoItem}>
+                <div className={styles.infoItem} style={{ position: 'relative' }}>
                   <span className={styles.infoLabel}>مبلغ الإيجار</span>
-                  <span className={styles.infoValue}>{beneficiary.rentAmount} ريال</span>
+                  <span
+                    className={styles.infoValue}
+                    style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}
+                    onMouseEnter={e => {
+                      const icon = e.currentTarget.querySelector('.edit-icon') as HTMLElement;
+                      if (icon) icon.style.visibility = 'visible';
+                    }}
+                    onMouseLeave={e => {
+                      const icon = e.currentTarget.querySelector('.edit-icon') as HTMLElement;
+                      if (icon) icon.style.visibility = 'hidden';
+                    }}
+                  >
+                    {editingField === 'rentAmount' ? (
+                      <input
+                        type="text"
+                        value={editedBeneficiary?.rentAmount || ''}
+                        autoFocus
+                        onChange={e => handleEditChange('rentAmount', e.target.value)}
+                        onBlur={() => setEditingField(null)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') setEditingField(null);
+                        }}
+                        className={styles.editInput}
+                      />
+                    ) : (
+                      <span className={styles.editableField}>{editedBeneficiary?.rentAmount} ريال</span>
+                    )}
+                    <span
+                      className={`edit-icon ${styles.editIcon}`}
+                      style={{
+                        marginRight: 8,
+                        cursor: 'pointer',
+                        visibility: 'hidden',
+                        position: 'static',
+                        display: 'inline-block',
+                      }}
+                      onClick={() => setEditingField('rentAmount')}
+                    >
+                      ✏️
+                    </span>
+                  </span>
                 </div>
               )}
-              <div className={styles.infoItem}>
+              <div className={styles.infoItem} style={{ position: 'relative' }}>
                 <span className={styles.infoLabel}>عقد الإيجار</span>
                 <span className={styles.infoValue}>
                   {beneficiary.rentContractFile ? (
@@ -559,9 +1252,84 @@ const BeneficiaryDetailsPage = () => {
           </div>
           <div className={styles.detailsInfo}>
             <div className={styles.infoGrid}>
-              <div className={styles.infoItem}>
+              <div className={styles.infoItem} style={{ position: 'relative' }}>
                 <span className={styles.infoLabel}>اسم البنك</span>
-                <span className={styles.infoValue}>{beneficiary.bankName}</span>
+                <span
+                  className={styles.infoValue}
+                  style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}
+                  onMouseEnter={e => {
+                    const icon = e.currentTarget.querySelector('.edit-icon') as HTMLElement;
+                    if (icon) icon.style.visibility = 'visible';
+                  }}
+                  onMouseLeave={e => {
+                    const icon = e.currentTarget.querySelector('.edit-icon') as HTMLElement;
+                    if (icon) icon.style.visibility = 'hidden';
+                  }}
+                >
+                  {editingField === 'bankName' ? (
+                    <Select
+                      options={bankOptions}
+                      value={bankOptions.find(opt => opt.value === editedBeneficiary?.bankName)}
+                      onChange={option => handleEditChange('bankName', option?.value)}
+                      onBlur={() => setEditingField(null)}
+                      classNamePrefix="customSelect"
+                      autoFocus
+                      menuPlacement="auto"
+                      styles={{
+                        control: (base) => ({
+                          ...base,
+                          borderRadius: 8,
+                          borderColor: '#b0c4de',
+                          minHeight: 44,
+                          fontSize: 16,
+                          fontWeight: 500,
+                          background: '#f0f6ff',
+                          color: '#374151',
+                          boxShadow: 'none',
+                          '&:hover': { borderColor: 'rgb(58, 61, 108)' }
+                        }),
+                        option: (base, state) => ({
+                          ...base,
+                          background: state.isSelected
+                            ? '#e8f2ff'
+                            : state.isFocused
+                            ? '#d1e7ff'
+                            : '#fff',
+                          color: '#374151',
+                          fontSize: 16,
+                          fontWeight: 500,
+                          direction: 'rtl',
+                          textAlign: 'right',
+                          cursor: 'pointer',
+                        }),
+                        menu: (base) => ({
+                          ...base,
+                          borderRadius: 8,
+                          zIndex: 9999,
+                          direction: 'rtl',
+                          textAlign: 'right'
+                        })
+                      }}
+                      isRtl
+                      placeholder="اختر البنك"
+                    />
+                  ) : (
+                    <span className={styles.editableField}>{editedBeneficiary?.bankName}</span>
+                  )}
+                  <span
+                    className={`edit-icon ${styles.editIcon}`}
+                    style={{
+                      marginRight: 8,
+                      cursor: 'pointer',
+                      visibility: 'hidden',
+                      position: 'static',
+                      display: 'inline-block',
+                    }}
+                    onClick={() => setEditingField('bankName')}
+                  >
+                    ✏️
+                  </span>
+                </span>
               </div>
               <div className={styles.infoItem}>
                 <span className={styles.infoLabel}>صورة الآيبان</span>
@@ -600,25 +1368,242 @@ const BeneficiaryDetailsPage = () => {
                   <th>الاسم</th>
                   <th>رقم الهوية</th>
                   <th>تاريخ الميلاد</th>
-                  <th>الجنس</th>
                   <th>صلة القرابة</th>
                   <th>المرحلة الدراسية</th>
+                  <th>الصف</th>
                   <th>الحالة الصحية</th>
                   <th>نوع الإعاقة</th>
                 </tr>
               </thead>
               <tbody>
-                {beneficiary.housemates.map((housemate, index) => (
+                {editedBeneficiary && editedBeneficiary.housemates.map((housemate, index) => (
                   <tr key={index}>
                     <td>{index + 1}</td>
-                    <td>{housemate.name}</td>
-                    <td>{housemate.identityNumber}</td>
+                    {/* name */}
+                    <td style={{ position: 'relative' }}>
+                      {editingField === `name-${index}` ? (
+                        <input
+                          type="text"
+                          value={housemate.name}
+                          autoFocus
+                          onChange={e => {
+                            const newHousemates = [...editedBeneficiary.housemates];
+                            newHousemates[index].name = e.target.value;
+                            setEditedBeneficiary({ ...editedBeneficiary, housemates: newHousemates });
+                          }}
+                          onBlur={() => setEditingField(null)}
+                          onKeyDown={e => { if (e.key === 'Enter') setEditingField(null); }}
+                          className={styles.editInput}
+                        />
+                      ) : (
+                        <span className={styles.infoValue}>
+                          {housemate.name}
+                          <span
+                            className={`edit-icon ${styles.editIcon}`}
+                            onClick={() => setEditingField(`name-${index}`)}
+                          >
+                            ✏️
+                          </span>
+                        </span>
+                      )}
+                    </td>
+                    {/* identityNumber */}
+                    <td style={{ position: 'relative' }}>
+                      {editingField === `identityNumber-${index}` ? (
+                        <input
+                          type="text"
+                          value={housemate.identityNumber}
+                          autoFocus
+                          onChange={e => {
+                            const newHousemates = [...editedBeneficiary.housemates];
+                            newHousemates[index].identityNumber = e.target.value;
+                            setEditedBeneficiary({ ...editedBeneficiary, housemates: newHousemates });
+                          }}
+                          onBlur={() => setEditingField(null)}
+                          onKeyDown={e => { if (e.key === 'Enter') setEditingField(null); }}
+                          className={styles.editInput}
+                        />
+                      ) : (
+                        <span className={styles.infoValue}>
+                          {housemate.identityNumber}
+                          <span
+                            className={`edit-icon ${styles.editIcon}`}
+                            onClick={() => setEditingField(`identityNumber-${index}`)}
+                          >
+                            ✏️
+                          </span>
+                        </span>
+                      )}
+                    </td>
+                    {/* birthDate */}
                     <td>{formatDate(housemate.birthDate)} ({housemate.dateType})</td>
-                    <td>{housemate.gender}</td>
-                    <td>{housemate.kinship}</td>
-                    <td>{housemate.studyLevel || "-"}</td>
-                    <td>{housemate.healthStatus || "-"}</td>
-                    <td>{housemate.disabilityType || "-"}</td>
+                    {/* kinship */}
+                    <td style={{ position: 'relative' }}>
+                      {editingField === `kinship-${index}` ? (
+                        <input
+                          type="text"
+                          value={housemate.kinship}
+                          autoFocus
+                          onChange={e => {
+                            const newHousemates = [...editedBeneficiary.housemates];
+                            newHousemates[index].kinship = e.target.value;
+                            setEditedBeneficiary({ ...editedBeneficiary, housemates: newHousemates });
+                          }}
+                          onBlur={() => setEditingField(null)}
+                          onKeyDown={e => { if (e.key === 'Enter') setEditingField(null); }}
+                          className={styles.editInput}
+                        />
+                      ) : (
+                        <span className={styles.infoValue}>
+                          {housemate.kinship}
+                          <span
+                            className={`edit-icon ${styles.editIcon}`}
+                            onClick={() => setEditingField(`kinship-${index}`)}
+                          >
+                            ✏️
+                          </span>
+                        </span>
+                      )}
+                    </td>
+                    {/* studyLevel */}
+                    <td style={{ position: 'relative' }}>
+                      {editingField === `studyLevel-${index}` ? (
+                        <select
+                          value={housemate.studyLevel || ''}
+                          autoFocus
+                          onChange={e => {
+                            const newHousemates = [...editedBeneficiary.housemates];
+                            newHousemates[index].studyLevel = e.target.value;
+                            // إذا تم اختيار جامعي، امسح الصف
+                            if (e.target.value === 'جامعي') newHousemates[index].studyGrade = '';
+                            setEditedBeneficiary({ ...editedBeneficiary, housemates: newHousemates });
+                          }}
+                          onBlur={() => setEditingField(null)}
+                          className={styles.editInput}
+                        >
+                          <option value="">اختر</option>
+                          <option value="ابتدائي">ابتدائي</option>
+                          <option value="متوسط">متوسط</option>
+                          <option value="ثانوي">ثانوي</option>
+                          <option value="جامعي">جامعي</option>
+                        </select>
+                      ) : (
+                        <span className={styles.infoValue}>
+                          {housemate.studyLevel || "-"}
+                          <span
+                            className={`edit-icon ${styles.editIcon}`}
+                            onClick={() => setEditingField(`studyLevel-${index}`)}
+                          >
+                            ✏️
+                          </span>
+                        </span>
+                      )}
+                    </td>
+                    {/* studyGrade */}
+                    <td style={{ position: 'relative' }}>
+                      {/* إذا كانت المرحلة جامعي، لا يظهر الصف */}
+                      {housemate.studyLevel === 'جامعي' ? (
+                        <span className={styles.infoValue}>-</span>
+                      ) : editingField === `studyGrade-${index}` ? (
+                        <select
+                          value={housemate.studyGrade || ''}
+                          autoFocus
+                          onChange={e => {
+                            const newHousemates = [...editedBeneficiary.housemates];
+                            newHousemates[index].studyGrade = e.target.value;
+                            setEditedBeneficiary({ ...editedBeneficiary, housemates: newHousemates });
+                          }}
+                          onBlur={() => setEditingField(null)}
+                          className={styles.editInput}
+                        >
+                          <option value="">اختر</option>
+                          {housemate.studyLevel === 'ابتدائي' && [1,2,3,4,5,6].map(n => (
+                            <option key={n} value={n}>{n}</option>
+                          ))}
+                          {(housemate.studyLevel === 'متوسط' || housemate.studyLevel === 'ثانوي') && [1,2,3].map(n => (
+                            <option key={n} value={n}>{n}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <span className={styles.infoValue}>
+                          {housemate.studyLevel === 'جامعي' ? '-' : (housemate.studyGrade || '-')}
+                          {housemate.studyLevel !== 'جامعي' && (
+                            <span
+                              className={`edit-icon ${styles.editIcon}`}
+                              onClick={() => setEditingField(`studyGrade-${index}`)}
+                            >
+                              ✏️
+                            </span>
+                          )}
+                        </span>
+                      )}
+                    </td>
+                    {/* healthStatus */}
+                    <td style={{ position: 'relative' }}>
+                      {editingField === `healthStatus-${index}` ? (
+                        <select
+                          value={housemate.healthStatus || ''}
+                          autoFocus
+                          onChange={e => {
+                            const newHousemates = [...editedBeneficiary.housemates];
+                            newHousemates[index].healthStatus = e.target.value as 'سليم' | 'غير سليم';
+                            // إذا تم اختيار سليم، امسح نوع الإعاقة
+                            if (e.target.value === 'سليم') newHousemates[index].disabilityType = undefined;
+                            setEditedBeneficiary({ ...editedBeneficiary, housemates: newHousemates });
+                          }}
+                          onBlur={() => setEditingField(null)}
+                          className={styles.editInput}
+                        >
+                          <option value="">اختر</option>
+                          <option value="سليم">سليم</option>
+                          <option value="غير سليم">غير سليم</option>
+                        </select>
+                      ) : (
+                        <span className={styles.infoValue}>
+                          {housemate.healthStatus || "-"}
+                          <span
+                            className={`edit-icon ${styles.editIcon}`}
+                            onClick={() => setEditingField(`healthStatus-${index}`)}
+                          >
+                            ✏️
+                          </span>
+                        </span>
+                      )}
+                    </td>
+                    {/* disabilityType */}
+                    <td style={{ position: 'relative' }}>
+                      {housemate.healthStatus === 'غير سليم' ? (
+                        editingField === `disabilityType-${index}` ? (
+                          <select
+                            value={housemate.disabilityType || ''}
+                            autoFocus
+                            onChange={e => {
+                              const newHousemates = [...editedBeneficiary.housemates];
+                              newHousemates[index].disabilityType = e.target.value as 'مريض' | 'ذوي احتياجات خاصة';
+                              setEditedBeneficiary({ ...editedBeneficiary, housemates: newHousemates });
+                            }}
+                            onBlur={() => setEditingField(null)}
+                            className={styles.editInput}
+                          >
+                            <option value="">اختر</option>
+                            <option value="مريض">مريض</option>
+                            <option value="ذوي احتياجات خاصة">ذوي احتياجات خاصة</option>
+                          </select>
+                        ) : (
+                          <span className={styles.infoValue}>
+                            {housemate.disabilityType || "-"}
+                            <span
+                              className={`edit-icon ${styles.editIcon}`}
+                              onClick={() => setEditingField(`disabilityType-${index}`)}
+                            >
+                              ✏️
+                            </span>
+                          </span>
+                        )
+                      ) : (
+                        <span className={styles.infoValue}>-</span>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -690,6 +1675,16 @@ const BeneficiaryDetailsPage = () => {
                 <span className={styles.buttonText}>رفض</span>
               </button>
             </div>
+            {hasEdits && (
+              <div style={{ marginTop: 16, textAlign: 'center' }}>
+                <button className={styles.saveButton} onClick={handleSaveEdits}>
+                  حفظ التعديلات
+                </button>
+                {saveError && (
+                  <div style={{ color: 'red', marginTop: 8 }}>{saveError}</div>
+                )}
+              </div>
+            )}
           </div>
         )}
 

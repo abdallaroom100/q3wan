@@ -180,6 +180,17 @@
   line-height: 1.5;
 }
 
+.editIcon {
+  margin-right: 8px;
+  cursor: pointer;
+  visibility: hidden;
+  transition: visibility 0.2s;
+}
+
+.infoValue:hover .editIcon {
+  visibility: visible;
+}
+
 /* File Links */
 .fileLink {
   color: rgb(58, 61, 108);
@@ -334,7 +345,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 400px;
+  height: 100vh;
   background-color: #f0f6ff;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -470,4 +481,32 @@
 }
 .closePopupButton:hover {
   background: rgb(149, 122, 77);
+}
+
+.selectInput {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1.5px solid #b0c4de;
+  background-color: #f0f6ff;
+  color: #374151;
+  font-size: 16px;
+  font-weight: 500;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+  box-shadow: 0 1px 4px rgba(58, 61, 108, 0.04);
+  appearance: none;
+  cursor: pointer;
+}
+
+.selectInput:focus, .selectInput:hover {
+  border-color: rgb(58, 61, 108);
+  box-shadow: 0 2px 8px rgba(58, 61, 108, 0.10);
+  background-color: #e8f2ff;
+}
+
+.selectInput option {
+  color: #374151;
+  background: #fff;
+  font-size: 16px;
 } 

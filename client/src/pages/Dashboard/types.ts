@@ -5,6 +5,7 @@ export interface Housemate {
   gender: "ذكر" | "أنثى";
   kinship: string;
   studyLevel?: string;
+  studyGrade?: string;
   healthStatus?: "سليم" | "غير سليم";
   disabilityType?: "مريض" | "ذوي احتياجات خاصة";
   dateType?: 'هجري' | 'ميلادي';

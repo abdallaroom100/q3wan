@@ -14,7 +14,7 @@ const Footer = () => {
 
         <div className="footer-links">
           <h4>روابط سريعة</h4>
-          <ul>
+          <ul className=''>
             <li><a href="#">الرئيسية</a></li>
             <li><a href="#">عن الجمعية</a></li>
             <li><a href="#">مشاريع ثابتة</a></li>
