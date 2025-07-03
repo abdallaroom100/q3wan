@@ -8,17 +8,17 @@ const NewsSection = () => (
       <div className={styles.cards} style={{direction:"rtl"}}>
         {[
           {
-            img: "/img/q3wan1.jpg",
+            img: "/img/q3wan1.webp",
             title: " نبادر بالأضاحي.. لنرسم فرحة العيد" ,
             text: "",
           },
           {
-            img: "/img/q3wan2.jpg",
+            img: "/img/q3wan2.webp",
             title: "سخاؤكم جعل صيفهم أطيب",
             text: "",
           },
           {
-            img: "/img/q3wan3.jpg",
+            img: "/img/q3wan3.webp",
             title: "شكرًا لمن سعى وشكرًا لمن دعم",
             text: "",
           },

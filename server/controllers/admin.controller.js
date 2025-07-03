@@ -194,8 +194,60 @@ export const confirmBeneficiary  =  async (req,res)=>{
 }
 
 
+ export const deleteBeneficiary = async (req,res)=>{
 
+  try {
+    const {reportId}  = req.params
+    if(!mongoose.Types.ObjectId.isValid(reportId))
+      return res.status(400).json({error:"رقم المعرف هذا غير صالح"})
 
+    
+     const currentAdmin = await Admin.findById(req.adminId)
+     if(!currentAdmin) return res.status(400).json({error:"بيانات الادمن غير موجوده"})
+     const currentReport= await Report.findById(reportId)
+    if(!currentReport){
+      return res.status(401).json({error:"التقرير هذا غير موجود"})
+    } 
+    
+   await User.findByIdAndDelete(currentReport.user._id)
+   await Report.findByIdAndDelete(currentReport._id)
+   res.status(200).json({success:true,message:"تم حذف بيانات المستفيد"})
+
+  } catch (error) {
+    console.log(error.message)
+
+    console.log("error in reject beneficiary")
+  }
+ }
+
+ export const editBeneficiaryData = async (req,res) =>{
+
+  try {
+    const {reportId} = req.params 
+   const { firstName,
+      secondName,
+      thirdName,
+      lastName,
+      identityNumber,
+      phone,
+      gender,
+      birthDate,
+      maritalStatus,
+      nationality,
+      cityOfResidence,
+      jobStatus,
+      healthStatus,
+      disabilityType,
+      district,
+      rentAmount,
+      bankName,
+      housemate,
+    } = req.body
+  } catch (error) {
+        console.log("error in edit beneficiary data")
+    console.log(error.message)
+  }
+ }
 // committee abilities
 
 export const decideIfBeneficiaryIsDeserve = async (req,res) =>{
