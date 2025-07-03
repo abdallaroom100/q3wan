@@ -1,10 +1,10 @@
 import axios from "axios"
 import React, { SetStateAction, useEffect } from "react";
+import { setupCache } from "axios-cache-interceptor";
 
-
+const cacheAxios = setupCache(axios)
 
  export const useGetCurrentAdminTasks =  ({setCurrentAdminTasks,setLoading} :{setCurrentAdminTasks:React.Dispatch<SetStateAction<any[]>>,setLoading:React.Dispatch<SetStateAction<boolean>>}) =>{
-
 
      let adminToken:string ;
      try {
@@ -17,10 +17,13 @@ import React, { SetStateAction, useEffect } from "react";
      }
      const getCurrentTasks = async () =>{
           setLoading(true)
-        await axios.get("/admin/tasks",{
+        await cacheAxios.get("/admin/tasks",{
             headers:{
                 "Content-Type":"application/json",
                 "authorization":`Bearer ${adminToken}`
+            },
+            cache:{
+                ttl:1000 * 60 *5
             }
         }).then((res)=>{
           

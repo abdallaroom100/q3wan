@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import styles from "./BeneficiaryDetails.module.css";
 import { Beneficiary, RequestHistory } from "../Dashboard/types";
 import { useGetCurrentReportData } from "../Dashboard/hooks/useGetCurrentReportData";
+import { MoonLoader } from "react-spinners";
 
 // بيانات تجريبية - في المستقبل ستأتي من API
 const mockBeneficiaries: Beneficiary[] = [
@@ -338,13 +339,21 @@ const BeneficiaryDetailsPage = () => {
   }
 
   if (!beneficiary) {
-    return (
-      <div className={styles.errorContainer}>
+    setTimeout(() => {
+     return <div className={styles.errorContainer}>
         <h2>لم يتم العثور على المستفيد</h2>
         <button onClick={handleBack} className={styles.backButton}>
           العودة للوحة التحكم
         </button>
       </div>
+    }, 200);
+    return (
+           <div className="w-full h-screen flex justify-center items-center ">
+        <MoonLoader />
+      </div>
+      
+      
+     
     );
   }
 

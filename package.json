@@ -3,10 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-   
-    "client":"npm start --prefix client",
-    "server":"npm start --prefix server",
-    "dev":"concurrently \"npm run server\" \"npm run client\""
+    "client": "npm start --prefix client",
+    "server": "npm start --prefix server",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "keywords": [],
   "author": "",
@@ -14,5 +13,8 @@
   "description": "",
   "devDependencies": {
     "concurrently": "^9.2.0"
+  },
+  "dependencies": {
+    "axios-cache-interceptor": "^1.8.0"
   }
 }
