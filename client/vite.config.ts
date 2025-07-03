@@ -28,10 +28,10 @@ export default defineConfig({
       usePolling: true
     },
      proxy: {
-      '/user': 'http://localhost:5000',
+      '/user': 'http://localhost:4000',
       // لو عندك مسارات تانية أضفها هنا
       // '/api': 'http://localhost:5000'
-      '/admin': 'http://localhost:5000'
+      '/admin': 'http://localhost:4000'
     }
   }
 })
