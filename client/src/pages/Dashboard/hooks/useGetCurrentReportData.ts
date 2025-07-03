@@ -19,7 +19,7 @@ export const useGetCurrentReportData = (reportId: string) => {
   const getReportDetails = async (reportId: string) => {
     setLoading(true);
     await axios
-      .get(`http://localhost:5000/admin/reportDetails/${reportId}`, {
+      .get(`/admin/reportDetails/${reportId}`, {
         headers: {
           "Content-Type": "application/json",
           authorization: `Bearer ${token}`,

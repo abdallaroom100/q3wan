@@ -17,7 +17,7 @@ const useSignUpUser = () => {
     
     try {
       // const res = await axios.post(`${import.meta.env.VITE_NODE_ENV  == 'development' ? "http://localhost:5000":"https://children-khaki.vercel.app"}/user/signup`, signupData);
-      const res = await axios.post("http://localhost:5000/user/signup", signupData);
+      const res = await axios.post("/user/signup", signupData);
       setUserData(res.data); // ✅ تحديث state
       return { success: true, userData: res.data };
     } catch (err: any) {

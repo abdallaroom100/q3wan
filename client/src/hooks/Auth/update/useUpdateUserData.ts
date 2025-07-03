@@ -19,7 +19,7 @@ const useUpdateUserData = () => {
     try {
       // await axios.patch("https://children-khaki.vercel.app/user/update", formData, {
       console.log(formData)
-      await axios.patch("http://localhost:5000/user/testupdate", formData, {
+      await axios.patch("/user/testupdate", formData, {
         headers: {
           "Authorization": `Bearer ${currentUserToken}`,
           "Content-Type": "multipart/form-data"

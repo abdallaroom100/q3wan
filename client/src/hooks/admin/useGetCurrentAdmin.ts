@@ -24,7 +24,7 @@ const useGetCurrentAdmin = () => {
   const getCurrentAdmin = async () => {
     setIsLoading(true);
     await axios
-      .get("http://localhost:5000/admin/me",{
+      .get("/admin/me",{
         headers:{
             "Content-Type":"application/json",
             "authorization":`Bearer ${token}`
@@ -38,7 +38,7 @@ const useGetCurrentAdmin = () => {
       .catch((error) => {
         setError(error.response.data.error)
         console.log(error.response.data.error)
-        navigate("/admin-login")
+        navigate("/dashboard/login")
         // hotToast({ type: "error", message: error.response.data.error });
       })
       .finally(() => setIsLoading(false));

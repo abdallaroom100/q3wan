@@ -13,7 +13,7 @@ const useLoginUser = () => {
   }> => {
     try {
       const response = await axios.post(
-        "http://localhost:5000/user/login",
+        "/user/login",
         loginData
       );
        dispatch(setUser(response.data))

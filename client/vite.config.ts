@@ -4,6 +4,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [
     react(),
+  
   ],
   build: {
     target: 'esnext',
@@ -25,6 +26,12 @@ export default defineConfig({
     hmr: true,
     watch: {
       usePolling: true
+    },
+     proxy: {
+      '/user': 'http://localhost:5000',
+      // لو عندك مسارات تانية أضفها هنا
+      // '/api': 'http://localhost:5000'
+      '/admin': 'http://localhost:5000'
     }
   }
 })

@@ -23,7 +23,7 @@ const Dashboard = () => {
     }
   }, []);
 
-  const handleTabClick = (tab) => {
+  const handleTabClick = (tab:string) => {
     setActiveTab(tab);
     setIsMenuOpen(false);
   };
@@ -129,7 +129,7 @@ const Dashboard = () => {
                 setIsMenuOpen(false);
                 localStorage.removeItem("admin")
                 dispatch(logoutAdmin())
-                history("/admin-login")
+                history("/dashboard/login")
               }}
             >
               تسجيل الخروج

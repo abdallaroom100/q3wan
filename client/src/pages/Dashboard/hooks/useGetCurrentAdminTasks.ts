@@ -17,7 +17,7 @@ import React, { SetStateAction, useEffect } from "react";
      }
      const getCurrentTasks = async () =>{
           setLoading(true)
-        await axios.get("http://localhost:5000/admin/tasks",{
+        await axios.get("/admin/tasks",{
             headers:{
                 "Content-Type":"application/json",
                 "authorization":`Bearer ${adminToken}`

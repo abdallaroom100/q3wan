@@ -63,7 +63,7 @@ const useFetchCurrentUser = () => {
     setError(undefined)
     try {
       // const response = axios.get(`${import.meta.env.VITE_NODE_ENV == 'development' ? "http://localhost:5000":"https://children-khaki.vercel.app"}/user/me`,{
-      const response = axios.get("http://localhost:5000/user/me",{
+      const response = axios.get("/user/me",{
         headers:{
           "Authorization":`Bearer ${currentUserToken}`
         }

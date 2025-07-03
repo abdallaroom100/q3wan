@@ -63,7 +63,7 @@ function App() {
           </Layout>}>
 
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/admin-login" element={<AdminLogin />} />
+          <Route path="/dashboard/login" element={<AdminLogin />} />
           <Route path="/dashboard/beneficiary/:id" element={<BeneficiaryDetails />} />
           </Route>
         </Routes>

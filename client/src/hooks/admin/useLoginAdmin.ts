@@ -8,7 +8,7 @@ export const useLoginAdmin = () => {
      let error:string | null = null
   const loginAdmin = async (email:string,password:string) =>{
           
-          await axios.post("http://localhost:5000/admin/login",{email,password})
+          await axios.post("/admin/login",{email,password})
           .then((res)=>{
               localStorage.setItem("admin",JSON.stringify(res.data.admin))
            admin = res.data?.admin

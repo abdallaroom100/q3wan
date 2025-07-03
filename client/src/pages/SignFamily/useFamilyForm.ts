@@ -45,10 +45,10 @@ export interface UserData {
   ibanImage?: string | File | null;
   numberOfFacilities?: number;
   numberOfMales?: number;
-  housemate?: Housemate[];
+  housemate?: Housemate[] |null;
   birthDatetype?: string;
   rentImage?: string;
-  facilitiesInfo?: any[];
+  facilitiesInfo?: Housemate[] ;
 }
 
 export interface IncomeSource {
@@ -101,6 +101,7 @@ export function useFamilyForm(userData?: UserData) {
   useEffect(() => {
     const saved = localStorage.getItem(FORM_KEY);
     if (!saved && userData) {
+      
       setFormData({
         ...userData,
         housemate: Array.isArray(userData.facilitiesInfo) && userData.facilitiesInfo.length > 0 ? userData.facilitiesInfo : null,

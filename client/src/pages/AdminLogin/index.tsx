@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import hotToast from "../../common/hotToast";
 import useLoginAdmin from "../../hooks/admin/useLoginAdmin";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { assignAdmin } from "../../store/slices/dashboard/AdminSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const fadeInStyle: React.CSSProperties = {
   animation: 'fadeIn 0.7s',
@@ -15,6 +15,13 @@ const AdminLogin = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate()
   const dispatch = useDispatch()
+  const checkAdmin = useSelector((state:Record<string,any>)=>state.admin.admin)
+  useEffect(() => {
+     if(checkAdmin){
+       navigate("/dashboard")
+     }
+    
+   }, [checkAdmin]);
    const {loginAdmin} = useLoginAdmin()
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
