@@ -6,6 +6,7 @@ import React from "react";
 import { FaUser, FaHome, FaUsers } from 'react-icons/fa';
 import ProgressSteps from '../../components/ProgressSteps';
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 // تعريف سنوات وشهور وأيام الهجري
 const hijriYears: number[] = Array.from({length: 201}, (_, i) => 1300 + i); // 1300-1500
@@ -164,12 +165,9 @@ function validateForm(formData: UserData, companions: any[], incomeSources: Inco
   return { valid: true };
 }
 
-const SignFamily = ({
-  userData,
-}: {
-  userData: UserData |undefined;
-}) => {
-   
+const SignFamily = () => {
+  const [companions, setCompanions] = useState<any[]>([]);
+    const userData = useSelector((state:any)=>state.user.user)
    // Safely parse signFamilyFormData from localStorage, fallback to empty object if not present or invalid
    const singfamily = (() => {
      try {
@@ -202,7 +200,6 @@ const SignFamily = ({
   const currentHijriYear = getCurrentHijriYear();
   const [companionsCount, setCompanionsCount] = useState<number>(0);
   const [maleCount, setMaleCount] = useState<number>(0);
-  const [companions, setCompanions] = useState<any[]>([]);
   const [incomeSources, setIncomeSources] = useState<IncomeSource[]>(() => {
     // جلب من user في localStorage أولاً
     const userStr = localStorage.getItem('user');
@@ -586,6 +583,12 @@ const SignFamily = ({
         ...userData,
         // أي تحويلات إضافية تحتاجها هنا
       });
+    }
+  }, [userData]);
+
+  useEffect(() => {
+    if (userData?.facilitiesInfo && Array.isArray(userData.facilitiesInfo)) {
+      setCompanions(userData.facilitiesInfo);
     }
   }, [userData]);
 

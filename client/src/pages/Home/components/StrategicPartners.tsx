@@ -284,6 +284,7 @@ const StrategicPartners: React.FC = () => {
               <PartnerCard key={partner.name}>
                 <PartnerLogoWrapper>
                   <PartnerLogo
+                  loading='lazy'
                     src={partner.logo}
                     alt={partner.name}
                   />

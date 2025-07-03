@@ -6,8 +6,6 @@ import { useGetCurrentReportData } from "../Dashboard/hooks/useGetCurrentReportD
 import { MoonLoader } from "react-spinners";
 import Select from 'react-select';
 
-
-
 const mockRequestHistory: RequestHistory[] = [
   {
     id: 1,
@@ -47,20 +45,15 @@ const useIsMobile = () => {
 
 const BeneficiaryDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
-
-  
-   const {error,loading,reportDetails} = useGetCurrentReportData(id || "")
+  const { error, loading, reportDetails } = useGetCurrentReportData(id || "");
   const navigate = useNavigate();
   const [beneficiary, setBeneficiary] = useState<Beneficiary | null>(null);
   const [editedBeneficiary, setEditedBeneficiary] = useState<Beneficiary | null>(null);
-  // const [loading, setLoading] = useState(true);
   const [printing, setPrinting] = useState(false);
-  // Popup state
   const [popupImage, setPopupImage] = useState<string | null>(null);
   const isMobile = useIsMobile();
   const [editingField, setEditingField] = useState<string | null>(null);
 
-  // دالة لتحويل بيانات reportDetails إلى Beneficiary
   const mapReportDetailsToBeneficiary = (data: any): Beneficiary => {
     return {
       id: data._id || "",
@@ -118,12 +111,11 @@ const BeneficiaryDetailsPage = () => {
     if (reportDetails) {
       const mapped = mapReportDetailsToBeneficiary(reportDetails);
       setBeneficiary(mapped);
-      setEditedBeneficiary(mapped); // initialize edited state
+      setEditedBeneficiary(mapped);
     }
   }, [reportDetails]);
 
   useEffect(() => {
-    // عند انتهاء الطباعة، أرجع العناصر
     const handleAfterPrint = () => setPrinting(false);
     window.addEventListener('afterprint', handleAfterPrint);
     return () => window.removeEventListener('afterprint', handleAfterPrint);
@@ -133,19 +125,17 @@ const BeneficiaryDetailsPage = () => {
     setPrinting(true);
     setTimeout(() => {
       window.print();
-    }, 100); // أعطي فرصة للـ state أن تتغير قبل الطباعة
+    }, 100);
   };
 
   const handleApprove = () => {
     console.log("Approving beneficiary:", beneficiary?.id);
     alert("تم اعتماد المستفيد بنجاح!");
-    // هنا يمكن إضافة منطق اعتماد المستفيد
   };
 
   const handleReject = () => {
     console.log("Rejecting beneficiary:", beneficiary?.id);
     alert("تم رفض المستفيد!");
-    // هنا يمكن إضافة منطق رفض المستفيد
   };
 
   const handleBack = () => {
@@ -162,25 +152,21 @@ const BeneficiaryDetailsPage = () => {
     return styles.statusPending;
   };
 
-  // Helper to update editedBeneficiary fields
   const handleEditChange = (field: keyof Beneficiary, value: any) => {
     if (!editedBeneficiary) return;
     setEditedBeneficiary({ ...editedBeneficiary, [field]: value });
   };
 
-  // Editable fields list
   const editableFields: (keyof Beneficiary)[] = [
     'firstName', 'secondName', 'thirdName', 'lastName', 'identityNumber', 'phone', 'gender', 'birthDate',
     'maritalStatus', 'nationality', 'cityOfResidence', 'jobStatus', 'healthStatus', 'disabilityType',
     'district', 'rentAmount', 'bankName', 'housemates'
   ];
 
-  // Compare only editable fields
   const hasEdits = beneficiary && editedBeneficiary && editableFields.some(
     field => JSON.stringify(beneficiary[field]) !== JSON.stringify(editedBeneficiary[field])
   );
 
-  // قائمة البنوك السعودية
   const saudiBanks = [
     "الأهلي السعودي",
     "الراجحي",
@@ -201,35 +187,22 @@ const BeneficiaryDetailsPage = () => {
 
   const [saveError, setSaveError] = useState<string | null>(null);
 
-  // Validation function
   const validateEdits = () => {
     if (!editedBeneficiary) return 'حدث خطأ في البيانات.';
-    // الأسماء الأربعة
     if (!editedBeneficiary.firstName) return 'الاسم الأول مطلوب.';
     if (!editedBeneficiary.secondName) return 'الاسم الثاني مطلوب.';
     if (!editedBeneficiary.thirdName) return 'الاسم الثالث مطلوب.';
     if (!editedBeneficiary.lastName) return 'اسم العائلة مطلوب.';
-    // رقم الهوية
     if (!/^[0-9]{10}$/.test(editedBeneficiary.identityNumber)) return 'رقم الهوية يجب أن يكون 10 أرقام.';
-    // رقم الجوال
     if (!/^[0-9]{9}$/.test(editedBeneficiary.phone)) return 'رقم الجوال يجب أن يكون 9 أرقام.';
-    // الجنس
     if (!editedBeneficiary.gender) return 'الجنس مطلوب.';
-    // تاريخ الميلاد
     if (!/^\d{4}-\d{2}-\d{2}$/.test(editedBeneficiary.birthDate)) return 'تاريخ الميلاد يجب أن يكون بالشكل yyyy-mm-dd';
-    // الحالة الاجتماعية
     if (!editedBeneficiary.maritalStatus) return 'الحالة الاجتماعية مطلوبة.';
-    // الحالة الصحية
     if (!editedBeneficiary.healthStatus) return 'الحالة الصحية مطلوبة.';
-    // نوع الإعاقة إذا كان غير سليم
     if (editedBeneficiary.healthStatus === 'غير سليم' && !editedBeneficiary.disabilityType) return 'نوع الإعاقة مطلوب إذا كانت الحالة الصحية غير سليم.';
-    // المدينة
     if (!editedBeneficiary.cityOfResidence) return 'المدينة مطلوبة.';
-    // الحي
     if (!editedBeneficiary.district) return 'الحي مطلوب.';
-    // مبلغ الإيجار إذا كان نوع السكن إيجار
     if (beneficiary?.housingType === 'إيجار' && !editedBeneficiary.rentAmount) return 'مبلغ الإيجار مطلوب.';
-    // البنك
     if (!saudiBanks.includes(editedBeneficiary.bankName || '')) return 'يرجى اختيار اسم البنك من القائمة.';
     return null;
   };
@@ -241,7 +214,6 @@ const BeneficiaryDetailsPage = () => {
       return;
     }
     setSaveError(null);
-    // TODO: send editedBeneficiary to backend
     alert('تم حفظ التعديلات!');
     setBeneficiary(editedBeneficiary);
   };
@@ -265,7 +237,6 @@ const BeneficiaryDetailsPage = () => {
     { value: 'أرمل', label: 'أرمل' }
   ];
   const bankOptions = saudiBanks.map(b => ({ value: b, label: b }));
-
   const jobStatusOptions = [
     { value: 'موظف', label: 'موظف' },
     { value: 'عاطل', label: 'عاطل' }
@@ -281,35 +252,32 @@ const BeneficiaryDetailsPage = () => {
 
   if (!beneficiary) {
     setTimeout(() => {
-     return <div className={styles.errorContainer}>
-        <h2>لم يتم العثور على المستفيد</h2>
-        <button onClick={handleBack} className={styles.backButton}>
-          العودة للوحة التحكم
-        </button>
-      </div>
+      return (
+        <div className={styles.errorContainer}>
+          <h2>لم يتم العثور على المستفيد</h2>
+          <button onClick={handleBack} className={styles.backButton}>
+            العودة للوحة التحكم
+          </button>
+        </div>
+      );
     }, 200);
     return (
-           <div className="w-full h-screen flex justify-center items-center ">
+      <div className="w-full h-screen flex justify-center items-center">
         <MoonLoader />
       </div>
-      
-      
-     
     );
   }
 
   return (
     <div className={styles.pageWrapper}>
-      {/* Popup for image */}
       {popupImage && (
         <div className={styles.popupOverlay} onClick={() => setPopupImage(null)}>
           <div className={styles.popupContent} onClick={e => e.stopPropagation()}>
-            <img src={popupImage} alt="مصدر الدخل" className={styles.popupImage} />
+            <img loading="lazy" src={popupImage} alt="مصدر الدخل" className={styles.popupImage} />
             <button className={styles.closePopupButton} onClick={() => setPopupImage(null)}>إغلاق</button>
           </div>
         </div>
       )}
-      {/* Header */}
       {!printing && (
         <header className={styles.header}>
           <div className={styles.headerContent}>
@@ -344,7 +312,6 @@ const BeneficiaryDetailsPage = () => {
         </header>
       )}
       <div className={styles.content}>
-        {/* البيانات الشخصية */}
         <div className={styles.card}>
           <div className={styles.cardHeader}>
             <h3 className={styles.cardTitle}>
@@ -353,9 +320,9 @@ const BeneficiaryDetailsPage = () => {
             </h3>
           </div>
           <div className={styles.detailsGrid}>
-            {/* صورة المستفيد */}
             <div className={styles.imageContainer}>
               <img
+              loading="lazy"
                 src={beneficiary.idImagePath}
                 alt={beneficiary.fullName}
                 className={styles.detailsImage}
@@ -365,11 +332,8 @@ const BeneficiaryDetailsPage = () => {
                 }}
               />
             </div>
-            
-            {/* بيانات المستفيد */}
             <div className={styles.detailsInfo}>
               <div className={styles.infoGrid}>
-                {/* firstName */}
                 <div className={styles.infoItem} style={{ position: 'relative' }}>
                   <span className={styles.infoLabel}>الاسم الأول</span>
                   <span
@@ -414,7 +378,6 @@ const BeneficiaryDetailsPage = () => {
                     </span>
                   </span>
                 </div>
-                {/* secondName */}
                 <div className={styles.infoItem} style={{ position: 'relative' }}>
                   <span className={styles.infoLabel}>الاسم الثاني</span>
                   <span
@@ -459,7 +422,6 @@ const BeneficiaryDetailsPage = () => {
                     </span>
                   </span>
                 </div>
-                {/* thirdName */}
                 <div className={styles.infoItem} style={{ position: 'relative' }}>
                   <span className={styles.infoLabel}>الاسم الثالث</span>
                   <span
@@ -504,7 +466,6 @@ const BeneficiaryDetailsPage = () => {
                     </span>
                   </span>
                 </div>
-                {/* lastName */}
                 <div className={styles.infoItem} style={{ position: 'relative' }}>
                   <span className={styles.infoLabel}>الاسم الأخير</span>
                   <span
@@ -549,7 +510,6 @@ const BeneficiaryDetailsPage = () => {
                     </span>
                   </span>
                 </div>
-                {/* identityNumber */}
                 <div className={styles.infoItem} style={{ position: 'relative' }}>
                   <span className={styles.infoLabel}>رقم الهوية</span>
                   <span
@@ -594,7 +554,6 @@ const BeneficiaryDetailsPage = () => {
                     </span>
                   </span>
                 </div>
-                {/* phone */}
                 <div className={styles.infoItem} style={{ position: 'relative' }}>
                   <span className={styles.infoLabel}>رقم الجوال</span>
                   <span
@@ -642,7 +601,6 @@ const BeneficiaryDetailsPage = () => {
                     </span>
                   </span>
                 </div>
-                {/* gender */}
                 <div className={styles.infoItem} style={{ position: 'relative' }}>
                   <span className={styles.infoLabel}>الجنس</span>
                   <span
@@ -722,7 +680,6 @@ const BeneficiaryDetailsPage = () => {
                     </span>
                   </span>
                 </div>
-                {/* birthDate */}
                 <div className={styles.infoItem} style={{ position: 'relative' }}>
                   <span className={styles.infoLabel}>تاريخ الميلاد</span>
                   <span
@@ -767,7 +724,6 @@ const BeneficiaryDetailsPage = () => {
                     </span>
                   </span>
                 </div>
-                {/* healthStatus */}
                 <div className={styles.infoItem} style={{ position: 'relative' }}>
                   <span className={styles.infoLabel}>الحالة الصحية</span>
                   <span
@@ -847,7 +803,6 @@ const BeneficiaryDetailsPage = () => {
                     </span>
                   </span>
                 </div>
-                {/* disabilityType */}
                 {editedBeneficiary?.healthStatus === 'غير سليم' && (
                   <div className={styles.infoItem} style={{ position: 'relative' }}>
                     <span className={styles.infoLabel}>نوع الإعاقة</span>
@@ -929,7 +884,6 @@ const BeneficiaryDetailsPage = () => {
                     </span>
                   </div>
                 )}
-                {/* maritalStatus */}
                 <div className={styles.infoItem} style={{ position: 'relative' }}>
                   <span className={styles.infoLabel}>الحالة الاجتماعية</span>
                   <span
@@ -1009,7 +963,6 @@ const BeneficiaryDetailsPage = () => {
                     </span>
                   </span>
                 </div>
-                {/* nationality */}
                 <div className={styles.infoItem} style={{ position: 'relative' }}>
                   <span className={styles.infoLabel}>الجنسية</span>
                   <span
@@ -1058,8 +1011,6 @@ const BeneficiaryDetailsPage = () => {
             </div>
           </div>
         </div>
-
-        {/* بيانات السكن */}
         <div className={styles.card}>
           <div className={styles.cardHeader}>
             <h3 className={styles.cardTitle}>
@@ -1069,7 +1020,6 @@ const BeneficiaryDetailsPage = () => {
           </div>
           <div className={styles.detailsInfo}>
             <div className={styles.infoGrid}>
-              {/* Editable cityOfResidence */}
               <div className={styles.infoItem} style={{ position: 'relative' }}>
                 <span className={styles.infoLabel}>المدينة</span>
                 <span
@@ -1114,7 +1064,6 @@ const BeneficiaryDetailsPage = () => {
                   </span>
                 </span>
               </div>
-              {/* Editable district */}
               <div className={styles.infoItem} style={{ position: 'relative' }}>
                 <span className={styles.infoLabel}>الحي</span>
                 <span
@@ -1159,7 +1108,6 @@ const BeneficiaryDetailsPage = () => {
                   </span>
                 </span>
               </div>
-              {/* housingType read-only */}
               <div className={styles.infoItem} style={{ position: 'relative' }}>
                 <span className={styles.infoLabel}>نوع السكن</span>
                 <span className={styles.infoValue}>{beneficiary.housingType}</span>
@@ -1241,8 +1189,6 @@ const BeneficiaryDetailsPage = () => {
             </div>
           </div>
         </div>
-
-        {/* بيانات البنك */}
         <div className={styles.card}>
           <div className={styles.cardHeader}>
             <h3 className={styles.cardTitle}>
@@ -1351,8 +1297,6 @@ const BeneficiaryDetailsPage = () => {
             </div>
           </div>
         </div>
-
-        {/* المرافقين */}
         <div className={styles.card}>
           <div className={styles.cardHeader}>
             <h3 className={styles.cardTitle}>
@@ -1379,7 +1323,6 @@ const BeneficiaryDetailsPage = () => {
                 {editedBeneficiary && editedBeneficiary.housemates.map((housemate, index) => (
                   <tr key={index}>
                     <td>{index + 1}</td>
-                    {/* name */}
                     <td style={{ position: 'relative' }}>
                       {editingField === `name-${index}` ? (
                         <input
@@ -1407,7 +1350,6 @@ const BeneficiaryDetailsPage = () => {
                         </span>
                       )}
                     </td>
-                    {/* identityNumber */}
                     <td style={{ position: 'relative' }}>
                       {editingField === `identityNumber-${index}` ? (
                         <input
@@ -1435,9 +1377,7 @@ const BeneficiaryDetailsPage = () => {
                         </span>
                       )}
                     </td>
-                    {/* birthDate */}
                     <td>{formatDate(housemate.birthDate)} ({housemate.dateType})</td>
-                    {/* kinship */}
                     <td style={{ position: 'relative' }}>
                       {editingField === `kinship-${index}` ? (
                         <input
@@ -1465,7 +1405,6 @@ const BeneficiaryDetailsPage = () => {
                         </span>
                       )}
                     </td>
-                    {/* studyLevel */}
                     <td style={{ position: 'relative' }}>
                       {editingField === `studyLevel-${index}` ? (
                         <select
@@ -1474,7 +1413,6 @@ const BeneficiaryDetailsPage = () => {
                           onChange={e => {
                             const newHousemates = [...editedBeneficiary.housemates];
                             newHousemates[index].studyLevel = e.target.value;
-                            // إذا تم اختيار جامعي، امسح الصف
                             if (e.target.value === 'جامعي') newHousemates[index].studyGrade = '';
                             setEditedBeneficiary({ ...editedBeneficiary, housemates: newHousemates });
                           }}
@@ -1499,9 +1437,7 @@ const BeneficiaryDetailsPage = () => {
                         </span>
                       )}
                     </td>
-                    {/* studyGrade */}
                     <td style={{ position: 'relative' }}>
-                      {/* إذا كانت المرحلة جامعي، لا يظهر الصف */}
                       {housemate.studyLevel === 'جامعي' ? (
                         <span className={styles.infoValue}>-</span>
                       ) : editingField === `studyGrade-${index}` ? (
@@ -1538,7 +1474,6 @@ const BeneficiaryDetailsPage = () => {
                         </span>
                       )}
                     </td>
-                    {/* healthStatus */}
                     <td style={{ position: 'relative' }}>
                       {editingField === `healthStatus-${index}` ? (
                         <select
@@ -1547,7 +1482,6 @@ const BeneficiaryDetailsPage = () => {
                           onChange={e => {
                             const newHousemates = [...editedBeneficiary.housemates];
                             newHousemates[index].healthStatus = e.target.value as 'سليم' | 'غير سليم';
-                            // إذا تم اختيار سليم، امسح نوع الإعاقة
                             if (e.target.value === 'سليم') newHousemates[index].disabilityType = undefined;
                             setEditedBeneficiary({ ...editedBeneficiary, housemates: newHousemates });
                           }}
@@ -1570,7 +1504,6 @@ const BeneficiaryDetailsPage = () => {
                         </span>
                       )}
                     </td>
-                    {/* disabilityType */}
                     <td style={{ position: 'relative' }}>
                       {housemate.healthStatus === 'غير سليم' ? (
                         editingField === `disabilityType-${index}` ? (
@@ -1610,8 +1543,6 @@ const BeneficiaryDetailsPage = () => {
             </table>
           </div>
         </div>
-
-        {/* مصادر الدخل */}
         <div className={styles.card}>
           <div className={styles.cardHeader}>
             <h3 className={styles.cardTitle}>
@@ -1655,8 +1586,6 @@ const BeneficiaryDetailsPage = () => {
             </table>
           </div>
         </div>
-
-        {/* أزرار الإجراءات */}
         {!printing && (
           <div className={styles.card}>
             <div className={styles.cardHeader}>
@@ -1687,8 +1616,6 @@ const BeneficiaryDetailsPage = () => {
             )}
           </div>
         )}
-
-        {/* سير الطلب */}
         {!printing && (
           <div className={styles.card}>
             <div className={styles.cardHeader}>
@@ -1738,4 +1665,4 @@ const BeneficiaryDetailsPage = () => {
   );
 };
 
-export default BeneficiaryDetailsPage; 
+export default BeneficiaryDetailsPage;

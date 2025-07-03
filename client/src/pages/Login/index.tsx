@@ -32,10 +32,12 @@ export default function ArabicAuthForm() {
   });
    
   const currentUser = useSelector((state:any)=>state.user.user)
-  
-  if(currentUser){
-  history("/")
-  }
+  useEffect(() => {
+    
+    if(currentUser){
+    history("/")
+    }
+  }, [currentUser]);
 
 
   const dispatch = useDispatch()
@@ -57,11 +59,10 @@ export default function ArabicAuthForm() {
 
     if (userData) {
       hotToast({ type: "success", message: "تم تسجيل الدخول بنجاح!" });
-      // dispatch(setUser(userData))
       localStorage.setItem("user", JSON.stringify(userData))
-      setTimeout(() => {
-        window.location.reload();
-      }, 500);
+      // dispatch(setUser(userData))
+        // window.location.reload();
+    
     }
     return;
   };

@@ -35,17 +35,10 @@ axios.defaults.withCredentials = true;
 config.autoAddCss = false;
 
 function App() {
- 
-  const dispatch = useDispatch()
-  console.log(import.meta.env.VITE_NODE_ENV)
-  const {userData,isLoading} = useFetchCurrentUser()
 
 
-    if(isLoading){
-      return <div className="h-screen w-full flex justify-center items-center">
-        <MoonLoader />
-      </div>
-    }
+
+    
     
   return (
     <BrowserRouter>
@@ -55,7 +48,7 @@ function App() {
           <Route element={<Layout><UserLayout /></Layout>}>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
-            <Route path='/sign-family' element={<SignFamily userData={userData}/>} />
+            <Route path='/sign-family' element={<SignFamily />} />
           </Route>
           {/* Admin Layout: No Header, No Layout */}
           <Route element= {<Layout>

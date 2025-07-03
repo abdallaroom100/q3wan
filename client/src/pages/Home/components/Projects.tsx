@@ -108,6 +108,7 @@ const projects = [
                 {/* Top section with image and gradient overlay */}
                 <div className={` h-64 relative overflow-hidden rounded-t-2xl`}>
                   <img 
+                  loading="lazy"
                     src={project.img} 
                     alt={project.title}
                     className="w-full h-full  "

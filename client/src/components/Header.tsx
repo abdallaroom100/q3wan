@@ -30,12 +30,9 @@ const Header = () => {
   ];
   const handleLogout = () => {
     dispatch(logOut());
- 
      localstorageList.forEach((item)=>localStorage.removeItem(item))
-    
-
-
-    window.location.reload();
+     hotToast({type:"success",message:"تم تسجيل الخروج "})
+     history("/login")
   };
 
   return (
