@@ -6,26 +6,24 @@ import path from "path"
 import complaintsRouter from "./routers/complaint.router.js"
 import userRouter from "./routers/user.router.js"
 import adminRouter from "./routers/admin.router.js"
-import bodyParser from "body-parser"
-import { sendForgetPassowrdMessage } from "./utils/sendForgetrPassowrdMessage.js"
+
 import dotenv from "dotenv"
 
 
 
 dotenv.config()
-import {dirname} from "path"
+import {dirname} from "path";
 import {fileURLToPath} from "url"
 
 // Configure multer storag
 // Middlewares
 const app = express();
+
 // sendForgetPassowrdMessage()
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
-
-app.use("/uploads", express.static(path.join(__dirname, "uploads")))
 app.use(cors({
     origin: true,
     credentials: true,
@@ -33,10 +31,21 @@ app.use(cors({
     allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
+
+app.use("/uploads", express.static(path.join(__dirname, "uploads")))
+
+
+ 
+
 app.use("/user", userRouter);
 app.use("/admin",adminRouter)
 app.use("/complaint",complaintsRouter)
+app.use(express.static(path.join(__dirname,"../client/dist")))
+app.get("*",(req,res)=>{
+    res.sendFile(path.join(__dirname,"../client/dist/index.html"))
+})
 // Routes
+
 
 connectDb()
 // connection
