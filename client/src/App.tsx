@@ -50,7 +50,8 @@ import { Suspense, lazy } from "react";
 
 // export default App;
 import "@fortawesome/fontawesome-svg-core/styles.css";
-const Home = lazy(() => import("./pages/Home"));
+import Home from "./pages/Home";
+
 const Login = lazy(() => import("./pages/Login"));
 const SignFamily = lazy(() => import("./pages/SignFamily/testIndex"));
 const UserLayout = lazy(() => import("./layouts/UserLayout"));
