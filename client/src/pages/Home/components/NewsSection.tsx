@@ -25,7 +25,7 @@ const NewsSection = () => (
         ].map(({ img, title, text }, i) => (
           <div className={styles.card} key={i}>
             <span className={styles.badge}>جديد</span>
-            <img className={styles.cardImg} src={img} alt={`خبر ${i + 1}`} loading="lazy" />
+            <img className={styles.cardImg} src={img} alt={`خبر ${i + 1}`}  fetchPriority="high"/>
             <div className={styles.cardContent}>
               <h2 className={styles.cardTitle + ' ' + styles.centerCardTitle}>{title}</h2>
               <p className={styles.cardText + ' ' + styles.centerCardText}>{text}</p>
