@@ -58,14 +58,16 @@ const AdminLayout = lazy(() => import("./layouts/AdminLayout"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const AdminLogin = lazy(() => import("./pages/AdminLogin"));
 const BeneficiaryDetails = lazy(() => import("./pages/BeneficiaryDetails"));
-
+import { MoonLoader } from "react-spinners";
 axios.defaults.withCredentials = true;   
 config.autoAddCss = false;
 
 function App() {
   return (
     <BrowserRouter>
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<div className="w-full h-screen flex justify-center items-center">
+        <MoonLoader />
+      </div>}>
         <Routes>
           <Route element={<Layout ><UserLayout /></Layout>}>
             <Route path="/" element={<Home />} />
