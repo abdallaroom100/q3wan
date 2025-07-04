@@ -51,14 +51,15 @@ import { Suspense, lazy } from "react";
 // export default App;
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import Home from "./pages/Home";
-
+import BeneficiaryDetails from "./pages/BeneficiaryDetails";
 const Login = lazy(() => import("./pages/Login"));
 const SignFamily = lazy(() => import("./pages/SignFamily/testIndex"));
 const UserLayout = lazy(() => import("./layouts/UserLayout"));
 const AdminLayout = lazy(() => import("./layouts/AdminLayout"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const AdminLogin = lazy(() => import("./pages/AdminLogin"));
-const BeneficiaryDetails = lazy(() => import("./pages/BeneficiaryDetails"));
+
+
 import { MoonLoader } from "react-spinners";
 axios.defaults.withCredentials = true;   
 config.autoAddCss = false;

@@ -5,6 +5,7 @@ import { Beneficiary, RequestHistory } from "../Dashboard/types";
 import { useGetCurrentReportData } from "../Dashboard/hooks/useGetCurrentReportData";
 import { MoonLoader } from "react-spinners";
 import Select from 'react-select';
+import hotToast from "../../common/hotToast";
 
 const mockRequestHistory: RequestHistory[] = [
   {
@@ -160,11 +161,14 @@ const BeneficiaryDetailsPage = () => {
   const editableFields: (keyof Beneficiary)[] = [
     'firstName', 'secondName', 'thirdName', 'lastName', 'identityNumber', 'phone', 'gender', 'birthDate',
     'maritalStatus', 'nationality', 'cityOfResidence', 'jobStatus', 'healthStatus', 'disabilityType',
-    'district', 'rentAmount', 'bankName', 'housemates'
+    'district', 'rentAmount', 'bankName'
   ];
 
-  const hasEdits = beneficiary && editedBeneficiary && editableFields.some(
-    field => JSON.stringify(beneficiary[field]) !== JSON.stringify(editedBeneficiary[field])
+  const hasEdits = beneficiary && editedBeneficiary && (
+    editableFields.some(
+      field => JSON.stringify(beneficiary[field]) !== JSON.stringify(editedBeneficiary[field])
+    ) ||
+    JSON.stringify(beneficiary.housemates) !== JSON.stringify(editedBeneficiary.housemates)
   );
 
   const saudiBanks = [
@@ -204,13 +208,27 @@ const BeneficiaryDetailsPage = () => {
     if (!editedBeneficiary.district) return 'الحي مطلوب.';
     if (beneficiary?.housingType === 'إيجار' && !editedBeneficiary.rentAmount) return 'مبلغ الإيجار مطلوب.';
     if (!saudiBanks.includes(editedBeneficiary.bankName || '')) return 'يرجى اختيار اسم البنك من القائمة.';
+    // فحص بيانات المرافقين
+    for (let i = 0; i < editedBeneficiary.housemates.length; i++) {
+      const h = editedBeneficiary.housemates[i];
+      if (!h.name) return `اسم المرافق رقم ${i + 1} مطلوب.`;
+      if (h.name.trim().split(/\s+/).length < 4) return `اسم المرافق رقم ${i + 1} يجب أن يكون رباعي.`;
+      if (!/^[0-9]{10}$/.test(h.identityNumber)) return `رقم هوية المرافق رقم ${i + 1} يجب أن يكون 10 أرقام.`;
+      if (!h.kinship) return `صلة القرابة للمرافق رقم ${i + 1} مطلوبة.`;
+      if (!h.studyLevel) return `المرحلة الدراسية للمرافق رقم ${i + 1} مطلوبة.`;
+      if (h.studyLevel !== 'جامعي' && !h.studyGrade) return `صف المرافق رقم ${i + 1} مطلوب.`;
+      if (!h.healthStatus) return `الحالة الصحية للمرافق رقم ${i + 1} مطلوبة.`;
+      if (h.healthStatus === 'غير سليم' && !h.disabilityType) return `نوع الإعاقة للمرافق رقم ${i + 1} مطلوب إذا كانت الحالة الصحية غير سليم.`;
+    }
     return null;
   };
 
   const handleSaveEdits = () => {
+    console.log(editedBeneficiary)
     const error = validateEdits();
     if (error) {
-      setSaveError(error);
+      // setSaveError(error);
+      hotToast({type:"error",message:error})
       return;
     }
     setSaveError(null);
@@ -1330,9 +1348,10 @@ const BeneficiaryDetailsPage = () => {
                           value={housemate.name}
                           autoFocus
                           onChange={e => {
-                            const newHousemates = [...editedBeneficiary.housemates];
-                            newHousemates[index].name = e.target.value;
-                            setEditedBeneficiary({ ...editedBeneficiary, housemates: newHousemates });
+                            const newHousematesName = editedBeneficiary.housemates.map((h, i) =>
+                              i === index ? { ...h, name: e.target.value } : h
+                            );
+                            setEditedBeneficiary({ ...editedBeneficiary, housemates: newHousematesName });
                           }}
                           onBlur={() => setEditingField(null)}
                           onKeyDown={e => { if (e.key === 'Enter') setEditingField(null); }}
@@ -1357,9 +1376,10 @@ const BeneficiaryDetailsPage = () => {
                           value={housemate.identityNumber}
                           autoFocus
                           onChange={e => {
-                            const newHousemates = [...editedBeneficiary.housemates];
-                            newHousemates[index].identityNumber = e.target.value;
-                            setEditedBeneficiary({ ...editedBeneficiary, housemates: newHousemates });
+                            const newHousematesIdentityNumber = editedBeneficiary.housemates.map((h, i) =>
+                              i === index ? { ...h, identityNumber: e.target.value } : h
+                            );
+                            setEditedBeneficiary({ ...editedBeneficiary, housemates: newHousematesIdentityNumber });
                           }}
                           onBlur={() => setEditingField(null)}
                           onKeyDown={e => { if (e.key === 'Enter') setEditingField(null); }}
@@ -1385,9 +1405,10 @@ const BeneficiaryDetailsPage = () => {
                           value={housemate.kinship}
                           autoFocus
                           onChange={e => {
-                            const newHousemates = [...editedBeneficiary.housemates];
-                            newHousemates[index].kinship = e.target.value;
-                            setEditedBeneficiary({ ...editedBeneficiary, housemates: newHousemates });
+                            const newHousematesKinship = editedBeneficiary.housemates.map((h, i) =>
+                              i === index ? { ...h, kinship: e.target.value } : h
+                            );
+                            setEditedBeneficiary({ ...editedBeneficiary, housemates: newHousematesKinship });
                           }}
                           onBlur={() => setEditingField(null)}
                           onKeyDown={e => { if (e.key === 'Enter') setEditingField(null); }}
@@ -1411,10 +1432,10 @@ const BeneficiaryDetailsPage = () => {
                           value={housemate.studyLevel || ''}
                           autoFocus
                           onChange={e => {
-                            const newHousemates = [...editedBeneficiary.housemates];
-                            newHousemates[index].studyLevel = e.target.value;
-                            if (e.target.value === 'جامعي') newHousemates[index].studyGrade = '';
-                            setEditedBeneficiary({ ...editedBeneficiary, housemates: newHousemates });
+                            const newHousematesStudyLevel = editedBeneficiary.housemates.map((h, i) =>
+                              i === index ? { ...h, studyLevel: e.target.value, studyGrade: e.target.value === 'جامعي' ? '' : h.studyGrade } : h
+                            );
+                            setEditedBeneficiary({ ...editedBeneficiary, housemates: newHousematesStudyLevel });
                           }}
                           onBlur={() => setEditingField(null)}
                           className={styles.editInput}
@@ -1445,9 +1466,10 @@ const BeneficiaryDetailsPage = () => {
                           value={housemate.studyGrade || ''}
                           autoFocus
                           onChange={e => {
-                            const newHousemates = [...editedBeneficiary.housemates];
-                            newHousemates[index].studyGrade = e.target.value;
-                            setEditedBeneficiary({ ...editedBeneficiary, housemates: newHousemates });
+                            const newHousematesStudyGrade = editedBeneficiary.housemates.map((h, i) =>
+                              i === index ? { ...h, studyGrade: e.target.value } : h
+                            );
+                            setEditedBeneficiary({ ...editedBeneficiary, housemates: newHousematesStudyGrade });
                           }}
                           onBlur={() => setEditingField(null)}
                           className={styles.editInput}
@@ -1480,10 +1502,10 @@ const BeneficiaryDetailsPage = () => {
                           value={housemate.healthStatus || ''}
                           autoFocus
                           onChange={e => {
-                            const newHousemates = [...editedBeneficiary.housemates];
-                            newHousemates[index].healthStatus = e.target.value as 'سليم' | 'غير سليم';
-                            if (e.target.value === 'سليم') newHousemates[index].disabilityType = undefined;
-                            setEditedBeneficiary({ ...editedBeneficiary, housemates: newHousemates });
+                            const newHousematesHealthStatus = editedBeneficiary.housemates.map((h, i) =>
+                              i === index ? { ...h, healthStatus: e.target.value as 'سليم' | 'غير سليم', disabilityType: e.target.value === 'سليم' ? undefined : h.disabilityType } : h
+                            );
+                            setEditedBeneficiary({ ...editedBeneficiary, housemates: newHousematesHealthStatus });
                           }}
                           onBlur={() => setEditingField(null)}
                           className={styles.editInput}
@@ -1511,9 +1533,10 @@ const BeneficiaryDetailsPage = () => {
                             value={housemate.disabilityType || ''}
                             autoFocus
                             onChange={e => {
-                              const newHousemates = [...editedBeneficiary.housemates];
-                              newHousemates[index].disabilityType = e.target.value as 'مريض' | 'ذوي احتياجات خاصة';
-                              setEditedBeneficiary({ ...editedBeneficiary, housemates: newHousemates });
+                              const newHousematesDisabilityType = editedBeneficiary.housemates.map((h, i) =>
+                                i === index ? { ...h, disabilityType: e.target.value as 'مريض' | 'ذوي احتياجات خاصة' } : h
+                              );
+                              setEditedBeneficiary({ ...editedBeneficiary, housemates: newHousematesDisabilityType });
                             }}
                             onBlur={() => setEditingField(null)}
                             className={styles.editInput}
