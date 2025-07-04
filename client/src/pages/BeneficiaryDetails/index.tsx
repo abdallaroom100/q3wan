@@ -6,6 +6,7 @@ import { useGetCurrentReportData } from "../Dashboard/hooks/useGetCurrentReportD
 import { MoonLoader } from "react-spinners";
 import Select from 'react-select';
 import hotToast from "../../common/hotToast";
+import { useEditReportData } from "../Dashboard/hooks/useEditReportData";
 
 const mockRequestHistory: RequestHistory[] = [
   {
@@ -222,7 +223,7 @@ const BeneficiaryDetailsPage = () => {
     }
     return null;
   };
-
+   const {reportLoading,reportError, editedUser,editReport} = useEditReportData()
   const handleSaveEdits = () => {
     console.log(editedBeneficiary)
     const error = validateEdits();
@@ -232,8 +233,19 @@ const BeneficiaryDetailsPage = () => {
       return;
     }
     setSaveError(null);
-    alert('تم حفظ التعديلات!');
-    setBeneficiary(editedBeneficiary);
+    editReport({beneficiaryData:editedBeneficiary,reportId:id})
+    if(reportError){
+       hotToast({type:"error",message:reportError})
+       return 
+    }
+    if(!reportError){
+     return setTimeout(() => {
+        setBeneficiary(editedBeneficiary)
+        setTimeout(() => {
+          window.location.reload()
+        }, 300);
+      }, 600);
+    }
   };
 
   const genderOptions = [

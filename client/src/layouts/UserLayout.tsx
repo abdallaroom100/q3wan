@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { setUser } from "../store/slices/user";
 import { MoonLoader } from "react-spinners";
 import Header from "../components/Header";
+import { Toaster } from "react-hot-toast";
 
 function UserLayout() {
   const dispatch = useDispatch();
@@ -31,6 +32,7 @@ function UserLayout() {
   return <div>
       <Header />
     <Outlet />
+    <Toaster />
     </div>
 }
 

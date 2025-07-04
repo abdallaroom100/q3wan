@@ -2,7 +2,7 @@ import "./App.css";
 import { BrowserRouter, Routes, Route} from "react-router-dom";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import Layout from "./Layout";
-import "@fortawesome/fontawesome-svg-core/styles.css";
+// import "@fortawesome/fontawesome-svg-core/styles.css";
 import axios from "axios";
 import { Suspense, lazy } from "react";
 
@@ -50,13 +50,13 @@ import { Suspense, lazy } from "react";
 
 // export default App;
 import "@fortawesome/fontawesome-svg-core/styles.css";
+import Dashboard from "./pages/Dashboard";
 import Home from "./pages/Home";
 import BeneficiaryDetails from "./pages/BeneficiaryDetails";
 const Login = lazy(() => import("./pages/Login"));
 const SignFamily = lazy(() => import("./pages/SignFamily/testIndex"));
 const UserLayout = lazy(() => import("./layouts/UserLayout"));
 const AdminLayout = lazy(() => import("./layouts/AdminLayout"));
-const Dashboard = lazy(() => import("./pages/Dashboard"));
 const AdminLogin = lazy(() => import("./pages/AdminLogin"));
 
 
