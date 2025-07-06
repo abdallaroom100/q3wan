@@ -53,7 +53,7 @@ export const protectedAdminRoute = (req,res,next)=>{
     } catch (err) {
       return res.status(401).json({ error: "رمز الجلسة غير صالح أو منتهي الصلاحية" });
     }
-
+   console.log(decode ,decode.adminId)
     if (!decode || !decode.adminId) {
       return res.status(401).json({ error: "تم انتهاء الجلسه الجاريه برجاء تسجيل الدخول من جديد" });
     }

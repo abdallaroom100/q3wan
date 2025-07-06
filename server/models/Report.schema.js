@@ -26,7 +26,7 @@ const reportModel = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["under_review", "under_committee", "under_manager"],
+      enum: ["under_review", "under_committee", "under_manager","done"],
       required: true,
     },
     comments: {
@@ -35,7 +35,7 @@ const reportModel = new mongoose.Schema(
     },
     reportStatus: {
       type: String,
-      enum: ["rejected", "accepted", ""],
+      enum: ["rejected", "accepted", "","rejected_manager","accepted_manager"],
       default: ""
     }
   },

@@ -1996,8 +1996,8 @@ const SignFamily = () => {
   // إذا كان المستخدم قد سجل بالفعل، اعرض popup
   if (showAlreadyRegistered) {
     return (
-      <div className="h-[85vh] flex items-center justify-center bg-gray-50" style={{ direction: 'rtl' }}>
-        <div className="bg-white rounded-2xl shadow-2xl p-10 max-w-lg w-full mx-6 text-center border border-gray-100">
+      <div className="h-[90vh] sm:h-[85vh] flex items-center justify-center bg-gray-50" style={{ direction: 'rtl' }}>
+        <div className="bg-white sm:rounded-2xl shadow-2xl p-10 max-w-lg w-full md:mx-6 text-center border border-gray-100 sm:h-auto  h-full mx-0">
           <div className="flex justify-center mb-8">
             <div className="relative">
               <div className="absolute inset-0 bg-green-400 rounded-full animate-ping opacity-20"></div>

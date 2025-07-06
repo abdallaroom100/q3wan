@@ -53,6 +53,8 @@ import "@fortawesome/fontawesome-svg-core/styles.css";
 import Dashboard from "./pages/Dashboard";
 import Home from "./pages/Home";
 import BeneficiaryDetails from "./pages/BeneficiaryDetails";
+import AboutUs from "./pages/AboutUs";
+import Goals from "./pages/Goals";
 const Login = lazy(() => import("./pages/Login"));
 const SignFamily = lazy(() => import("./pages/SignFamily/testIndex"));
 const UserLayout = lazy(() => import("./layouts/UserLayout"));
@@ -73,6 +75,8 @@ function App() {
         <Routes>
           <Route element={<Layout ><UserLayout /></Layout>}>
             <Route path="/" element={<Home />} />
+            <Route path="/about" element={<AboutUs />} />
+            <Route path="/goals" element={<Goals />} />
             <Route path="/login" element={<Login />} />
             <Route path="/sign-family" element={<SignFamily />} />
           </Route>

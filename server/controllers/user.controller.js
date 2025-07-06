@@ -423,7 +423,7 @@ export const testUpdate = async (req, res) => {
       familyCardFile: finalFamilyCardFile,
       facilitiesInfo: homeData.housemates || [],
       housemate: homeData,
-      hasAFamily: homeData.housemates && homeData.housemates.length > 0,
+      hasAFamily: true,
       idImagePath: finalIdImagePath,
     };
 
@@ -452,16 +452,16 @@ export const testUpdate = async (req, res) => {
     res.status(200).json({
       message: "تم تحديث البيانات بنجاح",
       success: true,
-      data: freshUser,
+      data: freshUser, 
     });
-  } catch (error) {
+  } catch (error) { 
     console.error("Error in updateUser function:", error.message);
     await deleteUploadedFiles(req.files);
     res.status(500).json({ error: "حدث خطأ أثناء تحديث البيانات" });
   }
-};
+}; 
 
-export const updateUser = (req, res) => {};
+export const updateUser = (req, res) => {};  
 
 export const getAllUsers = async (req, res) => {
   try {
