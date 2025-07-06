@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import styles from "./BeneficiaryDetails.module.css";
 import { Beneficiary, RequestHistory } from "../Dashboard/types";
@@ -7,33 +7,14 @@ import { MoonLoader } from "react-spinners";
 import Select from 'react-select';
 import hotToast from "../../common/hotToast";
 import { useEditReportData } from "../Dashboard/hooks/useEditReportData";
+import { useConfirmCurrentReport } from "../Dashboard/hooks/useConfirmCurrentReport";
+import { useAcceptCommitteeReport } from "../Dashboard/hooks/useAcceptCommitteeReport";
+import { useRejectCommitteeToReport } from "../Dashboard/hooks/useRejectCommitteeToReport";
+import { useDeleteBeneficiary } from "../Dashboard/hooks/useDeleteBeneficiary";
+import { useRejectManagerReport } from "../Dashboard/hooks/useRejectManagerReport";
+import { useAcceptManagerReport } from "../Dashboard/hooks/useAcceptManagerReport";
 
-const mockRequestHistory: RequestHistory[] = [
-  {
-    id: 1,
-    userId: "1826",
-    name: "مامون علي حارث",
-    role: "مراجع",
-    decision: "",
-    date: "27/05/2025 05:36:04 م"
-  },
-  {
-    id: 2,
-    userId: "1826",
-    name: "علي صقر المطيري",
-    role: "اللجنه",
-    decision: "اعتمد",
-    date: "27/05/2025 05:36:04 م"
-  },
-  {
-    id: 3,
-    userId: "1825",
-    name: "علي عبدالـمحسن المطيري",
-    role: "مدير عام",
-    decision: "اعتمد",
-    date: "27/05/2025 05:36:36 م"
-  }
-];
+
 
 const useIsMobile = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -46,6 +27,7 @@ const useIsMobile = () => {
 };
 
 const BeneficiaryDetailsPage = () => {
+   const history = useNavigate()
   const { id } = useParams<{ id: string }>();
   const { error, loading, reportDetails } = useGetCurrentReportData(id || "");
   const navigate = useNavigate();
@@ -55,6 +37,159 @@ const BeneficiaryDetailsPage = () => {
   const [popupImage, setPopupImage] = useState<string | null>(null);
   const isMobile = useIsMobile();
   const [editingField, setEditingField] = useState<string | null>(null);
+  const [showConfirmPopup, setShowConfirmPopup] = useState(false);
+  const [confirmAction, setConfirmAction] = useState<'approve' | 'reject' | null>(null);
+  const [currentAdmin, setCurrentAdmin] = useState<any>(null);
+  const [approveComment, setApproveComment] = useState('');
+  const [rejectComment, setRejectComment] = useState('');
+  
+  // جميع hooks يجب أن تكون في أعلى الكومبوننت
+  const {confirmCurrentReport,confirmLoading,isConfirmed,confirmReportError} = useConfirmCurrentReport()
+  const {reportLoading,reportError, editedUser,editReport} = useEditReportData()
+  const {acceptCommitteeToReport,isAccepted,acceptCommitteeError} = useAcceptCommitteeReport()
+  const {rejectCommitteeToReport,isRejected,rejectCommitteeError} = useRejectCommitteeToReport()
+  const {deleteBeneficiary,isDeleted,deleteBeneficiaryError} = useDeleteBeneficiary()
+  const {rejectManagerReport,rejectManagerError,isManagerReject,rejectManagerLoading} = useRejectManagerReport()
+  const {acceptManagerLoading,acceptManagerReport,isManagerAccept,acceptManagerError} = useAcceptManagerReport()
+  
+  // الحصول على دور المستخدم الحالي
+  useEffect(() => {
+    try {
+      const adminData = JSON.parse(localStorage.getItem("admin") || "null");
+      setCurrentAdmin(adminData);
+    } catch (e) {
+      setCurrentAdmin(null);
+    }
+  }, []);
+
+
+
+  // مراقبة حالة الاعتماد
+  useEffect(() => {
+    if (isConfirmed) {
+      const successMessage = currentAdmin?.rule === 'committee'
+        ? "تم قبول المستفيد بنجاح!" 
+        : "تم اعتماد المستفيد بنجاح!";
+      hotToast({type: "success", message: successMessage});
+      setTimeout(() => {
+        history("/dashboard")
+      }, 250);
+    }
+  }, [isConfirmed, currentAdmin?.rule, history]);
+
+  // مراقبة أخطاء الاعتماد
+  useEffect(() => {
+    if (confirmReportError) {
+      hotToast({type: "error", message: confirmReportError});
+    }
+  }, [confirmReportError]);
+
+  // مراقبة حالة القبول من اللجنة
+  useEffect(() => {
+    if (isAccepted) {
+      hotToast({type:"success",message:"تم قبول المستفيد بنجاح"})
+      navigate("/dashboard")
+    }
+  }, [isAccepted, navigate]);
+
+  // مراقبة حالة الرفض من اللجنة
+  useEffect(() => {
+    if (isRejected) {
+      hotToast({type:"success",message:"تم رفض المستفيد بنجاح"})
+      navigate("/dashboard")
+    }
+  }, [isRejected, navigate]);
+
+  // مراقبة حالة الحذف
+  useEffect(() => {
+    if (isDeleted) {
+      hotToast({type:"success",message:"تم حذف المستفيد بنجاح"})
+      setTimeout(() => {
+        navigate("/dashboard")
+      }, 300);
+    }
+  }, [isDeleted, navigate]);
+
+  // مراقبة أخطاء اللجنة
+  useEffect(() => {
+    if (acceptCommitteeError) {
+      hotToast({type:"error",message:acceptCommitteeError})
+    }
+  }, [acceptCommitteeError]);
+
+  useEffect(() => {
+    if (rejectCommitteeError) {
+      hotToast({type:"error",message:rejectCommitteeError})
+    }
+  }, [rejectCommitteeError]);
+
+  // مراقبة أخطاء الحذف
+  useEffect(() => {
+    if (deleteBeneficiaryError) {
+      hotToast({type:"error",message:deleteBeneficiaryError})
+    }
+  }, [deleteBeneficiaryError]);
+
+  // مراقبة حالة الاعتماد من المدير
+  useEffect(() => {
+    if (isManagerAccept) {
+      hotToast({type:"success",message:"تم الاعتماد الكلي بنجاح"})
+      setTimeout(() => {
+        navigate("/dashboard")
+      }, 300);
+    }
+  }, [isManagerAccept, navigate]);
+
+  // مراقبة حالة الرفض من المدير
+  useEffect(() => {
+    if (isManagerReject) {
+      hotToast({type:"success",message:"تم الرفض الكلي بنجاح"})
+      setTimeout(() => {
+        navigate("/dashboard")
+      }, 300);
+    }
+  }, [isManagerReject, navigate]);
+
+  // مراقبة أخطاء المدير
+  useEffect(() => {
+    if (acceptManagerError) {
+      hotToast({type:"error",message:acceptManagerError})
+    }
+  }, [acceptManagerError]);
+
+  useEffect(() => {
+    if (rejectManagerError) {
+      hotToast({type:"error",message:rejectManagerError})
+    }
+  }, [rejectManagerError]);
+
+  // تحديد أسماء الأزرار حسب الدور
+  const getButtonLabels = () => {
+    if (currentAdmin?.rule === 'reviewer') {
+      return {
+        approveButton: 'اعتماد',
+        rejectButton: 'حذف',
+        approveIcon: '✔',
+        rejectIcon: '🗑️'
+      };
+    } else if (currentAdmin?.rule === 'committee') {
+      return {
+        approveButton: 'قبول',
+        rejectButton: 'رفض',
+        approveIcon: '📤',
+        rejectIcon: '✖'
+      };
+    } else {
+      return {
+        approveButton: 'اعتماد',
+        rejectButton: 'رفض',
+        approveIcon: '✔',
+        rejectIcon: '✖'
+      };
+    }
+  };
+
+  const buttonLabels = getButtonLabels();
 
   const mapReportDetailsToBeneficiary = (data: any): Beneficiary => {
     return {
@@ -130,14 +265,44 @@ const BeneficiaryDetailsPage = () => {
     }, 100);
   };
 
-  const handleApprove = () => {
-    console.log("Approving beneficiary:", beneficiary?.id);
-    alert("تم اعتماد المستفيد بنجاح!");
+  const handleApprove = useCallback(() => {
+    setConfirmAction('approve');
+    setShowConfirmPopup(true);
+    // مسح التعليقات عند فتح popup جديد
+    setApproveComment('');
+    setRejectComment('');
+  }, []);
+
+  const handleReject = useCallback(() => {
+    setConfirmAction('reject');
+    setShowConfirmPopup(true);
+    // مسح التعليقات عند فتح popup جديد
+    setApproveComment('');
+    setRejectComment('');
+      }, []);
+  const handleConfirmAction = async () => {
+    // التحقق من وجود تعليقات للجنة في حالة الرفض
+
+    if (confirmAction === 'approve') {
+      console.log("Approving beneficiary:", beneficiary?.id);
+      console.log("Comments:", approveComment);
+      await confirmCurrentReport(beneficiary?.id)
+    } 
+    setShowConfirmPopup(false);
+    setConfirmAction(null);
+    if (confirmAction === 'approve') {
+      setApproveComment('');
+    } else {
+      setRejectComment('');
+    }
   };
 
-  const handleReject = () => {
-    console.log("Rejecting beneficiary:", beneficiary?.id);
-    alert("تم رفض المستفيد!");
+  const handleCancelAction = () => {
+    setShowConfirmPopup(false);
+    setConfirmAction(null);
+    // مسح التعليقات عند الإلغاء
+    setApproveComment('');
+    setRejectComment('');
   };
 
   const handleBack = () => {
@@ -223,28 +388,22 @@ const BeneficiaryDetailsPage = () => {
     }
     return null;
   };
-   const {reportLoading,reportError, editedUser,editReport} = useEditReportData()
-  const handleSaveEdits = () => {
+
+  const handleSaveEdits = async () => {
     console.log(editedBeneficiary)
     const error = validateEdits();
     if (error) {
-      // setSaveError(error);
       hotToast({type:"error",message:error})
       return;
     }
     setSaveError(null);
-    editReport({beneficiaryData:editedBeneficiary,reportId:id})
-    if(reportError){
-       hotToast({type:"error",message:reportError})
-       return 
-    }
-    if(!reportError){
-     return setTimeout(() => {
+    await editReport({beneficiaryData:editedBeneficiary,reportId:id})
+    
+    // تحديث البيانات المحلية بعد الحفظ الناجح
+    if (!reportError && editedBeneficiary) {
+      setTimeout(() => {
         setBeneficiary(editedBeneficiary)
-        setTimeout(() => {
-          window.location.reload()
-        }, 300);
-      }, 600);
+      }, 350);
     }
   };
 
@@ -298,6 +457,127 @@ const BeneficiaryDetailsPage = () => {
     );
   }
 
+  // 1. أضف الدوال الجديدة للأكشنات في أعلى الكومبوننت
+  const handleApproveReviewer = async () => {
+    console.log('اعتماد من المراجع', beneficiary?.id, approveComment);
+    
+    // استخدام الدالة الأصلية للاعتماد
+    await confirmCurrentReport(beneficiary?.id)
+    
+    setShowConfirmPopup(false);
+    setConfirmAction(null);
+    setApproveComment('');
+  };
+  const handleDeleteReviewer = async () => {
+    console.log('حذف من المراجع', beneficiary?.id);
+    
+    // استخدام الدالة الأصلية للحذف
+    await deleteBeneficiary(beneficiary?.id)
+    
+    setShowConfirmPopup(false);
+    setConfirmAction(null);
+    setApproveComment('');
+  };
+
+  const handleAcceptCommittee = async () => {
+    console.log('=== handleAcceptCommittee EXECUTED ===');
+    console.log('قبول من اللجنة', beneficiary?.id, approveComment);
+    await acceptCommitteeToReport({userId:beneficiary?.id,comment:approveComment})
+    
+    setShowConfirmPopup(false);
+    setConfirmAction(null);
+    setApproveComment('');
+  };
+
+  const handleRejectCommittee = async () => {
+    console.log('=== handleRejectCommittee EXECUTED ===');
+    console.log('رفض من اللجنة', beneficiary?.id, rejectComment);
+    await rejectCommitteeToReport({userId:beneficiary?.id,comment:rejectComment})
+    
+    setShowConfirmPopup(false);
+    setConfirmAction(null);
+    setRejectComment('');
+  };
+
+  const handleApproveManager = async () => {
+    console.log('اعتماد كلي من المدير', beneficiary?.id);
+    if (beneficiary?.id) {
+      await acceptManagerReport({userId: beneficiary.id})
+    }
+    if(acceptManagerError){
+      hotToast({type:"error",message:acceptManagerError})
+        
+      }
+   if(isManagerAccept){
+    hotToast({type:"success",message:"تم اعتماد المتسفيد كليا"})
+    navigate("/dashboard")
+    }
+    setShowConfirmPopup(false);
+    setConfirmAction(null);
+    setApproveComment('');
+  };
+
+  const handleRejectManager = async () => {
+    console.log('رفض كلي من المدير', beneficiary?.id);
+    if (beneficiary?.id) {
+      await rejectManagerReport({userId: beneficiary.id})
+    }
+    if(rejectManagerError){
+    hotToast({type:"error",message:rejectManagerError})
+      
+    }
+    if(isManagerReject){
+    hotToast({type:"success",message:"تم رفض المتسفيد كليا"})
+    navigate("/dashboard")
+    }
+    setShowConfirmPopup(false);
+    setConfirmAction(null);
+    setRejectComment('');
+  };
+  // ... existing code ...
+  // 2. منطق اختيار الدالة المناسبة عند التأكيد في popup
+  const handleConfirmPopup = async () => {
+    console.log('handleConfirmPopup called with:', {
+      currentAdminRule: currentAdmin?.rule,
+      confirmAction: confirmAction
+    });
+    
+    if(currentAdmin?.rule === 'reviewer') {
+      console.log(confirmAction)
+      if(confirmAction === 'approve') {
+        console.log('Calling handleApproveReviewer for reviewer approve');
+        return await handleApproveReviewer();
+      }
+      if(confirmAction === 'reject') {
+        console.log('Calling handleDeleteReviewer for reviewer reject/delete');
+        return await handleDeleteReviewer();
+      }
+    }
+    if(currentAdmin?.rule === 'committee') {
+      if(confirmAction === 'approve') {
+        console.log('Calling handleAcceptCommittee for committee approve');
+        return await handleAcceptCommittee();
+      }
+      if(confirmAction === 'reject') {
+        console.log('Calling handleRejectCommittee for committee reject');
+        return await handleRejectCommittee();
+      }
+    }
+    if(currentAdmin?.rule === 'manager') {
+      if(confirmAction === 'approve') {
+        console.log('Calling handleApproveManager for manager approve');
+        return await handleApproveManager();
+      }
+      if(confirmAction === 'reject') {
+        console.log('Calling handleRejectManager for manager reject');
+        return await handleRejectManager();
+      }
+    }
+  };
+  // ... existing code ...
+  // في زر التأكيد في popup استبدل onClick={handleConfirmAction} بـ onClick={handleConfirmPopup}
+  // ... existing code ...
+
   return (
     <div className={styles.pageWrapper}>
       {popupImage && (
@@ -305,6 +585,129 @@ const BeneficiaryDetailsPage = () => {
           <div className={styles.popupContent} onClick={e => e.stopPropagation()}>
             <img loading="lazy" src={popupImage} alt="مصدر الدخل" className={styles.popupImage} />
             <button className={styles.closePopupButton} onClick={() => setPopupImage(null)}>إغلاق</button>
+          </div>
+        </div>
+      )}
+      {showConfirmPopup && (
+        <div className={styles.confirmPopupOverlay} onClick={handleCancelAction}>
+          <div className={styles.confirmPopupContent} onClick={e => e.stopPropagation()}>
+            <h3 className={styles.confirmPopupTitle}>
+              {confirmAction === 'approve' 
+                ? (currentAdmin?.rule === 'committee' ? 'تأكيد  قبول المستفيد' : currentAdmin?.rule === 'manager' ? 'تأكيد الاعتماد الكلي' : 'تأكيد الاعتماد')
+                : (currentAdmin?.rule === 'reviewer' ? 'تأكيد الحذف' : currentAdmin?.rule === 'manager' ? 'تأكيد الرفض الكلي' : 'تأكيد الرفض')
+              }
+            </h3>
+            <p className={styles.confirmPopupMessage}>
+              {confirmAction === 'approve' 
+                ? (currentAdmin?.rule === 'committee'
+                    ? 'هل أنت متأكد من قبول هذا المستفيد ؟' 
+                    : currentAdmin?.rule === 'manager'
+                    ? 'هل أنت متأكد من الاعتماد الكلي لهذا المستفيد؟'
+                    : 'هل أنت متأكد من اعتماد هذا المستفيد؟')
+                : (currentAdmin?.rule === 'reviewer' 
+                    ? 'هل أنت متأكد من حذف هذا المستفيد ؟' 
+                    : currentAdmin?.rule === 'manager'
+                    ? 'هل أنت متأكد من الرفض الكلي لهذا المستفيد ؟'
+                    : 'هل أنت متأكد من رفض هذا المستفيد ؟')
+              }
+            </p>
+            
+            {/* حقل التعليقات - يظهر للجنة في جميع الحالات وللمراجع في حالة الاعتماد فقط */}
+            {(currentAdmin?.rule === 'committee' || (currentAdmin?.rule === 'reviewer' && confirmAction === 'approve')) && (
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ 
+                  display: 'block', 
+                  marginBottom: '8px', 
+                  fontWeight: '500', 
+                  color: '#374151',
+                  fontSize: '14px'
+                }}>
+                  {currentAdmin?.rule === 'committee' 
+                    ? (confirmAction === 'reject' ? 'التعليقات (مطلوب)' : 'التعليقات (اختياري)')
+                    : 'التعليقات (اختياري)'
+                  }
+                </label>
+                <textarea
+                  value={
+                    confirmAction === 'approve' 
+                      ? approveComment 
+                      : rejectComment
+                  }
+                  onChange={e => {
+                    if (confirmAction === 'approve') {
+                      setApproveComment(e.target.value);
+                    } else {
+                      setRejectComment(e.target.value);
+                    }
+                  }}
+                  placeholder={
+                    currentAdmin?.rule === 'committee' 
+                      ? (confirmAction === 'reject' 
+                          ? 'اكتب سبب الرفض هنا (مطلوب)...' 
+                          : 'اكتب تعليقاتك هنا (اختياري)...')
+                      : 'اكتب ملاحظاتك هنا (اختياري)...'
+                  }
+                  style={{
+                    width: '100%',
+                    minHeight: '100px',
+                    padding: '12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontFamily: 'inherit',
+                    resize: 'vertical',
+                    direction: 'rtl',
+                    textAlign: 'right'
+                  }}
+                />
+                {/* رسالة خطأ للجنة في حالة الرفض بدون تعليقات */}
+                {currentAdmin?.rule === 'committee' && confirmAction === 'reject' && !rejectComment.trim() && (
+                  <div style={{ 
+                    color: '#dc2626', 
+                    fontSize: '12px', 
+                    marginTop: '4px',
+                    fontWeight: '500'
+                  }}>
+                    يجب كتابة سبب الرفض
+                  </div>
+                )}
+              </div>
+            )}
+            
+            <div className={styles.confirmPopupButtons}>
+              <button 
+                onClick={async () => await handleConfirmPopup()}
+                disabled={confirmLoading || acceptManagerLoading || rejectManagerLoading || (currentAdmin?.rule === 'committee' && confirmAction === 'reject' && !rejectComment.trim())}
+                className={`${styles.confirmButton} ${
+                  confirmAction === 'approve' ? styles.confirmButtonApprove : styles.confirmButtonReject
+                }`}
+              >
+                {confirmLoading || acceptManagerLoading || rejectManagerLoading ? (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ 
+                      width: '16px', 
+                      height: '16px', 
+                      border: '2px solid transparent', 
+                      borderTop: '2px solid white', 
+                      borderRadius: '50%', 
+                      animation: 'spin 1s linear infinite' 
+                    }}></div>
+                    جاري...
+                  </div>
+                ) : (
+                  confirmAction === 'approve' 
+                    ? (currentAdmin?.rule === 'committee' ? 'قبول' : currentAdmin?.rule === 'manager' ? 'اعتماد كلي' : 'اعتماد')
+                    : (currentAdmin?.rule === 'reviewer' ? 'حذف' : currentAdmin?.rule === 'manager' ? 'رفض كلي' : 'رفض')
+                )}
+              </button>
+              <button 
+                onClick={handleCancelAction}
+                disabled={confirmLoading}
+                className={styles.cancelButton}
+              >
+                إلغاء
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -1630,28 +2033,76 @@ const BeneficiaryDetailsPage = () => {
               </h3>
             </div>
             <div className={styles.actionButtons}>
-              <button className={styles.approveButton} onClick={handleApprove}>
-                <span className={styles.buttonIcon}>✔</span>
-                <span className={styles.buttonText}>اعتماد</span>
-              </button>
-              <button className={styles.rejectButton} onClick={handleReject}>
-                <span className={styles.buttonIcon}>✖</span>
-                <span className={styles.buttonText}>رفض</span>
-              </button>
-            </div>
-            {hasEdits && (
-              <div style={{ marginTop: 16, textAlign: 'center' }}>
-                <button className={styles.saveButton} onClick={handleSaveEdits}>
-                  حفظ التعديلات
+              {hasEdits && (
+                <button 
+                  className={styles.saveButton} 
+                  onClick={async () => await handleSaveEdits()}
+                  disabled={reportLoading}
+                >
+                  {reportLoading ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div style={{ 
+                        width: '16px', 
+                        height: '16px', 
+                        border: '2px solid transparent', 
+                        borderTop: '2px solid white', 
+                        borderRadius: '50%', 
+                        animation: 'spin 1s linear infinite' 
+                      }}></div>
+                      جاري الحفظ...
+                    </div>
+                  ) : (
+                    <>
+                      <span className={styles.buttonIcon}>💾</span>
+                      <span className={styles.buttonText}>حفظ التعديلات</span>
+                    </>
+                  )}
                 </button>
-                {saveError && (
-                  <div style={{ color: 'red', marginTop: 8 }}>{saveError}</div>
-                )}
-              </div>
+              )}
+              {/* أزرار الإجراءات حسب الدور */}
+              {currentAdmin?.rule === 'reviewer' && (
+                <>
+                  <button className={styles.approveButton} style={{background:'#22c55e'}} onClick={() => {setConfirmAction('approve'); setShowConfirmPopup(true);}}>
+                    <span className={styles.buttonIcon}>✔</span>
+                    <span className={styles.buttonText}>اعتماد</span>
+                  </button>
+                  <button className={styles.rejectButton} style={{background:'#991b1b'}} onClick={() => {setConfirmAction('reject'); setShowConfirmPopup(true);}}>
+                    <span className={styles.buttonIcon}>🗑️</span>
+                    <span className={styles.buttonText}>حذف</span>
+                  </button>
+                </>
+              )}
+              {currentAdmin?.rule === 'committee' && (
+                <>
+                  <button className={styles.approveButton} style={{background:'#10b981', color:'#fff'}} onClick={() => {setConfirmAction('approve'); setShowConfirmPopup(true);}}>
+                    <span className={styles.buttonIcon}>✔</span>
+                    <span className={styles.buttonText}>قبول</span>
+                  </button>
+                  <button className={styles.rejectButton} style={{background:'#ef4444'}} onClick={() => {setConfirmAction('reject'); setShowConfirmPopup(true);}}>
+                    <span className={styles.buttonIcon}>✖</span>
+                    <span className={styles.buttonText}>رفض</span>
+                  </button>
+                </>
+              )}
+              {currentAdmin?.rule === 'manager' && (
+                <>
+                  <button className={styles.approveButton} style={{background:'#22c55e'}} onClick={() => {setConfirmAction('approve'); setShowConfirmPopup(true);}}>
+                    <span className={styles.buttonIcon}>✔</span>
+                    <span className={styles.buttonText}>اعتماد كلي</span>
+                  </button>
+                  <button className={styles.rejectButton} style={{background:'#ef4444'}} onClick={() => {setConfirmAction('reject'); setShowConfirmPopup(true);}}>
+                    <span className={styles.buttonIcon}>✖</span>
+                    <span className={styles.buttonText}>رفض كلي</span>
+                  </button>
+                </>
+              )}
+            </div>
+            {saveError && (
+              <div style={{ color: 'red', marginTop: 8, textAlign: 'center' }}>{saveError}</div>
             )}
           </div>
         )}
-        {!printing && (
+        {/* {!printing && (
           <div className={styles.card}>
             <div className={styles.cardHeader}>
               <h3 className={styles.cardTitle}>
@@ -1694,7 +2145,7 @@ const BeneficiaryDetailsPage = () => {
               </table>
             </div>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );

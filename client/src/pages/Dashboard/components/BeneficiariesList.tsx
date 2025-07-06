@@ -10,15 +10,35 @@ const BeneficiariesList = () => {
   const [searchYear, setSearchYear] = useState("");
   const [loading, setLoading] = useState<boolean>(false);
   const [currentAdminTasks, setCurrentAdminTasks] = useState<any[]>([]);
+  const [showCommentsModal, setShowCommentsModal] = useState<boolean>(false);
+  const [selectedTaskComments, setSelectedTaskComments] = useState<any>(null);
 
   useGetCurrentAdminTasks({ setCurrentAdminTasks, setLoading });
 
   // استخدم بيانات currentAdminTasks بدلاً من mockBeneficiaries
   const beneficiariesToShow = currentAdminTasks.length > 0 ? currentAdminTasks : [];
-
+  const currentAdmin = JSON.parse(localStorage.getItem("admin") || "{}");
+  console.log(currentAdmin)
   const handleSearch = () => {
     // هنا يمكن إضافة منطق البحث حسب التاريخ والسنة
     console.log("Searching with date:", searchDate, "and year:", searchYear);
+  };
+
+  const handleCommentsClick = (e: React.MouseEvent, task: any) => {
+    e.stopPropagation(); // منع انتشار الحدث للكارد
+    setSelectedTaskComments(task.comments);
+    setShowCommentsModal(true);
+  };
+
+  const closeCommentsModal = () => {
+    setShowCommentsModal(false);
+    setSelectedTaskComments(null);
+  };
+
+  const hasComments = (comments: any) => {
+    return comments?.reviewer?.comment || 
+           comments?.committee?.comment || 
+           comments?.manager?.comment;
   };
 
   const getStatusColor = (status: string) => {
@@ -37,8 +57,10 @@ const BeneficiariesList = () => {
   };
 
   const getStatusText = (status: string) => {
-    switch (status) {
-      case "approved":
+    
+   console.log(status)
+      switch (status) {
+      case "accepted":
         return "مقبول";
       case "rejected":
         return "مرفوض";
@@ -46,14 +68,20 @@ const BeneficiariesList = () => {
         return "في انتظار المراجعة";
       case "under_review":
         return "قيد المراجعة";
+      case "under_committee":
+        return "في انتظار اللجنة";
+        case "accepted_manager":
+          return "مقبول";
       default:
         return "غير محدد";
     }
+    
+    
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case "approved":
+      case "accepted":
         return "✅";
       case "rejected":
         return "❌";
@@ -74,37 +102,7 @@ const BeneficiariesList = () => {
   return (
     <div className=" md:p-6 max-w-7xl mx-auto">
       {/* شريط البحث */}
-      {/* <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 mb-8">
-        <div className="flex flex-wrap gap-4 items-end">
-          <div className="flex flex-col gap-2 min-w-48">
-            <label className="text-sm font-semibold text-gray-700">التاريخ</label>
-            <input
-              type="date"
-              value={searchDate}
-              onChange={(e) => setSearchDate(e.target.value)}
-              className="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all duration-200 outline-none"
-            />
-          </div>
-          <div className="flex flex-col gap-2 min-w-48">
-            <label className="text-sm font-semibold text-gray-700">السنة</label>
-            <input
-              type="number"
-              value={searchYear}
-              onChange={(e) => setSearchYear(e.target.value)}
-              placeholder="أدخل السنة"
-              className="px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all duration-200 outline-none placeholder-gray-400"
-            />
-          </div>
-          <button 
-            onClick={handleSearch} 
-            className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
-          >
-            بحث
-          </button>
-        </div>
-      </div> */}
-
-      {/* حالة التحميل */}
+      
       {loading && (
         <div className="flex flex-col items-center justify-center py-16">
           <MoonLoader color="#3b82f6" size={40} />
@@ -207,11 +205,24 @@ const BeneficiariesList = () => {
                     <div className="pt-2">
                       <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold border shadow-sm w-full justify-center transition-all duration-300 group-hover:shadow-md ${getStatusColor(task.status)}`}>
                         <span className="text-base">
-                          {getStatusIcon(task.status)}
+                          {getStatusIcon(currentAdmin?.rule == "manager" ? task.reportStatus : task.status)}
                         </span>
-                        {getStatusText(task.status)}
+                        {getStatusText(currentAdmin?.rule == "manager" ? task.reportStatus : task.status)}
                       </span>
                     </div>
+
+                    {/* زر التعليقات للمدير واللجنة */}
+                    {(currentAdmin?.rule === "manager" || currentAdmin?.rule === "committee") && hasComments(task.comments) && (
+                      <div className="pt-2">
+                        <button
+                          onClick={(e) => handleCommentsClick(e, task)}
+                          className="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-xl px-4 py-2 text-sm font-semibold transition-all duration-300 flex items-center justify-center gap-2 group-hover:shadow-md"
+                        >
+                          <span className="text-base">💬</span>
+                          عرض التعليقات
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -222,6 +233,92 @@ const BeneficiariesList = () => {
           </div>
         )}
       </section>
+
+      {/* نافذة التعليقات المنبثقة */}
+      {showCommentsModal && selectedTaskComments && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full max-h-[80vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-bold text-gray-800">التعليقات</h3>
+                <button
+                  onClick={closeCommentsModal}
+                  className="text-gray-500 hover:text-gray-700 text-2xl font-bold"
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                {/* تعليق المراجع */}
+                {selectedTaskComments.reviewer?.comment && (
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-blue-600 text-lg">👤</span>
+                      <span className="font-semibold text-gray-800">المراجع</span>
+                      {selectedTaskComments.reviewer.name && (
+                        <span className="text-sm text-gray-600">({selectedTaskComments.reviewer.name})</span>
+                      )}
+                    </div>
+                    <p className="text-gray-700 text-sm leading-relaxed">
+                      {selectedTaskComments.reviewer.comment}
+                    </p>
+                  </div>
+                )}
+
+                {/* تعليق اللجنة */}
+                {selectedTaskComments.committee?.comment && (
+                  <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-blue-600 text-lg">🏛️</span>
+                      <span className="font-semibold text-gray-800">اللجنة</span>
+                      {selectedTaskComments.committee.name && (
+                        <span className="text-sm text-gray-600">({selectedTaskComments.committee.name})</span>
+                      )}
+                    </div>
+                    <p className="text-gray-700 text-sm leading-relaxed">
+                      {selectedTaskComments.committee.comment}
+                    </p>
+                  </div>
+                )}
+
+                {/* تعليق المدير */}
+                {selectedTaskComments.manager?.comment && (
+                  <div className="bg-green-50 rounded-xl p-4 border border-green-200">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-green-600 text-lg">👨‍💼</span>
+                      <span className="font-semibold text-gray-800">المدير</span>
+                      {selectedTaskComments.manager.name && (
+                        <span className="text-sm text-gray-600">({selectedTaskComments.manager.name})</span>
+                      )}
+                    </div>
+                    <p className="text-gray-700 text-sm leading-relaxed">
+                      {selectedTaskComments.manager.comment}
+                    </p>
+                  </div>
+                )}
+
+                {/* رسالة إذا لم توجد تعليقات */}
+                {!hasComments(selectedTaskComments) && (
+                  <div className="text-center py-8 text-gray-500">
+                    <span className="text-4xl mb-2 block">💬</span>
+                    <p>لا توجد تعليقات متاحة</p>
+                  </div>
+                )}
+              </div>
+
+              <div className="mt-6 pt-4 border-t border-gray-200">
+                <button
+                  onClick={closeCommentsModal}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-xl transition-colors duration-300"
+                >
+                  إغلاق
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

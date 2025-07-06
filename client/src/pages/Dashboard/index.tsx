@@ -66,7 +66,7 @@ const Dashboard = () => {
           fixed top-0 right-0  w-80 h-screen bg-gradient-to-b from-slate-800 via-slate-900 to-slate-800 shadow-2xl z-50
           transform transition-transform duration-300 ease-in-out
           ${isMenuOpen ? "translate-x-0" : "translate-x-full"}
-          lg:static lg:translate-x-0 lg:w-80
+          lg:sticky lg:top-0 lg:translate-x-0 lg:w-80 lg:h-screen
         `}
       >
         {/* Header */}
@@ -139,7 +139,7 @@ const Dashboard = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-6 lg:p-8 overflow-y-auto pt-20 lg:pt-8">
+      <main className="flex-1 p-6 lg:p-8 overflow-y-auto pt-20 lg:pt-8 min-h-screen">
         <div className="max-w-6xl mx-auto">
           {renderContent()}
         </div>

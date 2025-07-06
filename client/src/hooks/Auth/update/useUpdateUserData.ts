@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface UpdateUserDataResponse {
   success: boolean;
@@ -8,6 +9,7 @@ interface UpdateUserDataResponse {
 }
 
 const useUpdateUserData = () => {
+  const navigate  = useNavigate()
   const updateUserData = async (formData: FormData): Promise<UpdateUserDataResponse> => {
     let currentUserToken = "";
     const data = localStorage.getItem("user") || "";
@@ -35,11 +37,14 @@ const useUpdateUserData = () => {
         // Update incomeSources with the new value from the response
         
         userObj.incomeSources = res.data.data.incomeSources;
-        
+        userObj.hasAFamily = true
         localStorage.setItem("user", JSON.stringify(userObj));
+        setTimeout(() => {
+          navigate("/")
+        }, 300);
       });
 
-      return { success: true, message: "تم تحديث البيانات بنجاح" };
+      return { success: true, message: "تم تسجيل  البيانات بنجاح" };
     } catch (error: any) {
       const errorMessage = error.response?.data?.error || "حدث خطأ ما";
       return { error: errorMessage, success: false };

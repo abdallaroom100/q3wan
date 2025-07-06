@@ -1,3 +1,4 @@
+import { Heading2 } from "lucide-react";
 import styles from "./NewsSection.module.css";
 
 const NewsSection = () => (
@@ -8,26 +9,27 @@ const NewsSection = () => (
       <div className={styles.cards} style={{direction:"rtl"}}>
         {[
           {
-            img: "/img/q3wan1.webp",
+            img: "/img/q3wan2.webp",
             title: " نبادر بالأضاحي.. لنرسم فرحة العيد" ,
             text: "",
           },
           {
-            img: "/img/q3wan2.webp",
+            img: "/img/q3wan1.webp",
             title: "سخاؤكم جعل صيفهم أطيب",
             text: "",
           },
           {
-            img: "/img/q3wan3.webp",
-            title: "شكرًا لمن سعى وشكرًا لمن دعم",
-            text: "",
+            img: "/img/قعوان.jpg",
+            title:" مبادرة فرحة نجاح يتيم",
+            text: "توزيع بطاقات العاب مجانية",
           },
         ].map(({ img, title, text }, i) => (
           <div className={styles.card} key={i}>
             <span className={styles.badge}>جديد</span>
-            <img className={styles.cardImg} src={img} alt={`خبر ${i + 1}`}  fetchPriority={"high"} />
+            <img className={styles.cardImg} src={img} alt={`خبر ${i + 1}`}  />
             <div className={styles.cardContent}>
               <h2 className={styles.cardTitle + ' ' + styles.centerCardTitle}>{title}</h2>
+   
               <p className={styles.cardText + ' ' + styles.centerCardText}>{text}</p>
             </div>
           </div>

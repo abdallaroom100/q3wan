@@ -5,8 +5,7 @@ import axios from "axios";
 import {  useState } from "react";
 import { Beneficiary } from "../types";
 
-
- export const useEditReportData = () =>{
+export const useEditReportData = () =>{
    
     let token = ""
      try {
@@ -18,11 +17,15 @@ import { Beneficiary } from "../types";
         console.log(error)
      }
    
-    const [editedUser ,setEditedUser] = useState<Record<string,any>|null>(null)
-    const [loading,setLoading] = useState<boolean>(false)
-    const [reportError,setReportError] = useState<string | null>(null)
+    const [editedUser, setEditedUser] = useState<Record<string,any>|null>(null)
+    const [loading, setLoading] = useState<boolean>(false)
+    const [reportError, setReportError] = useState<string | null>(null)
+    
     const editReport = async ({beneficiaryData,reportId}:{beneficiaryData:(Beneficiary |null),reportId:(string |undefined)})=>{
         setLoading(true)
+        setReportError(null); // إعادة تعيين الخطأ
+        setEditedUser(null); // إعادة تعيين البيانات المحررة
+        
         await axios.patch(`/admin/edit/${reportId}`,beneficiaryData,{
             headers:{
                 "Content-Type":"application/json",
@@ -41,6 +44,6 @@ import { Beneficiary } from "../types";
         }).finally(()=>setLoading(false))
     }
 
-    return {reportLoading:loading,reportError,editedUser,editReport}
+    return {reportLoading:loading, reportError, editedUser, editReport}
   
  }

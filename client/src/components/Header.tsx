@@ -43,7 +43,7 @@ const Header = () => {
       <button className="logo cursor-pointer" onClick={() => history("/")}>
         <picture>
        <source srcSet="img/logo.webp"  type="image/webp"/>
-        <img fetchPriority={"high"} src="img/logo.webp" className="logo" alt="شعار الجمعية" />
+        <img src="img/logo.webp" className="logo" alt="شعار الجمعية" />
         </picture>
       </button>
 

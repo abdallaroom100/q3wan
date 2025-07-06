@@ -3,7 +3,7 @@ import styles from "./SignFamily.module.css";
 import hotToast from "../../common/hotToast";
 import useUpdateUserData from "../../hooks/Auth/update/useUpdateUserData";
 import React from "react";
-import { FaUser, FaHome, FaUsers } from 'react-icons/fa';
+import { FaUser, FaHome, FaUsers, FaCheckCircle } from 'react-icons/fa';
 import ProgressSteps from '../../components/ProgressSteps';
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -121,8 +121,8 @@ const fieldLabels: {[key: string]: string} = {
   bankName: "البنك"
 };
 
-function validateForm(formData: UserData, companions: any[], incomeSources: IncomeSource[], dateType: string, companionsCount: number) {
-  // المرحلة الأولى (البيانات الشخصية)
+// دالة التحقق من المرحلة الأولى (البيانات الشخصية)
+function validateStep1(formData: UserData, dateType: string) {
   if (!formData.firstName) return { valid: false, message: 'يرجى ملء الاسم الأول' };
   if (!formData.secondName) return { valid: false, message: 'يرجى ملء الاسم الثاني' };
   if (!formData.thirdName) return { valid: false, message: 'يرجى ملء الاسم الثالث' };
@@ -131,7 +131,17 @@ function validateForm(formData: UserData, companions: any[], incomeSources: Inco
   if (!formData.gender) return { valid: false, message: 'يرجى اختيار الجنس' };
   if (!formData.nationality) return { valid: false, message: 'يرجى ملء الجنسية' };
   if (!formData.identityNumber) return { valid: false, message: 'يرجى ملء رقم الهوية' };
-  if (!formData.idImagePath) return { valid: false, message: 'يرجى إرفاق صورة الهوية' };
+  
+  // التحقق من وجود صورة الهوية (إما ملف جديد أو صورة محفوظة مسبقاً)
+  const userStr = localStorage.getItem('user');
+  let userIdImagePath = '';
+  if (userStr) {
+    try {
+      const userObj = JSON.parse(userStr);
+      if (userObj.idImagePath) userIdImagePath = userObj.idImagePath;
+    } catch {}
+  }
+  if (!formData.idImagePath && !userIdImagePath) return { valid: false, message: 'يرجى إرفاق صورة الهوية' };
   if (!formData.maritalStatus) return { valid: false, message: 'يرجى اختيار الحالة الاجتماعية' };
   if (!formData.birthDate) return { valid: false, message: 'يرجى ملء تاريخ الميلاد' };
   if (!dateType) return { valid: false, message: 'يرجى اختيار نوع تاريخ الميلاد' };
@@ -139,51 +149,164 @@ function validateForm(formData: UserData, companions: any[], incomeSources: Inco
   if (!formData.jobStatus) return { valid: false, message: 'يرجى اختيار المهنة' };
   if (!formData.healthStatus) return { valid: false, message: 'يرجى اختيار الحالة الصحية' };
   if (formData.healthStatus === 'غير سليم' && !formData.disabilityType) return { valid: false, message: 'يرجى اختيار نوع الإعاقة' };
+  
+  return { valid: true };
+}
 
-  // المرحلة الثانية (بيانات عامة)
+// دالة التحقق من المرحلة الثانية (بيانات عامة)
+function validateStep2(formData: UserData, incomeSources: IncomeSource[]) {
   if (!formData.cityOfResidence) return { valid: false, message: 'يرجى ملء مدينة السكن' };
   if (!formData.district) return { valid: false, message: 'يرجى ملء الحي' };
   if (!formData.housingType) return { valid: false, message: 'يرجى اختيار نوع السكن' };
   if (formData.housingType === 'إيجار') {
     if (!formData.rentAmount) return { valid: false, message: 'يرجى ملء مبلغ الإيجار' };
-    if (!formData.rentContractFile) return { valid: false, message: 'يرجى إرفاق صورة عقد الإيجار' };
+    
+    // التحقق من وجود عقد الإيجار (إما ملف جديد أو صورة محفوظة مسبقاً)
+    const userStr = localStorage.getItem('user');
+    let userRentImage = '';
+    if (userStr) {
+      try {
+        const userObj = JSON.parse(userStr);
+        if (userObj.rentImage) userRentImage = userObj.rentImage;
+      } catch {}
+    }
+    if (!formData.rentContractFile && !userRentImage) return { valid: false, message: 'يرجى إرفاق صورة عقد الإيجار' };
   }
   // مصادر الدخل
   if (!incomeSources || incomeSources.length === 0) return { valid: false, message: 'يرجى اختيار مصدر دخل واحد على الأقل' };
   for (let i = 0; i < incomeSources.length; i++) {
     const src = incomeSources[i];
     if (!src.sourceAmount) return { valid: false, message: `يرجى ملء مبلغ الدخل لمصدر الدخل (${src.sourceType})` };
-    if (!src.sourceImage) return { valid: false, message: `يرجى إرفاق صورة الدخل لمصدر الدخل (${src.sourceType})` };
+    
+    // التحقق من وجود صورة الدخل (إما ملف جديد أو صورة محفوظة مسبقاً)
+    const userStr = localStorage.getItem('user');
+    let userIncomeImage = '';
+    if (userStr) {
+      try {
+        const userObj = JSON.parse(userStr);
+        if (userObj.incomeSources && Array.isArray(userObj.incomeSources)) {
+          const userIncomeSource = userObj.incomeSources.find((s: any) => s.sourceType === src.sourceType);
+          if (userIncomeSource && userIncomeSource.sourceImage) {
+            userIncomeImage = userIncomeSource.sourceImage;
+          }
+        }
+      } catch {}
+    }
+    if (!src.sourceImage && !userIncomeImage) return { valid: false, message: `يرجى إرفاق صورة الدخل لمصدر الدخل (${src.sourceType})` };
   }
   if (!formData.bankName) return { valid: false, message: 'يرجى اختيار البنك' };
-  if (!formData.ibanImage) return { valid: false, message: 'يرجى إرفاق صورة الآيبان' };
-  // شرط كارت العائلة إذا يوجد مرافقين
-  if (companionsCount > 0 && !formData.familyCardFile) {
-    return { valid: false, message: 'يرجى إرفاق كارت العائلة' };
+  
+  // التحقق من وجود صورة الآيبان (إما ملف جديد أو صورة محفوظة مسبقاً)
+  const userStr = localStorage.getItem('user');
+  let userIbanImage = '';
+  if (userStr) {
+    try {
+      const userObj = JSON.parse(userStr);
+      if (userObj.ibanImage) userIbanImage = userObj.ibanImage;
+    } catch {}
   }
+  if (!formData.ibanImage && !userIbanImage) return { valid: false, message: 'يرجى إرفاق صورة الآيبان' };
+  
+  return { valid: true };
+}
 
+// دالة التحقق من المرحلة الثالثة (بيانات المرافقين)
+function validateStep3(formData: UserData, companions: any[], companionsCount: number) {
+  // شرط كارت العائلة إذا يوجد مرافقين
+  if (companionsCount > 0) {
+    // التحقق من وجود كارت العائلة (إما ملف جديد أو صورة محفوظة مسبقاً)
+    const userStr = localStorage.getItem('user');
+    let userFamilyCardImage = '';
+    if (userStr) {
+      try {
+        const userObj = JSON.parse(userStr);
+        if (userObj.familyCardFile) userFamilyCardImage = userObj.familyCardFile;
+      } catch {}
+    }
+    if (!formData.familyCardFile && !userFamilyCardImage) {
+      return { valid: false, message: 'يرجى إرفاق كارت العائلة' };
+    }
+  }
+  
+  // التحقق من بيانات المرافقين إذا كان عددهم أكبر من 0
+  if (companionsCount > 0) {
+    for (let i = 0; i < companionsCount; i++) {
+      const companion = companions[i];
+      if (!companion.name) return { valid: false, message: `يرجى ملء الاسم الرباعي للمرافق ${i + 1}` };
+      if (!companion.id) return { valid: false, message: `يرجى ملء رقم الهوية للمرافق ${i + 1}` };
+      if (!companion.birthDate) return { valid: false, message: `يرجى ملء تاريخ الميلاد للمرافق ${i + 1}` };
+      if (!companion.dateType) return { valid: false, message: `يرجى اختيار نوع تاريخ الميلاد للمرافق ${i + 1}` };
+      if (!companion.studyLevel) return { valid: false, message: `يرجى اختيار المرحلة الدراسية للمرافق ${i + 1}` };
+      if (companion.studyLevel && companion.studyLevel !== 'جامعي' && !companion.studyGrade) {
+        return { valid: false, message: `يرجى اختيار الصف للمرافق ${i + 1}` };
+      }
+      if (!companion.healthStatus) return { valid: false, message: `يرجى اختيار الحالة الصحية للمرافق ${i + 1}` };
+      if (companion.healthStatus === 'غير سليم' && !companion.disabilityType) {
+        return { valid: false, message: `يرجى اختيار نوع الإعاقة للمرافق ${i + 1}` };
+      }
+      if (!companion.kinship) return { valid: false, message: `يرجى ملء صلة القرابة للمرافق ${i + 1}` };
+    }
+  }
+  
+  return { valid: true };
+}
+
+// دالة التحقق الكاملة (للإرسال النهائي)
+function validateForm(formData: UserData, companions: any[], incomeSources: IncomeSource[], dateType: string, companionsCount: number) {
+  const step1Validation = validateStep1(formData, dateType);
+  if (!step1Validation.valid) return step1Validation;
+  
+  const step2Validation = validateStep2(formData, incomeSources);
+  if (!step2Validation.valid) return step2Validation;
+  
+  const step3Validation = validateStep3(formData, companions, companionsCount);
+  if (!step3Validation.valid) return step3Validation;
+  
   return { valid: true };
 }
 
 const SignFamily = () => {
   const [companions, setCompanions] = useState<any[]>([]);
-    const userData = useSelector((state:any)=>state.user.user)
-   // Safely parse signFamilyFormData from localStorage, fallback to empty object if not present or invalid
-   const singfamily = (() => {
-     try {
-       const data = localStorage.getItem("signFamilyFormData");
-       return data ? JSON.parse(data) : {};
-     } catch {
-       return {};
-     }
-   })();
-    console.log(singfamily.facilitiesInfo)
-   const navigate = useNavigate()
-   useEffect(() => {
-     if(!userData){
-       navigate("/login")
-     }
-   }, [userData]);
+  const [showAlreadyRegistered, setShowAlreadyRegistered] = useState(false);
+  const userData = useSelector((state:any)=>state.user.user)
+  const isLoading = useSelector((state:any)=>state.user.isLoading)
+  
+  // Safely parse signFamilyFormData from localStorage, fallback to empty object if not present or invalid
+  const singfamily = (() => {
+    try {
+      const data = localStorage.getItem("signFamilyFormData");
+      return data ? JSON.parse(data) : {};
+    } catch {
+      return {};
+    }
+  })();
+   console.log(singfamily.facilitiesInfo)
+  const navigate = useNavigate()
+  
+  useEffect(() => {
+    // لا تتحقق من userData إلا بعد انتهاء التحميل
+    if(!isLoading && !userData){
+      navigate("/login")
+    }
+  }, [userData, isLoading]);
+
+  // التحقق من hasAFamily عند تحميل الصفحة
+  useEffect(() => {
+    if (!isLoading && userData) {
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        try {
+          const userObj = JSON.parse(userStr);
+          if (userObj.hasAFamily === true) {
+            setShowAlreadyRegistered(true);
+          }
+        } catch (error) {
+          console.error('Error parsing user data:', error);
+        }
+      }
+    }
+  }, [userData, isLoading]);
+
   const {updateUserData} = useUpdateUserData()
   const [step, setStep] = useState(() => {
     const saved = localStorage.getItem(STEP_KEY);
@@ -306,16 +429,28 @@ const SignFamily = () => {
       try {
         const parsedCompanions = JSON.parse(tempCompanions);
         if (Array.isArray(parsedCompanions) && parsedCompanions.length > 0) {
-          setCompanions(parsedCompanions);
-          setCompanionsCount(parsedCompanions.length);
+          // ضمان التوافق بين id و identityNumber
+          const normalizedCompanions = parsedCompanions.map((companion: any) => ({
+            ...companion,
+            identityNumber: companion.identityNumber || companion.id || "",
+            id: companion.identityNumber || companion.id || ""
+          }));
+          setCompanions(normalizedCompanions);
+          setCompanionsCount(normalizedCompanions.length);
         }
       } catch {}
     } else if (savedCompanions) {
       try {
         const parsedCompanions = JSON.parse(savedCompanions);
         if (Array.isArray(parsedCompanions) && parsedCompanions.length > 0) {
-          setCompanions(parsedCompanions);
-          setCompanionsCount(parsedCompanions.length);
+          // ضمان التوافق بين id و identityNumber
+          const normalizedCompanions = parsedCompanions.map((companion: any) => ({
+            ...companion,
+            identityNumber: companion.identityNumber || companion.id || "",
+            id: companion.identityNumber || companion.id || ""
+          }));
+          setCompanions(normalizedCompanions);
+          setCompanionsCount(normalizedCompanions.length);
         } else {
           // إذا companions فاضي، اقرأ من user
           const userStr = localStorage.getItem('user');
@@ -323,7 +458,13 @@ const SignFamily = () => {
             try {
               const userObj = JSON.parse(userStr);
               if (Array.isArray(userObj.facilitiesInfo) && userObj.facilitiesInfo.length > 0) {
-                setCompanions(userObj.facilitiesInfo);
+                // ضمان التوافق بين id و identityNumber
+                const normalizedCompanions = userObj.facilitiesInfo.map((companion: any) => ({
+                  ...companion,
+                  identityNumber: companion.identityNumber || companion.id || "",
+                  id: companion.identityNumber || companion.id || ""
+                }));
+                setCompanions(normalizedCompanions);
                 setCompanionsCount(userObj.numberOfFacilities || userObj.facilitiesInfo.length);
               }
             } catch {}
@@ -337,7 +478,13 @@ const SignFamily = () => {
         try {
           const userObj = JSON.parse(userStr);
           if (Array.isArray(userObj.facilitiesInfo) && userObj.facilitiesInfo.length > 0) {
-            setCompanions(userObj.facilitiesInfo);
+            // ضمان التوافق بين id و identityNumber
+            const normalizedCompanions = userObj.facilitiesInfo.map((companion: any) => ({
+              ...companion,
+              identityNumber: companion.identityNumber || companion.id || "",
+              id: companion.identityNumber || companion.id || ""
+            }));
+            setCompanions(normalizedCompanions);
             setCompanionsCount(userObj.numberOfFacilities || userObj.facilitiesInfo.length);
           }
         } catch {}
@@ -561,6 +708,7 @@ const SignFamily = () => {
         newCompanions.push({
           name: '',
           id: '',
+          identityNumber: '', // إضافة identityNumber للتوافق
           birthDate: '',
           dateType: 'هجري',
           age: '',
@@ -633,6 +781,8 @@ const SignFamily = () => {
         formDataToSend.append('idImagePath', value);
       } else if (key === 'familyCardFile' && value instanceof File) {
         formDataToSend.append('familyCardFile', value);
+      } else if (key === 'rentContractFile' && value instanceof File) {
+        formDataToSend.append('rentContractFile', value);
       } else if (key === 'ibanImage' && value instanceof File) {
         formDataToSend.append('ibanImage', value);
       } else if (key !== 'incomeSources') {
@@ -683,7 +833,12 @@ const SignFamily = () => {
         localStorage.removeItem(DATETYPE_KEY);
         localStorage.removeItem(BIRTHDATE_KEY);
         localStorage.removeItem('signFamilyIncomeSources');
-        // يمكنك إضافة إعادة التوجيه هنا إذا كنت تريد
+        
+        // إعادة التوجيه للصفحة الرئيسية ثم عمل refresh
+        navigate("/");
+        setTimeout(() => {
+          window.location.reload();
+        }, 250); // انتظار نصف ثانية ثم عمل refresh
       } else {
         hotToast({ type: "error", message: result.error as string });
       }
@@ -711,6 +866,23 @@ const SignFamily = () => {
   };
 
   const handleNext = () => {
+    // التحقق من صحة البيانات حسب المرحلة الحالية
+    let validation;
+    
+    if (step === 1) {
+      validation = validateStep1(formData, dateType);
+    } else if (step === 2) {
+      validation = validateStep2(formData, incomeSources);
+    } else {
+      // لا نحتاج validation للمرحلة الأخيرة لأنها للإرسال فقط
+      validation = { valid: true };
+    }
+    
+    if (!validation.valid) {
+      hotToast({ type: "error", message: validation.message || "حدث خطأ غير متوقع" });
+      return;
+    }
+    
     setAnimDir("right");
     setStep((s) => {
       const next = Math.min(s + 1, 3);
@@ -822,15 +994,16 @@ const SignFamily = () => {
               />
             </div>
             <div className={styles.inputGroup}>
-              <label>ارفاق صورة الهوية</label>
+              <label>إرفاق صورة الهوية (JPG أو PNG فقط)</label>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <input
-                  type="file"
-                  name="idImagePath"
-                  style={{ display: 'none' }}
-                  id="idImagePathInput"
-                  onChange={handleChange}
-                />
+                                  <input
+                    type="file"
+                    name="idImagePath"
+                    accept=".jpg,.jpeg,.png"
+                    style={{ display: 'none' }}
+                    id="idImagePathInput"
+                    onChange={handleChange}
+                  />
                 <label htmlFor="idImagePathInput" className={styles.fileInputLabel} style={{
                   cursor: 'pointer',
                   background: '#e2e8f0',
@@ -1073,12 +1246,12 @@ const SignFamily = () => {
                   />
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>إرفاق عقد الإيجار (صورة أو PDF)</label>
+                  <label>إرفاق عقد الإيجار (JPG أو PNG فقط)</label>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <input
                       type="file"
                       name="rentContractFile"
-                      accept="image/*,application/pdf"
+                      accept=".jpg,.jpeg,.png"
                       style={{ display: 'none' }}
                       id="rentContractFileInput"
                       onChange={handleChange}
@@ -1223,12 +1396,12 @@ const SignFamily = () => {
                         onChange={e => updateIncomeSource(src.sourceType, 'sourceAmount', e.target.value)}
                       />
                       <label style={{ fontSize: 13, color: '#2c5282', fontWeight: 500, margin: '8px 0 4px' }}>
-                        إرفاق مستند الدخل
+                        إرفاق صورة مستند الدخل (JPG أو PNG فقط)
                       </label>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                         <input
                           type="file"
-                          accept="image/*,application/pdf"
+                          accept=".jpg,.jpeg,.png"
                           style={{ display: 'none' }}
                           id={`incomeSourceFile_${src.sourceType}`}
                           onChange={e => {
@@ -1332,12 +1505,12 @@ const SignFamily = () => {
             </div>
             {/* رفع صورة الآيبان */}
             <div className={styles.inputGroup}>
-              <label>إرفاق صورة الآيبان</label>
+              <label>إرفاق صورة الآيبان (JPG أو PNG فقط)</label>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <input
                   type="file"
                   name="ibanImage"
-                  accept="image/*,application/pdf"
+                  accept=".jpg,.jpeg,.png"
                   style={{ display: 'none' }}
                   id="ibanImageInput"
                   onChange={handleChange}
@@ -1439,12 +1612,12 @@ const SignFamily = () => {
             {/* رفع كارت العائلة */}
             {companionsCount > 0 && (
               <div className={styles.inputGroup} style={{ gridColumn: 'span 3' }}>
-                <label>إرفاق كارت العائلة (صورة أو PDF)</label>
+                <label>إرفاق كارت العائلة (JPG أو PNG فقط)</label>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <input
                     type="file"
                     name="familyCardFile"
-                    accept="image/*,application/pdf"
+                    accept=".jpg,.jpeg,.png"
                     style={{ display: 'none' }}
                     id="familyCardFileInput"
                     onChange={handleChange}
@@ -1519,10 +1692,11 @@ const SignFamily = () => {
                     <div className={styles.inputGroup}>
                       <label>رقم الهوية</label>
                       <input
-                        value={companion.id}
+                        value={companion.identityNumber || companion.id || ""}
                         onChange={e => {
                           const arr = [...companions];
-                          arr[idx].id = e.target.value;
+                          arr[idx].identityNumber = e.target.value;
+                          arr[idx].id = e.target.value; // حفظ في كلا الحقلين للتوافق
                           setCompanions(arr);
                         }}
                       />
@@ -1757,7 +1931,7 @@ const SignFamily = () => {
   ];
 
   // دوال مساعدة
-  const toggleIncomeSource = (sourceType: string) => {
+  const toggleIncomeSource = (sourceType: string) => { 
     setIncomeSources((prev: IncomeSource[]) => {
       const exists = prev.find((src: IncomeSource) => src.sourceType === sourceType);
       if (exists) {
@@ -1807,6 +1981,65 @@ const SignFamily = () => {
       if (userObj.rentImage) userRentImage = userObj.rentImage;
       if (userObj.idImagePath) userIdImagePath = userObj.idImagePath;
     } catch {}
+  }
+
+  // دالة للعودة للصفحة الرئيسية
+  const handleGoHome = () => {
+    navigate("/");
+  };
+
+  // دالة للمتابعة لتحديث البيانات
+  const handleUpdateData = () => {
+    setShowAlreadyRegistered(false);
+  };
+
+  // إذا كان المستخدم قد سجل بالفعل، اعرض popup
+  if (showAlreadyRegistered) {
+    return (
+      <div className="h-[85vh] flex items-center justify-center bg-gray-50" style={{ direction: 'rtl' }}>
+        <div className="bg-white rounded-2xl shadow-2xl p-10 max-w-lg w-full mx-6 text-center border border-gray-100">
+          <div className="flex justify-center mb-8">
+            <div className="relative">
+              <div className="absolute inset-0 bg-green-400 rounded-full animate-ping opacity-20"></div>
+              <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" className="text-green-500 text-7xl relative z-10" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
+                <path d="M504 256c0 136.967-111.033 248-248 248S8 392.967 8 256 119.033 8 256 8s248 111.033 248 248zM227.314 387.314l184-184c6.248-6.248 6.248-16.379 0-22.627l-22.627-22.627c-6.248-6.249-16.379-6.249-22.628 0L216 308.118l-70.059-70.059c-6.248-6.248-16.379-6.248-22.628 0l-22.627 22.627c-6.248 6.248-6.248 16.379 0 22.627l104 104c6.249 6.249 16.379 6.249 22.628.001z"></path>
+              </svg>
+            </div>
+          </div>
+          
+          <h2 className="text-3xl font-bold  mb-6 bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+            لقد قمت بالتسجيل بالفعل
+          </h2>
+          
+          <p className="text-gray-600 mb-8 text-xl leading-relaxed">   
+            تم تسجيل بياناتك بنجاح في النظام
+          </p>
+          
+          <div className="bg-blue-50 rounded-xl p-4 mb-10 border border-blue-100">
+            <span className="text-blue-700 text-base font-medium">هل تريد تحديث البيانات؟</span>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button
+              onClick={handleGoHome}
+              className="px-8 py-4 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-xl hover:from-gray-600 hover:to-gray-700 transition-all duration-300 font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+            >
+              الرجوع للرئيسية
+            </button>
+            <button
+              onClick={handleUpdateData}
+              className="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+            >
+              تحديث البيانات
+            </button>
+          </div>
+          
+          <div className="mt-10 pt-6 border-t border-gray-200">
+            <img alt="شعار الجمعية" src="img/logo.png" className="h-12 mx-auto opacity-60" />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (

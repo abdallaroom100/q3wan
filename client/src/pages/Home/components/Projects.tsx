@@ -1,6 +1,6 @@
 const projects = [
   {
-    img: "img/كفالة يتيم.jpg",
+    img: "img/كفالة.png",
     title: "كفالة يتيم",
     cost: "معدل 3600 ريال شهريا",
     beneficiaries: "فئة الأيتام حسب المعايير",
@@ -10,7 +10,7 @@ const projects = [
     bgGradient: "from-amber-600 to-orange-500"
   },
   {
-    img: "img/مشروع السله الغذائية.jpg",
+    img: "img/سلة.jpg",
     title: "السلة الغذائية",
     cost: "معدل 3600 ريال شهريا",
     beneficiaries: "جميع الأسر",

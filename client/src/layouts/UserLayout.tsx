@@ -2,7 +2,7 @@ import { Outlet } from "react-router-dom";
 import useFetchCurrentUser from "../hooks/Auth/useFetchCurrentUser";
 import { useDispatch } from "react-redux";
 import { useEffect } from "react";
-import { setUser } from "../store/slices/user";
+import { setUser, setIsLoading } from "../store/slices/user";
 import { MoonLoader } from "react-spinners";
 import Header from "../components/Header";
 import { Toaster } from "react-hot-toast";
@@ -10,6 +10,12 @@ import { Toaster } from "react-hot-toast";
 function UserLayout() {
   const dispatch = useDispatch();
   const { isLoading, userData } = useFetchCurrentUser();
+  
+  
+  useEffect(() => {
+    // تحديث حالة التحميل في Redux store
+    dispatch(setIsLoading(isLoading));
+  }, [isLoading, dispatch]);
 
   useEffect(() => {
     if (userData) {
