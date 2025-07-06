@@ -95,8 +95,8 @@ const Header = () => {
   // navItems without 'عن الجمعية'
   const navItems = [
     { href: "/", label: "الرئيسية" },
-    { href: "/about", label: "معلومات عنا" },
-    { href: "/goals", label: "أهدافنا" },
+    // { href: "/about", label: "معلومات عنا" },
+    // { href: "/goals", label: "أهدافنا" },
   ];
 
   // Dropdown items
