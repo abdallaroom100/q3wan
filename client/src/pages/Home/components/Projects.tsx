@@ -15,7 +15,7 @@ const projects = [
     cost: "معدل 3600 ريال شهريا",
     beneficiaries: "جميع الأسر",
     card: "تحويل بنكي",
-    period: "فترة الصرف شهرياً",
+    period: "فترة الصرف كل شهرين",
     bgColor: "bg-emerald-600",
     bgGradient: "from-emerald-600 to-emerald-500"
   },
