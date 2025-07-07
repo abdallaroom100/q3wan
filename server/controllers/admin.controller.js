@@ -717,9 +717,7 @@ export const acceptReportByManager = async (req,res)=>{
     const reports = await Report.find({reportStatus:"accepted_manager"}).populate("user")
    
     const currentAdmin = await Admin.findById(req.adminId)
-    if(currentAdmin.rule !== "manager"){
-      return res.status(400).json({error:"المدير فقط من يمكنه مراحعة المقبولين  "})
-    }
+  
  
      return res.status(200).json({success:true,reports})
     
