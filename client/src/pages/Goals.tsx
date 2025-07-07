@@ -53,7 +53,7 @@ const Goals: React.FC = () => {
         </section>
 
         {/* دعوة للعمل */}
-        <section className="text-center">
+        {/* <section className="text-center">
           <div className="bg-[rgb(58,61,108)] text-white rounded-lg p-8">
             <h2 className="text-2xl font-bold mb-4 !text-white">ساعدنا في تحقيق أهدافنا</h2>
             <p className="text-lg mb-6">
@@ -68,7 +68,7 @@ const Goals: React.FC = () => {
               </button>
             </div>
           </div>
-        </section>
+        </section> */}
       </div>
 
       {/* Footer */}

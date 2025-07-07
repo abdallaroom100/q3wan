@@ -59,7 +59,7 @@ export const loginAdmin = async (req, res) => {
 
     const currentAdmin = await Admin.findOne({ email });
     if (!currentAdmin) {
-      return res.status(200).json({ error: "بيانات الادمن هذا غير موجوده" });
+      return res.status(400).json({ error: "بيانات الادمن هذا غير موجوده" });
     }
     const checkPassword = bcrypt.compareSync(password, currentAdmin.password);
     if (!checkPassword) {
@@ -141,7 +141,7 @@ export const currentAdminTask = async (req, res) => {
 export const confirmBeneficiary = async (req, res) => {
   try {
     const { userId } = req.params;
-
+   const {comment } = req.body
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({ error: "رقم المعرف هذا غير صالح" });
     }
@@ -166,6 +166,11 @@ export const confirmBeneficiary = async (req, res) => {
 
     if (currentUserReport.status !== "under_review") {
       return res.status(400).json({ error: "تم اعتماد هذا التقرير من قبل" });
+    }
+
+    if (comment) {
+      currentUserReport.comments[`${currentAdmin.rule}`].name = currentAdmin.name;
+      currentUserReport.comments[`${currentAdmin.rule}`].comment = comment;
     }
 
     currentUserReport.status = "under_committee";
@@ -658,3 +663,32 @@ export const acceptReportByManager = async (req,res)=>{
     console.log(error.message)
   }
 }
+
+
+
+ export const searchForReport = async (req,res) =>{
+
+  try {
+     const {identifier} = req.body
+     if(!identifier) {
+      return res.status(400).json({error:"برجاء قم بادخال بيانات للعثور علي التقرير "})
+    }
+      
+      let beneficiary = await User.findOne({$or:[
+        {email:identifier},
+        {identityNumber:identifier},
+      ]})
+      if(!beneficiary){
+        return res.status(400).json({error:"لم يتم العثور علي مستفيد بالبيانات المقدمه"})
+      }
+      const beneficiaryReport = await Report.findOne({user:beneficiary?._id}).populate("user")
+      if(!beneficiaryReport){
+        return res.status(400).json({error:"المستفيد لم يقم بتسجيل تقرير"})
+      }
+      return res.status(200).json({success:true,report:beneficiaryReport})
+      
+  } catch (error) {
+    console.log(error.message)
+    console.log("error in search for report")
+  }
+ }

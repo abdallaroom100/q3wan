@@ -16,7 +16,7 @@ export const useConfirmCurrentReport = () => {
     console.log(error);
   }
   
-  const confirmCurrentReport = async (reportId: string| undefined) => {
+  const confirmCurrentReport = async ({reportId,comment}:{reportId: string| undefined,comment:string|undefined}) => {
     setLoading(true);
     setError(null); // إعادة تعيين الخطأ
     setIsConfirmed(false); // إعادة تعيين حالة التأكيد
@@ -24,7 +24,7 @@ export const useConfirmCurrentReport = () => {
     await axios
       .post(
         `/admin/confirm/${reportId}`,
-        {},
+        {comment},
         {
           headers: {
             "Content-Type": "application/json",

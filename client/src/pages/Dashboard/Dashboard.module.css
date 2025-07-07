@@ -301,7 +301,7 @@
 .tableContainer {
   overflow-x: auto;
   margin-top: 1.5rem;
-  border-radius: 12px;
+
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
@@ -916,4 +916,29 @@
 .statusPending {
   background: #fef3c7;
   color: #92400e;
+}
+
+.loadingMessage {
+  text-align: center;
+  padding: 2rem;
+  color: #4a5a7a;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.noResultsMessage {
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
+  font-size: 1rem;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+} 
+
+.reportCardCustom {
+  box-shadow: 0 2px 8px rgba(24, 90, 157, 0.06) !important;
+  border-radius: 12px !important;
+  border: 1px solid #e5e7eb !important;
+  background: #fff !important;
 } 

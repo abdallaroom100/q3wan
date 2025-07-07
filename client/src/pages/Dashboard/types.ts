@@ -73,12 +73,15 @@ export interface ReportData {
   id: number;
   beneficiaryName: string;
   identityNumber: string;
+  email?: string;
   requestDate: string;
   status: "approved" | "rejected" | "pending";
   executor: string;
   actionType: string;
   actionDate: string;
   rejectionReason: string;
+  reportId?: string; // معرف التقرير للانتقال إلى صفحة العرض
+  comments?: any; // التعليقات الأصلية للعرض في popup
 }
 
 export interface EditableReportData {

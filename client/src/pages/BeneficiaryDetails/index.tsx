@@ -280,22 +280,22 @@ const BeneficiaryDetailsPage = () => {
     setApproveComment('');
     setRejectComment('');
       }, []);
-  const handleConfirmAction = async () => {
-    // التحقق من وجود تعليقات للجنة في حالة الرفض
+  // const handleConfirmAction = async () => {
+  //   // التحقق من وجود تعليقات للجنة في حالة الرفض
 
-    if (confirmAction === 'approve') {
-      console.log("Approving beneficiary:", beneficiary?.id);
-      console.log("Comments:", approveComment);
-      await confirmCurrentReport(beneficiary?.id)
-    } 
-    setShowConfirmPopup(false);
-    setConfirmAction(null);
-    if (confirmAction === 'approve') {
-      setApproveComment('');
-    } else {
-      setRejectComment('');
-    }
-  };
+  //   if (confirmAction === 'approve') {
+  //     console.log("Approving beneficiary:", beneficiary?.id);
+  //     console.log("Comments:", approveComment);
+  //     await confirmCurrentReport({reportId:beneficiary?.id,comment:approveComment})
+  //   } 
+  //   setShowConfirmPopup(false);
+  //   setConfirmAction(null);
+  //   if (confirmAction === 'approve') {
+  //     setApproveComment('');
+  //   } else {
+  //     setRejectComment('');
+  //   }
+  // };
 
   const handleCancelAction = () => {
     setShowConfirmPopup(false);
@@ -462,7 +462,7 @@ const BeneficiaryDetailsPage = () => {
     console.log('اعتماد من المراجع', beneficiary?.id, approveComment);
     
     // استخدام الدالة الأصلية للاعتماد
-    await confirmCurrentReport(beneficiary?.id)
+    await confirmCurrentReport({reportId:beneficiary?.id,comment:approveComment})
     
     setShowConfirmPopup(false);
     setConfirmAction(null);

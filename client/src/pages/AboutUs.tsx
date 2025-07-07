@@ -1,6 +1,6 @@
 import React from 'react';
 import GoalsSection from '../components/GoalsSection';
-
+import Footer from '../components/Footer';
 const AboutUs: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50" style={{ direction: 'rtl' }}>
@@ -78,9 +78,7 @@ const AboutUs: React.FC = () => {
       </div>
 
       {/* Footer */}
-      <footer className="bg-gray-200 text-center py-5 text-gray-600">
-        © 2025 جمعية مبرة القعوان الخيرية - جميع الحقوق محفوظة
-      </footer>
+      <Footer />
     </div>
   );
 };

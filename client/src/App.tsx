@@ -53,14 +53,14 @@ import "@fortawesome/fontawesome-svg-core/styles.css";
 import Dashboard from "./pages/Dashboard";
 import Home from "./pages/Home";
 import BeneficiaryDetails from "./pages/BeneficiaryDetails";
-import AboutUs from "./pages/AboutUs";
-import Goals from "./pages/Goals";
+ 
 const Login = lazy(() => import("./pages/Login"));
 const SignFamily = lazy(() => import("./pages/SignFamily/testIndex"));
 const UserLayout = lazy(() => import("./layouts/UserLayout"));
 const AdminLayout = lazy(() => import("./layouts/AdminLayout"));
 const AdminLogin = lazy(() => import("./pages/AdminLogin"));
-
+const AboutUs =   lazy(()=>import("./pages/AboutUs"))
+const Goals =   lazy(()=>import("./pages/Goals"))
 
 import { MoonLoader } from "react-spinners";
 axios.defaults.withCredentials = true;   

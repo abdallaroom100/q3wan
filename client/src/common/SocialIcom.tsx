@@ -63,7 +63,8 @@ export default function SocialMediaIcons() {
   const socialLinks = [
     {
       icon: <MdEmail />,
-      link: "mailto:info@alqawan.com",
+     
+      link:  `https://mail.google.com/mail/?view=cm&fs=1&to=info@alqawan.com&su=التواصل مع مبرة قعوان`,
       color: "bg-[#3A3D6C]",
       size: "60px",
     },

@@ -95,8 +95,12 @@ const Header = () => {
   // navItems without 'عن الجمعية'
   const navItems = [
     { href: "/", label: "الرئيسية" },
-    // { href: "/about", label: "معلومات عنا" },
-    // { href: "/goals", label: "أهدافنا" },
+    { href: "/about", label: "معلومات عنا" },
+    { href: "/goals", label: "أهدافنا" },
+  ];
+  const navItemsMobile = [
+    { href: "/", label: "الرئيسية" },
+
   ];
 
   // Dropdown items
@@ -213,7 +217,7 @@ const Header = () => {
           <div className="flex flex-col items-center  w-full h-full gap-8 mt-[11.5vh] p-5">
             <nav className="flex flex-col gap-4 w-full max-w-90 !flex-[0] relative">
               {/* الرئيسية */}
-              {navItems.map((item, index) => (
+              {navItemsMobile.map((item, index) => (
                 <Link
                   key={index}
                   to={item.href}

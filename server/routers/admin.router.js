@@ -3,7 +3,7 @@
 
 import {Router} from "express"
 import { protectedAdminRoute } from "../utils/protectedRoute.js"
-import { acceptReportByCommittee, acceptReportByManager, confirmBeneficiary, currentAdminTask, decideIfBeneficiaryIsDeserve, deleteBeneficiary, editBeneficiaryData, editReportByManager, getCurrentAdmin, getCurrentReportData, getManagerTasks, loginAdmin, rejectReportByCommittee, rejectReportByManager, singupAdmin } from "../controllers/admin.controller.js"
+import { acceptReportByCommittee, acceptReportByManager, confirmBeneficiary, currentAdminTask, decideIfBeneficiaryIsDeserve, deleteBeneficiary, editBeneficiaryData, editReportByManager, getCurrentAdmin, getCurrentReportData, getManagerTasks, loginAdmin, rejectReportByCommittee, rejectReportByManager, searchForReport, singupAdmin } from "../controllers/admin.controller.js"
 const router =  Router()
 
 
@@ -17,6 +17,8 @@ router.post("/signup",singupAdmin)
 // admin tasks 
 
 router.get("/tasks",protectedAdminRoute,currentAdminTask)
+
+router.post("/search",protectedAdminRoute,searchForReport)
 
 
 router.post("/confirm/:userId",protectedAdminRoute,confirmBeneficiary)

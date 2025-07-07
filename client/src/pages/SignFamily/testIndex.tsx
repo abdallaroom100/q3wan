@@ -669,36 +669,63 @@ const SignFamily = () => {
     }
   }, [formData.birthDate, dateType, currentHijriYear]);
 
-  useEffect(() => {
-    setCompanions(prev =>
-      prev.map(companion => {
-        let ageNum = '';
-        if (companion.birthDate && companion.dateType) {
-          if (companion.dateType === 'ميلادي') {
-            const birthDateObj = new Date(companion.birthDate);
-            if (!isNaN(birthDateObj.getTime())) {
-              const today = new Date();
-              let age = today.getFullYear() - birthDateObj.getFullYear();
-              const m = today.getMonth() - birthDateObj.getMonth();
-              if (m < 0 || (m === 0 && today.getDate() < birthDateObj.getDate())) {
-                age--;
-              }
-              ageNum = age > 0 ? age.toString() : '';
-            }
-          } else {
-            // هجري
-            const [hYear] = companion.birthDate.split('-').map(Number);
-            if (hYear && !isNaN(hYear)) {
-              const hijriYear = getCurrentHijriYear();
-              const age = hijriYear - hYear;
-              ageNum = age > 0 ? age.toString() : '';
-            }
-          }
+  // دالة لحساب العمر
+  const calculateAge = (birthDate: string, dateType: string) => {
+    if (!birthDate || !dateType) return '';
+    
+    if (dateType === 'ميلادي') {
+      const birthDateObj = new Date(birthDate);
+      if (!isNaN(birthDateObj.getTime())) {
+        const today = new Date();
+        let age = today.getFullYear() - birthDateObj.getFullYear();
+        const m = today.getMonth() - birthDateObj.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDateObj.getDate())) {
+          age--;
         }
-        return { ...companion, age: ageNum };
-      })
-    );
-  }, [companionsCount, dateType]);
+        return age > 0 ? age.toString() : '';
+      }
+    } else {
+      // هجري
+      const [hYear] = birthDate.split('-').map(Number);
+      if (hYear && !isNaN(hYear)) {
+        const hijriYear = getCurrentHijriYear();
+        const age = hijriYear - hYear;
+        return age > 0 ? age.toString() : '';
+      }
+    }
+    return '';
+  };
+
+  // تحديث العمر للمرافقين عند تغيير أي تاريخ
+  useEffect(() => {
+    console.log('تحديث العمر للمرافقين:', companions);
+    setCompanions(prev => {
+      const updatedCompanions = prev.map(companion => {
+        const calculatedAge = calculateAge(companion.birthDate, companion.dateType);
+        console.log(`المرافق: ${companion.name}, تاريخ الميلاد: ${companion.birthDate}, نوع التاريخ: ${companion.dateType}, العمر المحسوب: ${calculatedAge}`);
+        return {
+          ...companion,
+          age: calculatedAge
+        };
+      });
+      console.log('المرافقين المحدثين:', updatedCompanions);
+      return updatedCompanions;
+    });
+  }, [companionsCount, dateType]); // تغيير dependencies لتجنب الحلقة اللانهائية
+
+  // useEffect منفصل لحساب العمر عند تغيير التاريخ
+  useEffect(() => {
+    const hasBirthDate = companions.some(companion => companion.birthDate && companion.dateType);
+    if (hasBirthDate) {
+      console.log('إعادة حساب العمر بسبب تغيير التاريخ');
+      setCompanions(prev => 
+        prev.map(companion => ({
+          ...companion,
+          age: calculateAge(companion.birthDate, companion.dateType)
+        }))
+      );
+    }
+  }, [companions.map(c => `${c.birthDate}-${c.dateType}`).join(',')]); // مراقبة تغييرات التاريخ
 
   // إضافة كروت فارغة جديدة عند زيادة عدد المرافقين
   useEffect(() => {
@@ -1196,35 +1223,62 @@ const SignFamily = () => {
               <ProgressSteps step={step} steps={steps} isMobile={isMobile} stepIcons={stepIcons} />
             </div>
           )}
-          <div className={styles.grid}>
+          <div className={styles.grid} style={{ 
+            gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
+            gap: isMobile ? '16px' : '20px'
+          }}>
             {/* مدينة السكن */}
-            <div className={styles.inputGroup}>
+            <div className={styles.inputGroup} style={{ 
+              gridColumn: isMobile ? 'span 1' : 'span 1',
+              marginBottom: isMobile ? '8px' : '0'
+            }}>
               <label>مدينة السكن</label>
               <input
                 name="cityOfResidence"
                 value={formData.cityOfResidence}
                 onChange={handleChange}
                 placeholder="ما هي مدينة سكنك الحالية؟"
+                style={{
+                  width: '100%',
+                  padding: isMobile ? '12px 16px' : '10px 12px',
+                  fontSize: isMobile ? '16px' : '14px'
+                }}
               />
             </div>
             {/* الحي */}
-            <div className={styles.inputGroup}>
+            <div className={styles.inputGroup} style={{ 
+              gridColumn: isMobile ? 'span 1' : 'span 1',
+              marginBottom: isMobile ? '8px' : '0'
+            }}>
               <label>الحي</label>
               <input
                 name="district"
                 value={formData.district}
                 onChange={handleChange}
                 placeholder="اسم الحي"
+                style={{
+                  width: '100%',
+                  padding: isMobile ? '12px 16px' : '10px 12px',
+                  fontSize: isMobile ? '16px' : '14px'
+                }}
               />
             </div>
             {/* نوع السكن */}
-            <div className={styles.inputGroup}>
+            <div className={styles.inputGroup} style={{ 
+              gridColumn: isMobile ? 'span 1' : 'span 1',
+              marginBottom: isMobile ? '8px' : '0'
+            }}>
               <label>نوع السكن</label>
               <select
                 name="housingType"
                 value={formData.housingType || ""}
                 onChange={handleChange}
                 required
+                style={{
+                  width: '100%',
+                  padding: isMobile ? '12px 16px' : '10px 12px',
+                  fontSize: isMobile ? '16px' : '14px'
+                }}
               >
                 <option value="" disabled hidden>اختر نوع السكن</option>
                 <option value="ملك">ملك</option>
@@ -1234,7 +1288,10 @@ const SignFamily = () => {
             {/* مبلغ الإيجار ورفع العقد */}
             {formData.housingType === "إيجار" && (
               <>
-                <div className={styles.inputGroup}>
+                <div className={styles.inputGroup} style={{ 
+                  gridColumn: isMobile ? 'span 1' : 'span 1',
+                  marginBottom: isMobile ? '8px' : '0'
+                }}>
                   <label>مبلغ الإيجار السنوي</label>
                   <input
                     type="number"
@@ -1243,11 +1300,24 @@ const SignFamily = () => {
                     min={0}
                     onChange={handleChange}
                     placeholder="أدخل مبلغ الإيجار بالريال"
+                    style={{
+                      width: '100%',
+                      padding: isMobile ? '12px 16px' : '10px 12px',
+                      fontSize: isMobile ? '16px' : '14px'
+                    }}
                   />
                 </div>
-                <div className={styles.inputGroup}>
+                <div className={styles.inputGroup} style={{ 
+                  gridColumn: isMobile ? 'span 1' : 'span 1',
+                  marginBottom: isMobile ? '8px' : '0'
+                }}>
                   <label>إرفاق عقد الإيجار (JPG أو PNG فقط)</label>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: isMobile ? '4px' : '8px',
+                    flexWrap: isMobile ? 'wrap' : 'nowrap'
+                  }}>
                     <input
                       type="file"
                       name="rentContractFile"
@@ -1259,10 +1329,10 @@ const SignFamily = () => {
                     <label htmlFor="rentContractFileInput" className={styles.fileInputLabel} style={{
                       cursor: 'pointer',
                       background: '#e2e8f0',
-                      padding: '6px 16px',
+                      padding: isMobile ? '8px 12px' : '6px 16px',
                       borderRadius: 6,
-                      minWidth: 90,
-                      fontSize: 13,
+                      minWidth: isMobile ? '80px' : '90px',
+                      fontSize: isMobile ? '12px' : '13px',
                       textAlign: 'center',
                       display: 'inline-block',
                       fontWeight: 500,
@@ -1273,13 +1343,13 @@ const SignFamily = () => {
                       <button
                         type="button"
                         style={{
-                          fontSize: 13,
-                          padding: '6px 16px',
-                          minWidth: 90,
+                          fontSize: isMobile ? '12px' : '13px',
+                          padding: isMobile ? '8px 12px' : '6px 16px',
+                          minWidth: isMobile ? '80px' : '90px',
                           borderRadius: 6,
                           border: 'none',
                           cursor: 'pointer',
-                          marginRight: 4,
+                          marginRight: isMobile ? '2px' : '4px',
                           background: '#3182ce', // أزرق
                           color: '#fff',
                           fontWeight: 500,
@@ -1303,11 +1373,25 @@ const SignFamily = () => {
               </>
             )}
             {/* مصادر الدخل */}
-            <div className={styles.inputGroup} style={{ gridColumn: 'span 3' }}>
-              <label style={{ fontWeight: 'bold', fontSize: 17, color: '#2c5282', marginBottom: 10, display: 'block' }}>
+            <div className={styles.inputGroup} style={{ 
+              gridColumn: isMobile ? 'span 1' : 'span 3',
+              marginBottom: isMobile ? '8px' : '0'
+            }}>
+              <label style={{ 
+                fontWeight: 'bold', 
+                fontSize: isMobile ? '15px' : '17px', 
+                color: '#2c5282', 
+                marginBottom: isMobile ? '8px' : '10px', 
+                display: 'block' 
+              }}>
                 اختر مصادر الدخل السنوية
               </label>
-              <div className={styles.incomeSourcesRow} style={{ marginBottom: '20px' }}>
+              <div className={styles.incomeSourcesRow} style={{ 
+                marginBottom: isMobile ? '16px' : '20px',
+                display: 'flex',
+                flexWrap: isMobile ? 'wrap' : 'wrap',
+                gap: isMobile ? '8px' : '8px'
+              }}>
                 {incomeOptions.map((opt) => {
                   const isActive = !!incomeSources.find(src => src.sourceType === opt.key);
                   return (
@@ -1320,16 +1404,17 @@ const SignFamily = () => {
                         border: isActive ? '2px solid #7ed957' : '1.5px solid #e5e7eb',
                         background: isActive ? '#eaffea' : '#f3f4f6',
                         color: isActive ? '#222' : '#4a5a7a',
-                        minWidth: 140,
-                        marginBottom: 8,
-                        marginLeft: 8,
+                        minWidth: isMobile ? '120px' : '140px',
+                        marginBottom: isMobile ? '4px' : '8px',
+                        marginLeft: isMobile ? '0' : '8px',
                         cursor: 'pointer',
                         borderRadius: 10,
-                        padding: '12px 18px',
+                        padding: isMobile ? '10px 14px' : '12px 18px',
                         fontWeight: 500,
-                        fontSize: 15,
+                        fontSize: isMobile ? '13px' : '15px',
                         transition: 'all 0.2s',
-                        position: 'relative'
+                        position: 'relative',
+                        flex: isMobile ? '1 1 calc(50% - 4px)' : '0 0 auto'
                       }}
                       onClick={() => toggleIncomeSource(opt.key)}
                     >
@@ -1338,11 +1423,11 @@ const SignFamily = () => {
                         <span
                           style={{
                             position: 'absolute',
-                            top: 4,
-                            left: 8,
+                            top: isMobile ? '2px' : '4px',
+                            left: isMobile ? '6px' : '8px',
                             color: '#7ed957',
                             fontWeight: 'bold',
-                            fontSize: 18,
+                            fontSize: isMobile ? '16px' : '18px',
                             cursor: 'pointer',
                             background: 'transparent',
                             border: 'none',
@@ -1365,26 +1450,52 @@ const SignFamily = () => {
               {incomeSources.length > 0 && (
                 <div style={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-                  gap: '16px',
-                  marginTop: '16px',
-                  padding: '16px',
+                  gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(250px, 1fr))',
+                  gap: isMobile ? '12px' : '16px',
+                  marginTop: isMobile ? '12px' : '16px',
+                  padding: isMobile ? '12px' : '16px',
                   background: '#f8f9fa',
                   borderRadius: '8px',
                   border: '1px solid #e5e7eb'
                 }}>
                   {incomeSources.map((src: IncomeSource) => (
-                    <div key={src.sourceType} style={{ display: 'flex', flexDirection: 'column', marginBottom: 12 }}>
-                      <label style={{ fontSize: '14px', color: '#4a5a7a', marginBottom: '8px', fontWeight: '500', textAlign: 'right' }}>
+                    <div key={src.sourceType} style={{ 
+                      display: 'flex', 
+                      flexDirection: 'column', 
+                      marginBottom: isMobile ? '8px' : '12px',
+                      padding: isMobile ? '12px' : '0',
+                      background: isMobile ? '#fff' : 'transparent',
+                      borderRadius: isMobile ? '8px' : '0',
+                      border: isMobile ? '1px solid #e5e7eb' : 'none'
+                    }}>
+                      <label style={{ 
+                        fontSize: isMobile ? '13px' : '14px', 
+                        color: '#4a5a7a', 
+                        marginBottom: isMobile ? '6px' : '8px', 
+                        fontWeight: '500', 
+                        textAlign: 'right' 
+                      }}>
                         نوع الدخل
                       </label>
                       <input
                         type="text"
                         value={src.sourceType}
                         disabled
-                        style={{ background: '#f3f4f6', color: '#222', fontWeight: 600 }}
+                        style={{ 
+                          background: '#f3f4f6', 
+                          color: '#222', 
+                          fontWeight: 600,
+                          padding: isMobile ? '10px 12px' : '8px 10px',
+                          fontSize: isMobile ? '14px' : '13px'
+                        }}
                       />
-                      <label style={{ fontSize: '14px', color: '#4a5a7a', margin: '8px 0 4px', fontWeight: '500', textAlign: 'right' }}>
+                      <label style={{ 
+                        fontSize: isMobile ? '13px' : '14px', 
+                        color: '#4a5a7a', 
+                        margin: isMobile ? '6px 0 3px' : '8px 0 4px', 
+                        fontWeight: '500', 
+                        textAlign: 'right' 
+                      }}>
                         مبلغ الدخل (سنويًا)
                       </label>
                       <input
@@ -1394,11 +1505,25 @@ const SignFamily = () => {
                         placeholder="أدخل المبلغ بالريال سنويًا"
                         value={src.sourceAmount}
                         onChange={e => updateIncomeSource(src.sourceType, 'sourceAmount', e.target.value)}
+                        style={{
+                          padding: isMobile ? '10px 12px' : '8px 10px',
+                          fontSize: isMobile ? '14px' : '13px'
+                        }}
                       />
-                      <label style={{ fontSize: 13, color: '#2c5282', fontWeight: 500, margin: '8px 0 4px' }}>
+                      <label style={{ 
+                        fontSize: isMobile ? '12px' : '13px', 
+                        color: '#2c5282', 
+                        fontWeight: 500, 
+                        margin: isMobile ? '6px 0 3px' : '8px 0 4px' 
+                      }}>
                         إرفاق صورة مستند الدخل (JPG أو PNG فقط)
                       </label>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <div style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: isMobile ? '4px' : '8px',
+                        flexWrap: isMobile ? 'wrap' : 'nowrap'
+                      }}>
                         <input
                           type="file"
                           accept=".jpg,.jpeg,.png"
@@ -1409,20 +1534,28 @@ const SignFamily = () => {
                             updateIncomeSource(src.sourceType, 'sourceImage', file);
                           }}
                         />
-                        <label htmlFor={`incomeSourceFile_${src.sourceType}`} className={styles.fileInputLabel} style={{ cursor: 'pointer', background: '#e2e8f0', padding: '6px 16px', borderRadius: 6, marginTop: 4 }}>
+                        <label htmlFor={`incomeSourceFile_${src.sourceType}`} className={styles.fileInputLabel} style={{ 
+                          cursor: 'pointer', 
+                          background: '#e2e8f0', 
+                          padding: isMobile ? '8px 12px' : '6px 16px', 
+                          borderRadius: 6, 
+                          marginTop: isMobile ? '2px' : '4px',
+                          fontSize: isMobile ? '12px' : '13px',
+                          minWidth: isMobile ? '80px' : '90px'
+                        }}>
                           {(src.sourceImage && (typeof src.sourceImage === 'string' || src.sourceImage instanceof File)) ? 'تحديث' : 'رفع ملف'}
                         </label>
                         {src.sourceImage && (
                           <button
                             type="button"
                             style={{
-                              fontSize: 13,
-                              padding: '6px 16px',
-                              minWidth: 90,
+                              fontSize: isMobile ? '12px' : '13px',
+                              padding: isMobile ? '8px 12px' : '6px 16px',
+                              minWidth: isMobile ? '80px' : '90px',
                               borderRadius: 6,
                               border: 'none',
                               cursor: 'pointer',
-                              marginRight: 4,
+                              marginRight: isMobile ? '2px' : '4px',
                               background: '#3182ce',
                               color: '#fff',
                               fontWeight: 500,
@@ -1441,8 +1574,16 @@ const SignFamily = () => {
                         )}
                         {src.sourceImage && src.sourceImage instanceof File && (
                           <>
-                            <span style={{ color: '#2c5282', fontWeight: 500, fontSize: 13 }}>{(src.sourceImage as File).name}</span>
-                            <button type="button" style={{ fontSize: 12, padding: '2px 10px' }} onClick={() => {
+                            <span style={{ 
+                              color: '#2c5282', 
+                              fontWeight: 500, 
+                              fontSize: isMobile ? '11px' : '13px',
+                              wordBreak: 'break-all'
+                            }}>{(src.sourceImage as File).name}</span>
+                            <button type="button" style={{ 
+                              fontSize: isMobile ? '11px' : '12px', 
+                              padding: isMobile ? '4px 8px' : '2px 10px' 
+                            }} onClick={() => {
                               if (src.sourceImage) {
                                 setImagePreview(URL.createObjectURL(src.sourceImage as File));
                                 setImagePreviewLabel(`مستند دخل: ${src.sourceType}`);
@@ -1450,7 +1591,10 @@ const SignFamily = () => {
                             }}>عرض</button>
                           </>
                         )}
-                        {!src.sourceImage && <span style={{ color: '#a0aec0', fontSize: 13 }}>لا يوجد ملف</span>}
+                        {!src.sourceImage && <span style={{ 
+                          color: '#a0aec0', 
+                          fontSize: isMobile ? '11px' : '13px' 
+                        }}>لا يوجد ملف</span>}
                       </div>
                     </div>
                   ))}
@@ -1460,30 +1604,34 @@ const SignFamily = () => {
               {incomeSources.length > 0 && (
                 <div style={{
                   display: 'flex',
-                  justifyContent: 'flex-end',
+                  justifyContent: isMobile ? 'center' : 'flex-end',
                   alignItems: 'center',
-                  marginTop: '16px',
-                  padding: '12px 16px',
+                  marginTop: isMobile ? '12px' : '16px',
+                  padding: isMobile ? '10px 12px' : '12px 16px',
                   background: '#e8f4f8',
                   borderRadius: '8px',
-                  border: '1px solid #b3d9e6'
+                  border: '1px solid #b3d9e6',
+                  flexDirection: isMobile ? 'column' : 'row',
+                  gap: isMobile ? '8px' : '0'
                 }}>
                   <span style={{
-                    fontSize: '16px',
+                    fontSize: isMobile ? '14px' : '16px',
                     fontWeight: 'bold',
                     color: '#2c5282',
-                    marginLeft: '12px'
+                    marginLeft: isMobile ? '0' : '12px',
+                    textAlign: isMobile ? 'center' : 'right'
                   }}>
                     إجمالي الدخل السنوي:
                   </span>
                   <span style={{
-                    fontSize: '18px',
+                    fontSize: isMobile ? '16px' : '18px',
                     fontWeight: 'bold',
                     color: '#1a365d',
                     background: 'white',
-                    padding: '6px 12px',
+                    padding: isMobile ? '8px 16px' : '6px 12px',
                     borderRadius: '4px',
-                    border: '1px solid #cbd5e0'
+                    border: '1px solid #cbd5e0',
+                    textAlign: 'center'
                   }}>
                     {totalIncome.toLocaleString()} ريال
                   </span>
@@ -1491,22 +1639,38 @@ const SignFamily = () => {
               )}
             </div>
             {/* اختيار البنك */}
-            <div className={styles.inputGroup}>
+            <div className={styles.inputGroup} style={{ 
+              gridColumn: isMobile ? 'span 1' : 'span 1',
+              marginBottom: isMobile ? '8px' : '0'
+            }}>
               <label>البنك</label>
               <select
                 name="bankName"
                 value={formData.bankName || ""}
                 onChange={handleChange}
                 required
+                style={{
+                  width: '100%',
+                  padding: isMobile ? '12px 16px' : '10px 12px',
+                  fontSize: isMobile ? '16px' : '14px'
+                }}
               >
                 <option value="" disabled hidden>اختر البنك</option>
                 {saudiBanks.map(b => <option key={b} value={b}>{b}</option>)}
               </select>
             </div>
             {/* رفع صورة الآيبان */}
-            <div className={styles.inputGroup}>
+            <div className={styles.inputGroup} style={{ 
+              gridColumn: isMobile ? 'span 1' : 'span 1',
+              marginBottom: isMobile ? '8px' : '0'
+            }}>
               <label>إرفاق صورة الآيبان (JPG أو PNG فقط)</label>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: isMobile ? '4px' : '8px',
+                flexWrap: isMobile ? 'wrap' : 'nowrap'
+              }}>
                 <input
                   type="file"
                   name="ibanImage"
@@ -1518,10 +1682,10 @@ const SignFamily = () => {
                 <label htmlFor="ibanImageInput" className={styles.fileInputLabel} style={{
                   cursor: 'pointer',
                   background: '#e2e8f0',
-                  padding: '6px 16px',
+                  padding: isMobile ? '8px 12px' : '6px 16px',
                   borderRadius: 6,
-                  minWidth: 90,
-                  fontSize: 13,
+                  minWidth: isMobile ? '80px' : '90px',
+                  fontSize: isMobile ? '12px' : '13px',
                   textAlign: 'center',
                   display: 'inline-block',
                   fontWeight: 500,
@@ -1532,13 +1696,13 @@ const SignFamily = () => {
                   <button
                     type="button"
                     style={{
-                      fontSize: 13,
-                      padding: '6px 16px',
-                      minWidth: 90,
+                      fontSize: isMobile ? '12px' : '13px',
+                      padding: isMobile ? '8px 12px' : '6px 16px',
+                      minWidth: isMobile ? '80px' : '90px',
                       borderRadius: 6,
                       border: 'none',
                       cursor: 'pointer',
-                      marginRight: 4,
+                      marginRight: isMobile ? '2px' : '4px',
                       background: '#3182ce', // أزرق
                       color: '#fff',
                       fontWeight: 500,
@@ -1567,9 +1731,15 @@ const SignFamily = () => {
       return (
         <div className={styles.card}>
           <h2 className={styles.title}>بيانات المرافقين</h2>
-          <div className={styles.grid}>
+          <div className={styles.grid} style={{ 
+            gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
+            gap: isMobile ? '16px' : '20px'
+          }}>
             {/* عدد المرافقين */}
-            <div className={styles.inputGroup}>
+            <div className={styles.inputGroup} style={{ 
+              gridColumn: isMobile ? 'span 1' : 'span 1',
+              marginBottom: isMobile ? '8px' : '0'
+            }}>
               <label>عدد المرافقين</label>
               <select
                 value={companionsCount}
@@ -1577,6 +1747,11 @@ const SignFamily = () => {
                   const val = parseInt(e.target.value) || 0;
                   setCompanionsCount(val);
                   setMaleCount(val);
+                }}
+                style={{
+                  width: '100%',
+                  padding: isMobile ? '12px 16px' : '10px 12px',
+                  fontSize: isMobile ? '16px' : '14px'
                 }}
               >
                 {Array.from({ length: 16 }, (_, i) => (
@@ -1586,11 +1761,19 @@ const SignFamily = () => {
             </div>
             {/* عدد الذكور */}
             {companionsCount > 0 && (
-              <div className={styles.inputGroup}>
+              <div className={styles.inputGroup} style={{ 
+                gridColumn: isMobile ? 'span 1' : 'span 1',
+                marginBottom: isMobile ? '8px' : '0'
+              }}>
                 <label>عدد الذكور</label>
                 <select
                   value={maleCount}
                   onChange={e => setMaleCount(Number(e.target.value))}
+                  style={{
+                    width: '100%',
+                    padding: isMobile ? '12px 16px' : '10px 12px',
+                    fontSize: isMobile ? '16px' : '14px'
+                  }}
                 >
                   {Array.from({ length: companionsCount + 1 }, (_, i) => (
                     <option key={i} value={i}>{i}</option>
@@ -1600,20 +1783,38 @@ const SignFamily = () => {
             )}
             {/* عدد الإناث */}
             {companionsCount > 0 && (
-              <div className={styles.inputGroup}>
+              <div className={styles.inputGroup} style={{ 
+                gridColumn: isMobile ? 'span 1' : 'span 1',
+                marginBottom: isMobile ? '8px' : '0'
+              }}>
                 <label>عدد الإناث</label>
                 <input
                   type="number"
                   value={companionsCount - maleCount}
                   disabled
+                  style={{
+                    width: '100%',
+                    padding: isMobile ? '12px 16px' : '10px 12px',
+                    fontSize: isMobile ? '16px' : '14px',
+                    background: '#f3f4f6',
+                    color: '#6b7280'
+                  }}
                 />
               </div>
             )}
             {/* رفع كارت العائلة */}
             {companionsCount > 0 && (
-              <div className={styles.inputGroup} style={{ gridColumn: 'span 3' }}>
+              <div className={styles.inputGroup} style={{ 
+                gridColumn: isMobile ? 'span 1' : 'span 3',
+                marginBottom: isMobile ? '8px' : '0'
+              }}>
                 <label>إرفاق كارت العائلة (JPG أو PNG فقط)</label>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: isMobile ? '4px' : '8px',
+                  flexWrap: isMobile ? 'wrap' : 'nowrap'
+                }}>
                   <input
                     type="file"
                     name="familyCardFile"
@@ -1625,10 +1826,10 @@ const SignFamily = () => {
                   <label htmlFor="familyCardFileInput" className={styles.fileInputLabel} style={{
                     cursor: 'pointer',
                     background: '#e2e8f0',
-                    padding: '6px 16px',
+                    padding: isMobile ? '8px 12px' : '6px 16px',
                     borderRadius: 6,
-                    minWidth: 90,
-                    fontSize: 13,
+                    minWidth: isMobile ? '80px' : '90px',
+                    fontSize: isMobile ? '12px' : '13px',
                     textAlign: 'center',
                     display: 'inline-block',
                     fontWeight: 500,
@@ -1641,13 +1842,13 @@ const SignFamily = () => {
                       <button
                         type="button"
                         style={{
-                          fontSize: 13,
-                          padding: '6px 16px',
-                          minWidth: 90,
+                          fontSize: isMobile ? '12px' : '13px',
+                          padding: isMobile ? '8px 12px' : '6px 16px',
+                          minWidth: isMobile ? '80px' : '90px',
                           borderRadius: 6,
                           border: 'none',
                           cursor: 'pointer',
-                          marginRight: 4,
+                          marginRight: isMobile ? '2px' : '4px',
                           background: '#3182ce', // أزرق
                           color: '#fff',
                           fontWeight: 500,
@@ -1671,13 +1872,33 @@ const SignFamily = () => {
           </div>
           {/* بيانات المرافقين */}
           {companionsCount > 0 && companions.length > 0 && (
-            <div className={styles.companionsScrollBox} style={{ marginTop: 24 }}>
+            <div className={styles.companionsScrollBox} style={{ 
+              marginTop: isMobile ? '16px' : '24px',
+              padding: isMobile ? '0 8px' : '0'
+            }}>
               {companions.map((companion, idx) => (
-                <div key={idx} className={styles.card} style={{ marginBottom: 18, background: '#f9f9fb' }}>
-                  <h3 style={{ color: '#4a5a7a', fontWeight: 700, marginBottom: 12 }}>بيانات المرافق {idx + 1}</h3>
-                  <div className={styles.grid}>
+                <div key={idx} className={styles.card} style={{ 
+                  marginBottom: isMobile ? '12px' : '18px', 
+                  background: '#f9f9fb',
+                  padding: isMobile ? '16px' : '20px',
+                  borderRadius: isMobile ? '12px' : '8px'
+                }}>
+                  <h3 style={{ 
+                    color: '#4a5a7a', 
+                    fontWeight: 700, 
+                    marginBottom: isMobile ? '8px' : '12px',
+                    fontSize: isMobile ? '16px' : '18px',
+                    textAlign: isMobile ? 'center' : 'right'
+                  }}>بيانات المرافق {idx + 1}</h3>
+                  <div className={styles.grid} style={{ 
+                    gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
+                    gap: isMobile ? '12px' : '16px'
+                  }}>
                     {/* الاسم الرباعي */}
-                    <div className={styles.inputGroup}>
+                    <div className={styles.inputGroup} style={{ 
+                      gridColumn: isMobile ? 'span 1' : 'span 1',
+                      marginBottom: isMobile ? '8px' : '0'
+                    }}>
                       <label>الاسم الرباعي</label>
                       <input
                         value={companion.name}
@@ -1686,10 +1907,18 @@ const SignFamily = () => {
                           arr[idx].name = e.target.value;
                           setCompanions(arr);
                         }}
+                        style={{
+                          width: '100%',
+                          padding: isMobile ? '10px 12px' : '8px 10px',
+                          fontSize: isMobile ? '14px' : '13px'
+                        }}
                       />
                     </div>
                     {/* رقم الهوية */}
-                    <div className={styles.inputGroup}>
+                    <div className={styles.inputGroup} style={{ 
+                      gridColumn: isMobile ? 'span 1' : 'span 1',
+                      marginBottom: isMobile ? '8px' : '0'
+                    }}>
                       <label>رقم الهوية</label>
                       <input
                         value={companion.identityNumber || companion.id || ""}
@@ -1699,12 +1928,24 @@ const SignFamily = () => {
                           arr[idx].id = e.target.value; // حفظ في كلا الحقلين للتوافق
                           setCompanions(arr);
                         }}
+                        style={{
+                          width: '100%',
+                          padding: isMobile ? '10px 12px' : '8px 10px',
+                          fontSize: isMobile ? '14px' : '13px'
+                        }}
                       />
                     </div>
                     {/* تاريخ الميلاد هجري/ميلادي + العمر */}
-                    <div className={styles.inputGroup}>
+                    <div className={styles.inputGroup} style={{ 
+                      gridColumn: isMobile ? 'span 1' : 'span 1',
+                      marginBottom: isMobile ? '8px' : '0'
+                    }}>
                       <label>تاريخ الميلاد</label>
-                      <div className={styles.dateRow}>
+                      <div className={styles.dateRow} style={{
+                        display: 'flex',
+                        gap: isMobile ? '4px' : '8px',
+                        flexWrap: isMobile ? 'wrap' : 'nowrap'
+                      }}>
                         <select
                           value={companion.dateType}
                           onChange={e => {
@@ -1712,9 +1953,13 @@ const SignFamily = () => {
                             arr[idx].dateType = e.target.value;
                             arr[idx].birthDate = '';
                             arr[idx].age = '';
-                            setCompanions(arr);
+                            setCompanions([...arr]); // إجبار التحديث
                           }}
-                          style={{ minWidth: 80 }}
+                          style={{ 
+                            minWidth: isMobile ? '70px' : '80px',
+                            padding: isMobile ? '8px 6px' : '6px 8px',
+                            fontSize: isMobile ? '12px' : '13px'
+                          }}
                         >
                           <option value="هجري">هجري</option>
                           <option value="ميلادي">ميلادي</option>
@@ -1724,23 +1969,20 @@ const SignFamily = () => {
                             type="date"
                             value={companion.birthDate}
                             onChange={e => {
+                              const newBirthDate = e.target.value;
+                              const calculatedAge = calculateAge(newBirthDate, 'ميلادي');
+                              console.log(`تغيير التاريخ ميلادي: ${newBirthDate}, العمر: ${calculatedAge}`);
+                              
                               const arr = [...companions];
-                              arr[idx].birthDate = e.target.value;
-                              // حساب العمر ميلادي
-                              let ageNum = 0;
-                              const birthDateObj = new Date(e.target.value);
-                              if (!isNaN(birthDateObj.getTime())) {
-                                const today = new Date();
-                                ageNum = today.getFullYear() - birthDateObj.getFullYear();
-                                const m = today.getMonth() - birthDateObj.getMonth();
-                                if (m < 0 || (m === 0 && today.getDate() < birthDateObj.getDate())) {
-                                  ageNum--;
-                                }
-                              }
-                              arr[idx].age = ageNum > 0 ? ageNum.toString() : '';
+                              arr[idx].birthDate = newBirthDate;
+                              arr[idx].age = calculatedAge;
                               setCompanions(arr);
                             }}
-                            style={{ flex: 1 }}
+                            style={{ 
+                              flex: 1,
+                              padding: isMobile ? '8px 6px' : '6px 8px',
+                              fontSize: isMobile ? '12px' : '13px'
+                            }}
                           />
                         ) : (
                           <>
@@ -1749,18 +1991,20 @@ const SignFamily = () => {
                               onChange={e => {
                                 const year = e.target.value;
                                 const [_, m, d] = companion.birthDate ? companion.birthDate.split('-') : [undefined, '', ''];
+                                const newBirthDate = `${year}-${m || ''}-${d || ''}`;
+                                const calculatedAge = calculateAge(newBirthDate, 'هجري');
+                                console.log(`تغيير السنة هجري: ${newBirthDate}, العمر: ${calculatedAge}`);
+                                
                                 const arr = [...companions];
-                                arr[idx].birthDate = `${year}-${m || ''}-${d || ''}`;
-                                // حساب العمر هجري
-                                let ageNum = 0;
-                                if (year) {
-                                  const hijriYear = getCurrentHijriYear();
-                                  ageNum = hijriYear - parseInt(year);
-                                }
-                                arr[idx].age = ageNum > 0 ? ageNum.toString() : '';
+                                arr[idx].birthDate = newBirthDate;
+                                arr[idx].age = calculatedAge;
                                 setCompanions(arr);
                               }}
-                              style={{ minWidth: 80 }}
+                              style={{ 
+                                minWidth: isMobile ? '70px' : '80px',
+                                padding: isMobile ? '8px 6px' : '6px 8px',
+                                fontSize: isMobile ? '12px' : '13px'
+                              }}
                             >
                               <option value="">سنة</option>
                               {Array.from({length: 201}, (_, i) => getCurrentHijriYear() - 200 + i).map(y => <option key={y} value={y}>{y}</option>)}
@@ -1770,11 +2014,20 @@ const SignFamily = () => {
                               onChange={e => {
                                 const month = e.target.value;
                                 const [y, _, d] = companion.birthDate ? companion.birthDate.split('-') : ['', undefined, ''];
+                                const newBirthDate = `${y || ''}-${month}-${d || ''}`;
+                                const calculatedAge = calculateAge(newBirthDate, 'هجري');
+                                console.log(`تغيير الشهر هجري: ${newBirthDate}, العمر: ${calculatedAge}`);
+                                
                                 const arr = [...companions];
-                                arr[idx].birthDate = `${y || ''}-${month}-${d || ''}`;
+                                arr[idx].birthDate = newBirthDate;
+                                arr[idx].age = calculatedAge;
                                 setCompanions(arr);
                               }}
-                              style={{ minWidth: 80 }}
+                              style={{ 
+                                minWidth: isMobile ? '70px' : '80px',
+                                padding: isMobile ? '8px 6px' : '6px 8px',
+                                fontSize: isMobile ? '12px' : '13px'
+                              }}
                             >
                               <option value="">شهر</option>
                               {hijriMonths.map((m, i) => <option key={m} value={i+1}>{m}</option>)}
@@ -1784,11 +2037,20 @@ const SignFamily = () => {
                               onChange={e => {
                                 const day = e.target.value;
                                 const [y, m, _] = companion.birthDate ? companion.birthDate.split('-') : ['', '', undefined];
+                                const newBirthDate = `${y || ''}-${m || ''}-${day}`;
+                                const calculatedAge = calculateAge(newBirthDate, 'هجري');
+                                console.log(`تغيير اليوم هجري: ${newBirthDate}, العمر: ${calculatedAge}`);
+                                
                                 const arr = [...companions];
-                                arr[idx].birthDate = `${y || ''}-${m || ''}-${day}`;
+                                arr[idx].birthDate = newBirthDate;
+                                arr[idx].age = calculatedAge;
                                 setCompanions(arr);
                               }}
-                              style={{ minWidth: 60 }}
+                              style={{ 
+                                minWidth: isMobile ? '50px' : '60px',
+                                padding: isMobile ? '8px 6px' : '6px 8px',
+                                fontSize: isMobile ? '12px' : '13px'
+                              }}
                             >
                               <option value="">يوم</option>
                               {hijriDays.map(d => <option key={d} value={d}>{d}</option>)}
@@ -1798,12 +2060,29 @@ const SignFamily = () => {
                       </div>
                     </div>
                     {/* العمر */}
-                    <div className={styles.inputGroup}>
+                    <div className={styles.inputGroup} style={{ 
+                      gridColumn: isMobile ? 'span 1' : 'span 1',
+                      marginBottom: isMobile ? '8px' : '0'
+                    }}>
                       <label>العمر</label>
-                      <input type="text" value={companion.age} disabled />
+                      <input 
+                        type="text" 
+                        value={companion.age} 
+                        disabled 
+                        style={{
+                          width: '100%',
+                          padding: isMobile ? '10px 12px' : '8px 10px',
+                          fontSize: isMobile ? '14px' : '13px',
+                          background: '#f3f4f6',
+                          color: '#6b7280'
+                        }}
+                      />
                     </div>
                     {/* المرحلة الدراسية */}
-                    <div className={styles.inputGroup}>
+                    <div className={styles.inputGroup} style={{ 
+                      gridColumn: isMobile ? 'span 1' : 'span 1',
+                      marginBottom: isMobile ? '8px' : '0'
+                    }}>
                       <label>المرحلة الدراسية</label>
                       <select
                         value={companion.studyLevel}
@@ -1812,6 +2091,11 @@ const SignFamily = () => {
                           arr[idx].studyLevel = e.target.value;
                           arr[idx].studyGrade = '';
                           setCompanions(arr);
+                        }}
+                        style={{
+                          width: '100%',
+                          padding: isMobile ? '10px 12px' : '8px 10px',
+                          fontSize: isMobile ? '14px' : '13px'
                         }}
                       >
                         <option value="">اختر المرحلة</option>
@@ -1823,7 +2107,10 @@ const SignFamily = () => {
                     </div>
                     {/* تفاصيل الصف */}
                     {(companion.studyLevel === 'ابتدائي' || companion.studyLevel === 'متوسط' || companion.studyLevel === 'ثانوي') && (
-                      <div className={styles.inputGroup}>
+                      <div className={styles.inputGroup} style={{ 
+                        gridColumn: isMobile ? 'span 1' : 'span 1',
+                        marginBottom: isMobile ? '8px' : '0'
+                      }}>
                         <label>الصف</label>
                         <select
                           value={companion.studyGrade}
@@ -1831,6 +2118,11 @@ const SignFamily = () => {
                             const arr = [...companions];
                             arr[idx].studyGrade = e.target.value;
                             setCompanions(arr);
+                          }}
+                          style={{
+                            width: '100%',
+                            padding: isMobile ? '10px 12px' : '8px 10px',
+                            fontSize: isMobile ? '14px' : '13px'
                           }}
                         >
                           <option value="">اختر الصف</option>
@@ -1847,7 +2139,10 @@ const SignFamily = () => {
                       </div>
                     )}
                     {/* الحالة الصحية */}
-                    <div className={styles.inputGroup}>
+                    <div className={styles.inputGroup} style={{ 
+                      gridColumn: isMobile ? 'span 1' : 'span 1',
+                      marginBottom: isMobile ? '8px' : '0'
+                    }}>
                       <label>الحالة الصحية</label>
                       <select
                         value={companion.healthStatus}
@@ -1857,6 +2152,11 @@ const SignFamily = () => {
                           if (e.target.value !== 'غير سليم') arr[idx].disabilityType = '';
                           setCompanions(arr);
                         }}
+                        style={{
+                          width: '100%',
+                          padding: isMobile ? '10px 12px' : '8px 10px',
+                          fontSize: isMobile ? '14px' : '13px'
+                        }}
                       >
                         <option value="">اختر الحالة الصحية</option>
                         <option value="سليم">سليم</option>
@@ -1865,7 +2165,10 @@ const SignFamily = () => {
                     </div>
                     {/* نوع الإعاقة */}
                     {companion.healthStatus === 'غير سليم' && (
-                      <div className={styles.inputGroup}>
+                      <div className={styles.inputGroup} style={{ 
+                        gridColumn: isMobile ? 'span 1' : 'span 1',
+                        marginBottom: isMobile ? '8px' : '0'
+                      }}>
                         <label>نوع الإعاقة</label>
                         <select
                           value={companion.disabilityType}
@@ -1873,6 +2176,11 @@ const SignFamily = () => {
                             const arr = [...companions];
                             arr[idx].disabilityType = e.target.value;
                             setCompanions(arr);
+                          }}
+                          style={{
+                            width: '100%',
+                            padding: isMobile ? '10px 12px' : '8px 10px',
+                            fontSize: isMobile ? '14px' : '13px'
                           }}
                         >
                           <option value="">اختر نوع الإعاقة</option>
@@ -1882,7 +2190,10 @@ const SignFamily = () => {
                       </div>
                     )}
                     {/* صلة القرابة */}
-                    <div className={styles.inputGroup}>
+                    <div className={styles.inputGroup} style={{ 
+                      gridColumn: isMobile ? 'span 1' : 'span 1',
+                      marginBottom: isMobile ? '8px' : '0'
+                    }}>
                       <label>صلة القرابة</label>
                       <input
                         value={companion.kinship}
@@ -1890,6 +2201,11 @@ const SignFamily = () => {
                           const arr = [...companions];
                           arr[idx].kinship = e.target.value;
                           setCompanions(arr);
+                        }}
+                        style={{
+                          width: '100%',
+                          padding: isMobile ? '10px 12px' : '8px 10px',
+                          fontSize: isMobile ? '14px' : '13px'
                         }}
                       />
                     </div>

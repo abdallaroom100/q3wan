@@ -21,7 +21,7 @@ const projects = [
   },
   
   {
-    img: "img/مشروع سقيا الماء.webp",
+    img: "img/ماء.jpg",
     title: "مشروع سقيا المياه",
     cost: "معدل 40 الف ريال",
     beneficiaries: "المناطق المحتاجة",

@@ -132,12 +132,12 @@ export default function ArabicAuthForm() {
 
   return (
     <div
-      className="min-h-screen bg-gradient-to-br from-[#2c3e50] via-[#1a1a2e] to-[#2c3e50] flex items-center justify-center p-4"
+      className="min-h-[89vh] bg-gradient-to-br from-[#f3f4f6] via-[#e5e7eb] to-[#f3f4f6] flex items-center justify-center p-4"
       dir="rtl"
     >
       <Toaster />
       <div className="relative z-10 w-full max-w-md">
-        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl overflow-hidden">
+        <div className="bg-white shadow-2xl rounded-3xl overflow-hidden border border-gray-100">
           <AuthHeader />
           <AuthTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
@@ -159,7 +159,7 @@ export default function ArabicAuthForm() {
         </div>
 
         <div className="text-center mt-8">
-          <p className="text-white/50 text-sm">© 2025 جميع الحقوق محفوظة</p>
+          <p className="text-gray-500 text-sm">© 2025 جميع الحقوق محفوظة</p>
         </div>
       </div>
 

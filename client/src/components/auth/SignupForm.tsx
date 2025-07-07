@@ -22,7 +22,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ signupData, onSignupChange, onS
           placeholder="الاسم رباعي"
           value={signupData.fullName}
           onChange={(e) => onSignupChange('fullName', e.target.value)}
-          className="w-full p-4 bg-white/10 border border-white/20 rounded-2xl text-white placeholder-white/60 backdrop-blur-sm focus:outline-none focus:border-[#2c3e50] transition-all duration-300"
+          className="w-full p-4 bg-white border border-gray-200 rounded-2xl text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[rgb(58,61,108)] focus:ring-2 focus:ring-[rgb(58,61,108)]/20 transition-all duration-300 shadow-sm"
         />
       </div>
       <div className="relative">
@@ -32,7 +32,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ signupData, onSignupChange, onS
           value={signupData.email}
           required
           onChange={(e) => onSignupChange('email', e.target.value)}
-          className="w-full p-4 bg-white/10 border border-white/20 rounded-2xl text-white placeholder-white/60 backdrop-blur-sm focus:outline-none focus:border-[#2c3e50] transition-all duration-300"
+          className="w-full p-4 bg-white border border-gray-200 rounded-2xl text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[rgb(58,61,108)] focus:ring-2 focus:ring-[rgb(58,61,108)]/20 transition-all duration-300 shadow-sm"
         />
       </div>
       <div className="relative flex gap-2 items-center justify-center ">
@@ -42,9 +42,9 @@ const SignupForm: React.FC<SignupFormProps> = ({ signupData, onSignupChange, onS
           style={{direction:'rtl'}}
           value={signupData.phone}
           onChange={(e) => onSignupChange('phone', e.target.value)}
-          className="w-full p-4 bg-white/10 border border-white/20 rounded-2xl text-white placeholder-white/60 backdrop-blur-sm focus:outline-none focus:border-[#2c3e50] transition-all duration-300"
+          className="w-full p-4 bg-white border border-gray-200 rounded-2xl text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[rgb(58,61,108)] focus:ring-2 focus:ring-[rgb(58,61,108)]/20 transition-all duration-300 shadow-sm"
         />
-        <span className='disabled text-white  bg-white/10 border border-white/20 !h-1/2 rounded-2xl px-2 py-1'> 966+</span>
+        <span className='disabled text-gray-600 bg-gray-100 border border-gray-200   px-2 py-3 rounded-lg '> 966+</span>
       </div>
       <div className="relative">
         <input
@@ -53,7 +53,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ signupData, onSignupChange, onS
           style={{direction:'rtl'}}
           value={signupData.identityNumber}
           onChange={(e) => onSignupChange('identityNumber', e.target.value)}
-          className="w-full p-4 bg-white/10 border border-white/20 rounded-2xl text-white placeholder-white/60 backdrop-blur-sm focus:outline-none focus:border-[#2c3e50] transition-all duration-300"
+          className="w-full p-4 bg-white border border-gray-200 rounded-2xl text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[rgb(58,61,108)] focus:ring-2 focus:ring-[rgb(58,61,108)]/20 transition-all duration-300 shadow-sm"
         />
       </div>
 
@@ -65,7 +65,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ signupData, onSignupChange, onS
           placeholder="كلمة المرور"
           value={signupData.password}
           onChange={(e) => onSignupChange('password', e.target.value)}
-          className="w-full p-4 bg-white/10 border border-white/20 rounded-2xl text-white placeholder-white/60 backdrop-blur-sm focus:outline-none focus:border-[#2c3e50] transition-all duration-300"
+          className="w-full p-4 bg-white border border-gray-200 rounded-2xl text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[rgb(58,61,108)] focus:ring-2 focus:ring-[rgb(58,61,108)]/20 transition-all duration-300 shadow-sm"
         />
       </div>
       <div className="relative">
@@ -74,21 +74,21 @@ const SignupForm: React.FC<SignupFormProps> = ({ signupData, onSignupChange, onS
           placeholder="تاكيد كلمة المرور"
           value={signupData.confirmPassword}
           onChange={(e) => onSignupChange('confirmPassword', e.target.value)}
-          className="w-full p-4 bg-white/10 border border-white/20 rounded-2xl text-white placeholder-white/60 backdrop-blur-sm focus:outline-none focus:border-[#2c3e50] transition-all duration-300"
+          className="w-full p-4 bg-white border border-gray-200 rounded-2xl text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[rgb(58,61,108)] focus:ring-2 focus:ring-[rgb(58,61,108)]/20 transition-all duration-300 shadow-sm"
         />
       </div>
 
       <button
         onClick={onSignup}
-        className="w-full py-4 px-6 bg-gradient-to-r from-[#2c3e50] to-[#1a1a2e] text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
+        className="w-full py-4 px-6 bg-gradient-to-r from-[rgb(58,61,108)] to-[rgb(149,122,77)] text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
       >
         إنشاء الحساب
       </button>
 
       <div className="text-center">
-        <p className="text-white/70 text-xs">
+        <p className="text-gray-500 text-xs">
           بالتسجيل، أنت توافق على 
-          <button className=" transition-colors duration-300 underline mx-1">
+          <button className="text-[rgb(58,61,108)] transition-colors duration-300 underline mx-1 hover:text-[rgb(149,122,77)]">
             الشروط والأحكام
           </button>
         </p>
