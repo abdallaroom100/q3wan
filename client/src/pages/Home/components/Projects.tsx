@@ -52,7 +52,7 @@ const projects = [
   },
   {
     img: "img/كسوة الشتاء.jpg",
-    title: "كسوة الشتوية",
+    title: "كسوة الشتاء",
       cost: "معدل 16 الف ريال",
       beneficiaries: " الأسر المحتاجة",
       card: "توزيع مباشر",
@@ -76,7 +76,7 @@ const projects = [
       cost: "كمية التمور الموزعة: 5600 كيلو جرام",
       beneficiaries: "الأسر المحتاجة ",
       card: "تنفيذ مباشر",
-      period: "مرة واحدة",
+      period: "مرة واحدة سنوياً",
       bgColor: "bg-cyan-600",
       bgGradient: "from-cyan-600 to-blue-500"
     },
@@ -86,7 +86,7 @@ const projects = [
       cost: "معدل 30 الف ريال سنويا",
       beneficiaries: "الأسر المحتاجة",
       card: "تنفيذ مباشر",
-      period: "مرة واحدة",
+      period: "مرة واحدة سنوياً",
       bgColor: "bg-cyan-600",
       bgGradient: "from-cyan-600 to-blue-500"
     },

@@ -15,7 +15,7 @@ const NewsSection = () => (
           },
           {
             img: "/img/q3wan1.webp",
-            title: "سخاؤكم جعل صيفهم أطيب",
+            title: "دعمكم جعل صيفهم أطيب",
             text: "",
           },
           {
