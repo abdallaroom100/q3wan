@@ -3,11 +3,11 @@ import { Menu, X } from "lucide-react";
 import BeneficiariesList from "./components/BeneficiariesList";
 import Reports from "./components/Reports";
 import EditReports from "./components/EditReports";
-import Settings from "./components/Settings";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { logoutAdmin } from "../../store/slices/dashboard/AdminSlice";
 import FinalReportsTable from "./components/FinalReportsTable";
+import AcceptedRecords from "./components/AcceptedRecords";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("beneficiaries");
@@ -37,6 +37,8 @@ const Dashboard = () => {
         return <Reports />;
       case "editReports":
         return <EditReports />;
+      case "acceptedRecords":
+        return <AcceptedRecords />;
       default:
         return <BeneficiariesList />;
     }
@@ -108,7 +110,18 @@ const Dashboard = () => {
           >
             التقارير
           </button>
-          
+
+          <button
+            className={`w-full p-4 rounded-xl text-lg font-semibold text-right transition-all duration-300 transform hover:scale-105 ${
+              activeTab === "acceptedRecords"
+                ? "bg-gradient-to-r from-cyan-500 to-cyan-600 text-white shadow-lg shadow-cyan-500/30"
+                : "text-slate-300 hover:text-white hover:bg-slate-700/50 hover:shadow-md"
+            }`}
+            onClick={() => handleTabClick("acceptedRecords")}
+          >
+            سجل المقبولين
+          </button>
+
           {/* Only show this button if admin.rule === 'manager' */}
           {admin && admin.rule === "manager" && (
             <button

@@ -4,7 +4,7 @@ import React, { SetStateAction, useEffect } from "react";
 
 
 
- export const useGetFinalReports =  ({setFinalReports,setLoading} :{setFinalReports:React.Dispatch<SetStateAction<any[]>>,setLoading:React.Dispatch<SetStateAction<boolean>>}) =>{
+ export const useGetAllFinalAccepted =  ({setFinalAcceptedReports,setLoading} :{setFinalAcceptedReports:React.Dispatch<SetStateAction<any[]>>,setLoading:React.Dispatch<SetStateAction<boolean>>}) =>{
 
      let adminToken:string ;
      try {
@@ -15,9 +15,9 @@ import React, { SetStateAction, useEffect } from "react";
      } catch (error) {
         console.log(error)
      }
-     const getFinalReports = async () =>{
+     const getFinalAcceptedReports = async () =>{
           setLoading(true)
-        await axios.get("/admin/final",{
+        await axios.get("/admin/archive",{
             headers:{
                 "Content-Type":"application/json",
                 "authorization":`Bearer ${adminToken}`
@@ -25,14 +25,14 @@ import React, { SetStateAction, useEffect } from "react";
             
         }).then((res)=>{
           
-            setFinalReports(res.data.reports)
+            setFinalAcceptedReports(res.data.reports)
         }).catch(err => {
             console.log(err.response.data.error)
         }).finally(()=>setLoading(false))
     }
     
     useEffect(() => {
-        getFinalReports()
+        getFinalAcceptedReports()
     }, []);
   
  }

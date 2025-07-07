@@ -1,31 +1,15 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { useEffect, useState } from "react";
 import styles from "../Dashboard.module.css";
-import { useNavigate } from "react-router-dom";
+import { useGetAllFinalAccepted } from "../hooks/useGetAllFinalAccepted";
 import Modal from "../../../components/Modal";
 
-const EditReports = () => {
-  const [finalReports, setFinalReports] = useState<any[]>([]);
+const AcceptedRecords = () => {
+  const [finalAcceptedReports, setFinalAcceptedReports] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [showCommentsModal, setShowCommentsModal] = useState(false);
   const [selectedComments, setSelectedComments] = useState<any>(null);
-  const navigate = useNavigate();
 
-  useEffect(() => {
-    const admin = JSON.parse(localStorage.getItem("admin") || "{}");
-    const adminToken = admin?.token;
-    if (!adminToken) return;
-    setLoading(true);
-    axios.get("/admin/final", {
-      headers: {
-        "Content-Type": "application/json",
-        "authorization": `Bearer ${adminToken}`,
-      },
-    })
-      .then((res) => setFinalReports(res.data.reports))
-      .catch((err) => console.log(err?.response?.data?.error))
-      .finally(() => setLoading(false));
-  }, []);
+  useGetAllFinalAccepted({ setFinalAcceptedReports, setLoading });
 
   const getStatusText = (status: string) => {
     switch (status) {
@@ -66,14 +50,12 @@ const EditReports = () => {
 
   return (
     <div className={styles.card}>
-      <div className={styles.detailsHeader}>
-        <h2 className={styles.detailsTitle}>تقرير المستفيدين مع إمكانية التعديل</h2>
-      </div>
+      <h1 className={styles.detailsTitle}>سجل المقبولين</h1>
       <div className={styles.tableContainer}>
         {loading ? (
           <div className="text-center py-8">جاري تحميل البيانات...</div>
-        ) : finalReports.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">لا توجد بيانات تقارير نهائية</div>
+        ) : finalAcceptedReports.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">لا توجد بيانات تقارير مقبولة</div>
         ) : (
           <table className={styles.table}>
             <thead>
@@ -88,15 +70,10 @@ const EditReports = () => {
               </tr>
             </thead>
             <tbody>
-              {finalReports.map((item, idx) => (
+              {finalAcceptedReports.map((item, idx) => (
                 <tr
                   key={item._id || idx}
                   style={{ cursor: "pointer" }}
-                  onClick={() => {
-                    if (item.user?._id) {
-                      navigate(`/dashboard/beneficiary/${item._id}`);
-                    }
-                  }}
                 >
                   <td>{`${item.user?.firstName || ""} ${item.user?.secondName || ""}`.trim() || "-"}</td>
                   <td>{item.user?.identityNumber || "-"}</td>
@@ -198,4 +175,4 @@ const EditReports = () => {
   );
 };
 
-export default EditReports; 
+export default AcceptedRecords; 
