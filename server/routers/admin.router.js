@@ -3,7 +3,7 @@
 
 import {Router} from "express"
 import { protectedAdminRoute } from "../utils/protectedRoute.js"
-import { acceptReportByCommittee, acceptReportByManager, confirmBeneficiary, currentAdminTask, decideIfBeneficiaryIsDeserve, deleteBeneficiary, editBeneficiaryData, editReportByManager, getCurrentAdmin, getCurrentReportData, getManagerTasks, loginAdmin, rejectReportByCommittee, rejectReportByManager, searchForReport, singupAdmin } from "../controllers/admin.controller.js"
+import { acceptReportByCommittee, acceptReportByManager, confirmBeneficiary, currentAdminTask, decideIfBeneficiaryIsDeserve, deleteBeneficiary, editBeneficiaryData, editReportByManager, getCurrentAdmin, getCurrentReportData, getFinalAcceptedReports, getFinalReports, getManagerTasks, loginAdmin, rejectReportByCommittee, rejectReportByManager, searchForReport, singupAdmin } from "../controllers/admin.controller.js"
 const router =  Router()
 
 
@@ -40,8 +40,8 @@ router.post("/acceptc/:userId",protectedAdminRoute,acceptReportByCommittee)
 router.get("/manageredit/:reportId",protectedAdminRoute,editReportByManager)
 router.post("/rejectm/:userId",protectedAdminRoute,rejectReportByManager)
 router.post("/acceptm/:userId",protectedAdminRoute,acceptReportByManager)
-
-
+router.get("/final",protectedAdminRoute,getFinalReports)
+router.get("/archive",protectedAdminRoute,getFinalAcceptedReports)
 
 
 router.patch("/edit/:reportId",protectedAdminRoute,editBeneficiaryData)

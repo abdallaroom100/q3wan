@@ -7,6 +7,7 @@ import Settings from "./components/Settings";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { logoutAdmin } from "../../store/slices/dashboard/AdminSlice";
+import FinalReportsTable from "./components/FinalReportsTable";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("beneficiaries");
@@ -142,6 +143,7 @@ const Dashboard = () => {
       <main className="flex-1 p-6 lg:p-8 overflow-y-auto pt-20 lg:pt-8 min-h-screen">
         <div className="max-w-6xl mx-auto">
           {renderContent()}
+          {/* تم حذف سيكشن القرارات النهائية من هنا */}
         </div>
       </main>
     </div>
