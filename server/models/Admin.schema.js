@@ -13,8 +13,18 @@ const adminSchema= new mongoose.Schema({
     },  
     email:{
         type:String,
-        required:true,
+        sparse:true,
         unique:true,
+    },
+    identityNumber:{
+        type:String,
+        unique:true, 
+        sparse:true,
+    },
+    phone:{
+        type:String,
+        unique:true,
+        sparse:true,
     },
     password:{
         type:String,

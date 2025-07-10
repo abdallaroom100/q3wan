@@ -693,16 +693,16 @@ interface CircularGalleryProps {
 const CircularGallery = memo(function CircularGallery({
   items = [
     {
-      image: "https://images.unsplash.com/photo-1682687220063-4742bd7fd538",
-      text: "Image 1",
+      image: "/img/q3wan1.jpg",
+      text: "",
     },
     {
-      image: "https://images.unsplash.com/photo-1682687220063-4742bd7fd538",
-      text: "Image 2",
+      image: "/img/q3wan2.jpg",
+      text: "",
     },
     {
-      image: "https://images.unsplash.com/photo-1682687220063-4742bd7fd538",
-      text: "Image 3",
+      image: "/img/q3wan3.jpg",
+      text: "",
     },
   ],
   bend = 3,

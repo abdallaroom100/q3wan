@@ -9,11 +9,18 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 // تعريف سنوات وشهور وأيام الهجري
-const hijriYears: number[] = Array.from({length: 201}, (_, i) => 1300 + i); // 1300-1500
+const hijriYears: number[] = Array.from({length: 151}, (_, i) => 1350 + i); // 1350-1500
 const hijriMonths: string[] = [
   "محرم", "صفر", "ربيع الأول", "ربيع الآخر", "جمادى الأولى", "جمادى الآخرة", "رجب", "شعبان", "رمضان", "شوال", "ذو القعدة", "ذو الحجة"
 ];
 const hijriDays: number[] = Array.from({length: 30}, (_, i) => i + 1);
+
+// الميلادي
+const FIXED_CURRENT_YEAR = 2025;
+const currentGregorianYear = FIXED_CURRENT_YEAR;
+const gregorianYears: number[] = Array.from({length: currentGregorianYear - 1949}, (_, i) => 1950 + i); // 1950-2025
+const gregorianMonths: number[] = Array.from({length: 12}, (_, i) => i + 1); // 1-12
+const gregorianDays: number[] = Array.from({length: 31}, (_, i) => i + 1); // 1-31
 
 const steps = ["البيانات الشخصية", "بيانات عامة", " بيانات المرافقين"];
 
@@ -23,7 +30,7 @@ type Housemate = {
   identityNumber: string;
   gender: "ذكر" | "أنثى";
   kinship: string;
-};
+};``
 
 type Home = {
   homeNickname: string;
@@ -67,6 +74,7 @@ interface UserData {
   numberOfFacilities?: number;
   numberOfMales?: number;
   housemate?: Housemate[];
+  birthDatetype?: string;
 }
 
 // تعريف نوع مصدر الدخل
@@ -79,8 +87,7 @@ interface IncomeSource {
 // دالة تقريبية لتحويل السنة الميلادية إلى هجرية والعكس
 function getCurrentHijriYear() {
   // معادلة تقريبية: الهجري = الميلادي - 622 + (الميلادي-622)/33
-  const now = new Date();
-  const gYear = now.getFullYear();
+  const gYear = FIXED_CURRENT_YEAR;
   return Math.floor((gYear - 622) + ((gYear - 622) / 33));
 }
 
@@ -232,8 +239,9 @@ function validateStep3(formData: UserData, companions: any[], companionsCount: n
   if (companionsCount > 0) {
     for (let i = 0; i < companionsCount; i++) {
       const companion = companions[i];
-      if (!companion.name) return { valid: false, message: `يرجى ملء الاسم الرباعي للمرافق ${i + 1}` };
-      if (!companion.id) return { valid: false, message: `يرجى ملء رقم الهوية للمرافق ${i + 1}` };
+      if (!companion.name) return { valid: false, message: `يرجى ملء الاسم الرباعي للمرافق ${i + 1}` }; 
+      const idValue = (companion?.identityNumber && (String(companion?.identityNumber))) || (companion.id && companion.id.trim());
+      if (!idValue) return { valid: false, message: `يرجى ملء رقم الهوية للمرافق ${i + 1}` };
       if (!companion.birthDate) return { valid: false, message: `يرجى ملء تاريخ الميلاد للمرافق ${i + 1}` };
       if (!companion.dateType) return { valid: false, message: `يرجى اختيار نوع تاريخ الميلاد للمرافق ${i + 1}` };
       if (!companion.studyLevel) return { valid: false, message: `يرجى اختيار المرحلة الدراسية للمرافق ${i + 1}` };
@@ -642,18 +650,20 @@ const SignFamily = () => {
       let ageNum = 0;
       if (dateType === 'ميلادي') {
         const birthDateObj = new Date(formData.birthDate);
-        const year = formData.birthDate.split('-')[0];
-        if (!isNaN(birthDateObj.getTime()) && year && !isNaN(Number(year))) {
-          const today = new Date();
-          ageNum = today.getFullYear() - birthDateObj.getFullYear();
-          const m = today.getMonth() - birthDateObj.getMonth();
-          if (m < 0 || (m === 0 && today.getDate() < birthDateObj.getDate())) {
-            ageNum--;
-          }
-          setAge(ageNum > 0 ? ageNum.toString() : "");
-        } else {
-          setAge("");
+        const [yearStr, monthStr, dayStr] = formData.birthDate.split('-');
+        const year = Number(yearStr);
+        const month = Number(monthStr);
+        const day = Number(dayStr);
+        if (!yearStr || !monthStr || !dayStr) return;
+        const todayYear = FIXED_CURRENT_YEAR;
+        const todayMonth = 7; // أغسطس (شهر 8، صفر-مبني)
+        const todayDay = 7;
+        ageNum = todayYear - birthDateObj.getFullYear();
+        const m = todayMonth - birthDateObj.getMonth();
+        if (m < 0 || (m === 0 && todayDay < birthDateObj.getDate())) {
+          ageNum--;
         }
+        setAge(ageNum > 0 ? ageNum.toString() : "");
       } else {
         // هجري: birthDate بصيغة yyyy-mm-dd
         const [hYear] = formData.birthDate.split('-').map(Number);
@@ -672,28 +682,82 @@ const SignFamily = () => {
   // دالة لحساب العمر
   const calculateAge = (birthDate: string, dateType: string) => {
     if (!birthDate || !dateType) return '';
-    
+
+    const parts = birthDate.split('-');
+    if (parts.length < 3) return '';
+    const [yearStr, monthStr, dayStr] = parts;
+    if (!yearStr || !monthStr || !dayStr) return '';
+    const year = Number(yearStr);
+    const month = Number(monthStr);
+    const day = Number(dayStr);
+
+    // تحقق أن كل جزء رقم صحيح وموجب
+    if (
+      (dateType === 'ميلادي' && (
+        !Number.isInteger(year) || year < 1900 || year > FIXED_CURRENT_YEAR ||
+        !Number.isInteger(month) || month < 1 || month > 12 ||
+        !Number.isInteger(day) || day < 1 || day > 31
+      )) ||
+      (dateType === 'هجري' && (
+        !Number.isInteger(year) || year < 1300 || year > getCurrentHijriYear() ||
+        !Number.isInteger(month) || month < 1 || month > 12 ||
+        !Number.isInteger(day) || day < 1 || day > 30
+      ))
+    ) {
+      return '';
+    }
+
+    let years = 0, months = 0, days = 0;
+
     if (dateType === 'ميلادي') {
-      const birthDateObj = new Date(birthDate);
-      if (!isNaN(birthDateObj.getTime())) {
-        const today = new Date();
-        let age = today.getFullYear() - birthDateObj.getFullYear();
-        const m = today.getMonth() - birthDateObj.getMonth();
-        if (m < 0 || (m === 0 && today.getDate() < birthDateObj.getDate())) {
-          age--;
-        }
-        return age > 0 ? age.toString() : '';
+      const birth = new Date(year, month - 1, day);
+      const today = new Date(FIXED_CURRENT_YEAR, 7, 7); // أغسطس (شهر 8 = index 7)، يوم 7
+      if (birth > today) return 'عمر غير صالح';
+      if (birth > today) return '';
+      years = today.getFullYear() - birth.getFullYear();
+      months = today.getMonth() - birth.getMonth();
+      days = today.getDate() - birth.getDate();
+      if (days < 0) {
+        months--;
+        // احسب عدد الأيام في الشهر السابق
+        const prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+        days += prevMonth.getDate();
+      }
+      if (months < 0) {
+        years--;
+        months += 12;
       }
     } else {
-      // هجري
-      const [hYear] = birthDate.split('-').map(Number);
-      if (hYear && !isNaN(hYear)) {
-        const hijriYear = getCurrentHijriYear();
-        const age = hijriYear - hYear;
-        return age > 0 ? age.toString() : '';
+      // هجري: نفس المنطق لكن بدون تحويل حقيقي للتقويم، فقط طرح مباشر
+      const hijriNow = 1447; // السنة الهجرية الحالية ثابتة
+      const hijriMonth = 1;
+      const hijriDay = 13;
+      // تحقق المستقبل في الهجري
+      if (
+        year > hijriNow ||
+        (year === hijriNow && month > hijriMonth) ||
+        (year === hijriNow && month === hijriMonth && day > hijriDay)
+      ) {
+        return 'عمر غير صالح';
+      }
+      years = hijriNow - year;
+      months = hijriMonth - month;
+      days = hijriDay - day;
+      if (days < 0) {
+        months--;
+        days += 30;
+      }
+      if (months < 0) {
+        years--;
+        months += 12;
       }
     }
-    return '';
+    let result = '';
+    if (years > 0) result += `${years} سنة`;
+    if (months > 0) result += (result ? '، ' : '') + `${months} شهر`;
+    if (days > 0) result += (result ? '، ' : '') + `${days} يوم`;
+    if (!result) result = 'أقل من يوم';
+    return result;
   };
 
   // تحديث العمر للمرافقين عند تغيير أي تاريخ
@@ -767,12 +831,47 @@ const SignFamily = () => {
     }
   }, [userData]);
 
+  // عند تحميل بيانات userData لا تعيد تعيين dateType إلى 'هجري' تلقائياً
+  useEffect(() => {
+    if (userData) {
+      setFormData({
+        ...userData,
+        // أي تحويلات إضافية تحتاجها هنا
+      });
+      // لا تعيد تعيين dateType هنا! فقط إذا كان موجود في userData أو localStorage
+      // إذا أردت استرجاع dateType من userData:
+      if (userData.birthDatetype && (userData.birthDatetype === 'هجري' || userData.birthDatetype === 'ميلادي')) {
+        setDateType(userData.birthDatetype);
+      }
+    }
+  }, [userData]);
+
   const handleSubmit = async () => {
     // تحقق من صحة البيانات أولاً برسالة دقيقة
     const validation = validateForm(formData, companions, incomeSources, dateType, companionsCount);
     if (!validation.valid) {
       hotToast({ type: "error", message: validation.message || "حدث خطأ غير متوقع" });
       return;
+    }
+
+    // لوج توضيحي لقيمة dateType عند الإرسال
+    console.log("[إرسال المستفيد الرئيسي] نوع التاريخ:", dateType);
+    console.log("[إرسال المستفيد الرئيسي] قيمة birthDate:", formData.birthDate);
+
+    // تحقق أن birthDate متوافقة مع نوع التاريخ
+    if (dateType === 'ميلادي') {
+      // تحقق أن السنة في الميلادي ضمن النطاق الصحيح
+      const [year, month, day] = (formData.birthDate || '').split('-');
+      if (!year || !month || !day || Number(year) < 1950 || Number(year) > FIXED_CURRENT_YEAR) {
+        hotToast({ type: "error", message: "يرجى اختيار تاريخ ميلاد ميلادي صحيح" });
+        return;
+      }
+    } else if (dateType === 'هجري') {
+      const [year, month, day] = (formData.birthDate || '').split('-');
+      if (!year || !month || !day || Number(year) < 1350 || Number(year) > 1447) {
+        hotToast({ type: "error", message: "يرجى اختيار تاريخ ميلاد هجري صحيح" });
+        return;
+      }
     }
 
     // إنشاء FormData وإضافة البيانات
@@ -804,6 +903,9 @@ const SignFamily = () => {
       if (key === 'home') {
         // لا ترسل home نهائيًا
         return;
+      } else if (key === 'birthDatetype') {
+        // تجاهل birthDatetype من formData/userData، سنضيفها يدويًا لاحقًا
+        return;
       } else if (key === 'idImagePath' && value instanceof File) {
         formDataToSend.append('idImagePath', value);
       } else if (key === 'familyCardFile' && value instanceof File) {
@@ -821,7 +923,7 @@ const SignFamily = () => {
         }
       }
     });
-    // أضف birthDatetype مع البيانات
+    // أضف birthDatetype مع البيانات مرة واحدة فقط
     formDataToSend.append('birthDatetype', dateType);
 
     // تجهيز incomeSources كمصفوفة كاملة (بما في ذلك الصور)
@@ -1095,18 +1197,59 @@ const SignFamily = () => {
               <div className={styles.dateRow}>
                 <select
                   value={dateType}
-                  onChange={e => setDateType(e.target.value as 'هجري' | 'ميلادي')}
+                  onChange={e => {
+                    setDateType(e.target.value as 'هجري' | 'ميلادي');
+                    setFormData(prev => ({ ...prev, birthDate: '' })); // إعادة ضبط التاريخ عند تغيير النوع
+                  }}
                 >
                   <option value="هجري">هجري</option>
                   <option value="ميلادي">ميلادي</option>
                 </select>
                 {dateType === 'ميلادي' ? (
-                  <input
-                    type="date"
-                    name="birthDate"
-                    value={formData.birthDate}
-                    onChange={handleChange}
-                  />
+                  <>
+                    <select
+                      value={formData.birthDate ? formData.birthDate.split('-')[0] : ''}
+                      onChange={e => {
+                        const year = e.target.value;
+                        const [_, m, d] = formData.birthDate ? formData.birthDate.split('-') : [undefined, '', ''];
+                        setFormData(prev => ({
+                          ...prev,
+                          birthDate: `${year}-${m || ''}-${d || ''}`
+                        }));
+                      }}
+                    >
+                      <option value="">سنة</option>
+                      {gregorianYears.map(y => <option key={y} value={y}>{y}</option>)}
+                    </select>
+                    <select
+                      value={formData.birthDate ? formData.birthDate.split('-')[1] : ''}
+                      onChange={e => {
+                        const month = e.target.value;
+                        const [y, _, d] = formData.birthDate ? formData.birthDate.split('-') : ['', undefined, ''];
+                        setFormData(prev => ({
+                          ...prev,
+                          birthDate: `${y || ''}-${month}-${d || ''}`
+                        }));
+                      }}
+                    >
+                      <option value="">شهر</option>
+                      {gregorianMonths.map(m => <option key={m} value={m}>{m}</option>)}
+                    </select>
+                    <select
+                      value={formData.birthDate ? formData.birthDate.split('-')[2] : ''}
+                      onChange={e => {
+                        const day = e.target.value;
+                        const [y, m, _] = formData.birthDate ? formData.birthDate.split('-') : ['', '', undefined];
+                        setFormData(prev => ({
+                          ...prev,
+                          birthDate: `${y || ''}-${m || ''}-${day}`
+                        }));
+                      }}
+                    >
+                      <option value="">يوم</option>
+                      {gregorianDays.map(d => <option key={d} value={d}>{d}</option>)}
+                    </select>
+                  </>
                 ) : (
                   <>
                     <select
@@ -1121,7 +1264,7 @@ const SignFamily = () => {
                       }}
                     >
                       <option value="">سنة</option>
-                      {Array.from({length: 201}, (_, i) => currentHijriYear - 200 + i).map(y => <option key={y} value={y}>{y}</option>)}
+                      {Array.from({length: 99}, (_, i) => 1350 + i).map(y => <option key={y} value={y}>{y}</option>)}
                     </select>
                     <select
                       value={formData.birthDate ? formData.birthDate.split('-')[1] : ''}
@@ -1157,7 +1300,7 @@ const SignFamily = () => {
             </div>
             <div className={styles.inputGroup}>
               <label>السن</label>
-              <input type="text" value={age} disabled />
+              <input type="text" value={calculateAge(formData.birthDate, dateType)} disabled />
             </div>
             <div className={styles.inputGroup}>
               <label>رقم الجوال</label>
@@ -1935,7 +2078,7 @@ const SignFamily = () => {
                         }}
                       />
                     </div>
-                    {/* تاريخ الميلاد هجري/ميلادي + العمر */}
+                  
                     <div className={styles.inputGroup} style={{ 
                       gridColumn: isMobile ? 'span 1' : 'span 1',
                       marginBottom: isMobile ? '8px' : '0'
@@ -1965,25 +2108,59 @@ const SignFamily = () => {
                           <option value="ميلادي">ميلادي</option>
                         </select>
                         {companion.dateType === 'ميلادي' ? (
-                          <input
-                            type="date"
-                            value={companion.birthDate}
-                            onChange={e => {
-                              const newBirthDate = e.target.value;
-                              const calculatedAge = calculateAge(newBirthDate, 'ميلادي');
-                              console.log(`تغيير التاريخ ميلادي: ${newBirthDate}, العمر: ${calculatedAge}`);
-                              
-                              const arr = [...companions];
-                              arr[idx].birthDate = newBirthDate;
-                              arr[idx].age = calculatedAge;
-                              setCompanions(arr);
-                            }}
-                            style={{ 
-                              flex: 1,
-                              padding: isMobile ? '8px 6px' : '6px 8px',
-                              fontSize: isMobile ? '12px' : '13px'
-                            }}
-                          />
+                          <>
+                            <select
+                              value={companion.birthDate ? companion.birthDate.split('-')[0] : ''}
+                              onChange={e => {
+                                const year = e.target.value;
+                                const [_, m, d] = companion.birthDate ? companion.birthDate.split('-') : [undefined, '', ''];
+                                const newBirthDate = `${year}-${m || ''}-${d || ''}`;
+                                const calculatedAge = calculateAge(newBirthDate, 'ميلادي');
+                                const arr = [...companions];
+                                arr[idx].birthDate = newBirthDate;
+                                arr[idx].age = calculatedAge;
+                                setCompanions(arr);
+                              }}
+                              style={{ minWidth: isMobile ? '70px' : '80px', padding: isMobile ? '8px 6px' : '6px 8px', fontSize: isMobile ? '12px' : '13px' }}
+                            >
+                              <option value="">سنة</option>
+                              {gregorianYears.map(y => <option key={y} value={y}>{y}</option>)}
+                            </select>
+                            <select
+                              value={companion.birthDate ? companion.birthDate.split('-')[1] : ''}
+                              onChange={e => {
+                                const month = e.target.value;
+                                const [y, _, d] = companion.birthDate ? companion.birthDate.split('-') : ['', undefined, ''];
+                                const newBirthDate = `${y || ''}-${month}-${d || ''}`;
+                                const calculatedAge = calculateAge(newBirthDate, 'ميلادي');
+                                const arr = [...companions];
+                                arr[idx].birthDate = newBirthDate;
+                                arr[idx].age = calculatedAge;
+                                setCompanions(arr);
+                              }}
+                              style={{ minWidth: isMobile ? '70px' : '80px', padding: isMobile ? '8px 6px' : '6px 8px', fontSize: isMobile ? '12px' : '13px' }}
+                            >
+                              <option value="">شهر</option>
+                              {gregorianMonths.map(m => <option key={m} value={m}>{m}</option>)}
+                            </select>
+                            <select
+                              value={companion.birthDate ? companion.birthDate.split('-')[2] : ''}
+                              onChange={e => {
+                                const day = e.target.value;
+                                const [y, m, _] = companion.birthDate ? companion.birthDate.split('-') : ['', '', undefined];
+                                const newBirthDate = `${y || ''}-${m || ''}-${day}`;
+                                const calculatedAge = calculateAge(newBirthDate, 'ميلادي');
+                                const arr = [...companions];
+                                arr[idx].birthDate = newBirthDate;
+                                arr[idx].age = calculatedAge;
+                                setCompanions(arr);
+                              }}
+                              style={{ minWidth: isMobile ? '50px' : '60px', padding: isMobile ? '8px 6px' : '6px 8px', fontSize: isMobile ? '12px' : '13px' }}
+                            >
+                              <option value="">يوم</option>
+                              {gregorianDays.map(d => <option key={d} value={d}>{d}</option>)}
+                            </select>
+                          </>
                         ) : (
                           <>
                             <select
@@ -1993,21 +2170,15 @@ const SignFamily = () => {
                                 const [_, m, d] = companion.birthDate ? companion.birthDate.split('-') : [undefined, '', ''];
                                 const newBirthDate = `${year}-${m || ''}-${d || ''}`;
                                 const calculatedAge = calculateAge(newBirthDate, 'هجري');
-                                console.log(`تغيير السنة هجري: ${newBirthDate}, العمر: ${calculatedAge}`);
-                                
                                 const arr = [...companions];
                                 arr[idx].birthDate = newBirthDate;
                                 arr[idx].age = calculatedAge;
                                 setCompanions(arr);
                               }}
-                              style={{ 
-                                minWidth: isMobile ? '70px' : '80px',
-                                padding: isMobile ? '8px 6px' : '6px 8px',
-                                fontSize: isMobile ? '12px' : '13px'
-                              }}
+                              style={{ minWidth: isMobile ? '70px' : '80px', padding: isMobile ? '8px 6px' : '6px 8px', fontSize: isMobile ? '12px' : '13px' }}
                             >
                               <option value="">سنة</option>
-                              {Array.from({length: 201}, (_, i) => getCurrentHijriYear() - 200 + i).map(y => <option key={y} value={y}>{y}</option>)}
+                              {Array.from({length: 100}, (_, i) => 1350 + i).map(y => <option key={y} value={y}>{y}</option>)}
                             </select>
                             <select
                               value={companion.birthDate ? companion.birthDate.split('-')[1] : ''}
@@ -2016,18 +2187,12 @@ const SignFamily = () => {
                                 const [y, _, d] = companion.birthDate ? companion.birthDate.split('-') : ['', undefined, ''];
                                 const newBirthDate = `${y || ''}-${month}-${d || ''}`;
                                 const calculatedAge = calculateAge(newBirthDate, 'هجري');
-                                console.log(`تغيير الشهر هجري: ${newBirthDate}, العمر: ${calculatedAge}`);
-                                
                                 const arr = [...companions];
                                 arr[idx].birthDate = newBirthDate;
                                 arr[idx].age = calculatedAge;
                                 setCompanions(arr);
                               }}
-                              style={{ 
-                                minWidth: isMobile ? '70px' : '80px',
-                                padding: isMobile ? '8px 6px' : '6px 8px',
-                                fontSize: isMobile ? '12px' : '13px'
-                              }}
+                              style={{ minWidth: isMobile ? '70px' : '80px', padding: isMobile ? '8px 6px' : '6px 8px', fontSize: isMobile ? '12px' : '13px' }}
                             >
                               <option value="">شهر</option>
                               {hijriMonths.map((m, i) => <option key={m} value={i+1}>{m}</option>)}
@@ -2039,18 +2204,12 @@ const SignFamily = () => {
                                 const [y, m, _] = companion.birthDate ? companion.birthDate.split('-') : ['', '', undefined];
                                 const newBirthDate = `${y || ''}-${m || ''}-${day}`;
                                 const calculatedAge = calculateAge(newBirthDate, 'هجري');
-                                console.log(`تغيير اليوم هجري: ${newBirthDate}, العمر: ${calculatedAge}`);
-                                
                                 const arr = [...companions];
                                 arr[idx].birthDate = newBirthDate;
                                 arr[idx].age = calculatedAge;
                                 setCompanions(arr);
                               }}
-                              style={{ 
-                                minWidth: isMobile ? '50px' : '60px',
-                                padding: isMobile ? '8px 6px' : '6px 8px',
-                                fontSize: isMobile ? '12px' : '13px'
-                              }}
+                              style={{ minWidth: isMobile ? '50px' : '60px', padding: isMobile ? '8px 6px' : '6px 8px', fontSize: isMobile ? '12px' : '13px' }}
                             >
                               <option value="">يوم</option>
                               {hijriDays.map(d => <option key={d} value={d}>{d}</option>)}
@@ -2067,7 +2226,7 @@ const SignFamily = () => {
                       <label>العمر</label>
                       <input 
                         type="text" 
-                        value={companion.age} 
+                        value={calculateAge(companion.birthDate, companion.dateType)} 
                         disabled 
                         style={{
                           width: '100%',
@@ -2318,7 +2477,7 @@ const SignFamily = () => {
             <div className="relative">
               <div className="absolute inset-0 bg-green-400 rounded-full animate-ping opacity-20"></div>
               <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" className="text-green-500 text-7xl relative z-10" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-                <path d="M504 256c0 136.967-111.033 248-248 248S8 392.967 8 256 119.033 8 256 8s248 111.033 248 248zM227.314 387.314l184-184c6.248-6.248 6.248-16.379 0-22.627l-22.627-22.627c-6.248-6.249-16.379-6.249-22.628 0L216 308.118l-70.059-70.059c-6.248-6.248-16.379-6.248-22.628 0l-22.627 22.627c-6.248 6.248-6.248 16.379 0 22.627l104 104c6.249 6.249 16.379 6.249 22.628.001z"></path>
+                <path d="M504 256c0 136.967-111.033 248-248 248S8 392.967 8 256 119.033 8 256 8s248 111.033 248 248zM227.314 387.314l184-184c6.248-6.248 6.248-16.379 0-22.627l-22.627-22.627c-6.248-6.248-16.379-6.249-22.628 0L216 308.118l-70.059-70.059c-6.248-6.248-16.379-6.248-22.628 0l-22.627 22.627c-6.248 6.248-6.248 16.379 0 22.627l104 104c6.249 6.249 16.379 6.249 22.628.001z"></path>
               </svg>
             </div>
           </div>

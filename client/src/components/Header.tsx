@@ -97,6 +97,7 @@ const Header = () => {
     { href: "/", label: "الرئيسية" },
     { href: "/about", label: "معلومات عنا" },
     { href: "/goals", label: "أهدافنا" },
+    { href: "/album", label: "معرض الصور" },
   ];
   const navItemsMobile = [
     { href: "/", label: "الرئيسية" },

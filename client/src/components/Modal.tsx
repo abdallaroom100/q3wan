@@ -24,7 +24,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
       role="dialog"
       tabIndex={-1}
     >
-      <div className="relative max-w-2xl w-full bg-white rounded-2xl shadow-2xl p-0">
+      <div style={{direction:"rtl"}} className="relative max-w-2xl w-full bg-white rounded-2xl shadow-2xl p-0">
         <button
           onClick={onClose}
           className="absolute top-4 left-4 bg-white rounded-full shadow p-2 text-2xl hover:bg-gray-100 transition z-10"

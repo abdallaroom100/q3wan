@@ -8,21 +8,28 @@ import { useDispatch } from "react-redux";
 import { logoutAdmin } from "../../store/slices/dashboard/AdminSlice";
 import FinalReportsTable from "./components/FinalReportsTable";
 import AcceptedRecords from "./components/AcceptedRecords";
+import ProcessFlow from "./components/ProcessFlow";
+import { usePersistentState } from "../../hooks/usePersistentState";
 
 const Dashboard = () => {
-  const [activeTab, setActiveTab] = useState("beneficiaries");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [admin, setAdmin] = useState<any>(null);
   const history = useNavigate()
   const dispatch = useDispatch()
+  const [activeTab, setActiveTab] = usePersistentState('dashboard_activeTab', 'beneficiaries');
   useEffect(() => {
     try {
       const adminData = JSON.parse(localStorage.getItem("admin") || "null");
       setAdmin(adminData);
+      
+      // If user is not manager and current tab is processFlow, redirect to beneficiaries
+      if (adminData && adminData.rule !== "manager" && activeTab === "processFlow") {
+        setActiveTab("beneficiaries");
+      }
     } catch (e) {
       setAdmin(null);
     }
-  }, []);
+  }, [activeTab, setActiveTab]);
 
   const handleTabClick = (tab:string) => {
     setActiveTab(tab);
@@ -39,6 +46,15 @@ const Dashboard = () => {
         return <EditReports />;
       case "acceptedRecords":
         return <AcceptedRecords />;
+      case "processFlow":
+        // Only allow access to ProcessFlow if user is manager
+        if (admin && admin.rule === "manager") {
+          return <ProcessFlow />;
+        } else {
+          // Redirect to beneficiaries if not manager
+          setActiveTab("beneficiaries");
+          return <BeneficiariesList />;
+        }
       default:
         return <BeneficiariesList />;
     }
@@ -119,8 +135,22 @@ const Dashboard = () => {
             }`}
             onClick={() => handleTabClick("acceptedRecords")}
           >
-            سجل المقبولين
+            السجل 
           </button>
+
+          {/* Only show Process Flow button if admin.rule === 'manager' */}
+          {admin && admin.rule === "manager" && (
+            <button
+              className={`w-full p-4 rounded-xl text-lg font-semibold text-right transition-all duration-300 transform hover:scale-105 ${
+                activeTab === "processFlow"
+                  ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/30"
+                  : "text-slate-300 hover:text-white hover:bg-slate-700/50 hover:shadow-md"
+              }`}
+              onClick={() => handleTabClick("processFlow")}
+            >
+              سير العمليات
+            </button>
+          )}
 
           {/* Only show this button if admin.rule === 'manager' */}
           {admin && admin.rule === "manager" && (
@@ -136,12 +166,50 @@ const Dashboard = () => {
             </button>
           )}
           
-          <div className="pt-2">
+          <div className="pt-2 space-y-3">
+            {/* <button
+              className="w-full p-3 rounded-xl text-sm font-semibold text-right bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/30 transition-all duration-300 transform hover:scale-105 hover:from-orange-600 hover:to-orange-700"
+                             onClick={() => {
+                 // Clear all persistent states
+                 localStorage.removeItem('dashboard_activeTab');
+                 localStorage.removeItem('processFlow_currentPage');
+                 localStorage.removeItem('acceptedRecords_currentPage');
+                 localStorage.removeItem('acceptedRecords_filters');
+                 localStorage.removeItem('acceptedRecords_viewMode');
+                 localStorage.removeItem('acceptedRecords_showFilters');
+                 localStorage.removeItem('editReports_currentPage');
+                 // Reset to default tab
+                 setActiveTab('beneficiaries');
+                 setIsMenuOpen(false);
+                 // Show success message
+                 alert('تم إعادة تعيين جميع الإعدادات بنجاح!');
+               }}
+            >
+              إعادة تعيين الإعدادات
+            </button> */}
             <button
               className="w-full p-4 rounded-xl text-lg font-semibold text-right bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg shadow-red-500/30 transition-all duration-300 transform hover:scale-105 hover:from-red-600 hover:to-red-700"
               onClick={() => {
                 setIsMenuOpen(false);
-                localStorage.removeItem("admin")
+                
+                // Clear all admin-related localStorage items
+                localStorage.removeItem("admin");
+                localStorage.removeItem('dashboard_activeTab');
+                localStorage.removeItem('processFlow_currentPage');
+                localStorage.removeItem('acceptedRecords_currentPage');
+                localStorage.removeItem('acceptedRecords_filters');
+                localStorage.removeItem('acceptedRecords_viewMode');
+                localStorage.removeItem('acceptedRecords_showFilters');
+                localStorage.removeItem('editReports_currentPage');
+                localStorage.removeItem('editReports_filters');
+                localStorage.removeItem('editReports_showFilters');
+                localStorage.removeItem('beneficiaries_currentPage');
+                localStorage.removeItem('beneficiaries_filters');
+                localStorage.removeItem('beneficiaries_showFilters');
+                localStorage.removeItem('reports_currentPage');
+                localStorage.removeItem('reports_filters');
+                localStorage.removeItem('reports_showFilters');
+                
                 dispatch(logoutAdmin())
                 history("/dashboard/login")
               }}
@@ -153,7 +221,7 @@ const Dashboard = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-6 lg:p-8 overflow-y-auto pt-20 lg:pt-8 min-h-screen">
+      <main className="flex-1  md:p-6 lg:p-8 overflow-y-auto pt-20 lg:pt-8 min-h-screen">
         <div className="max-w-6xl mx-auto">
           {renderContent()}
           {/* تم حذف سيكشن القرارات النهائية من هنا */}

@@ -51,7 +51,7 @@ const AdminLogin = () => {
         <img src="/img/logo.png" alt="شعار الشركة" className="mb-6 w-32 h-32 object-contain drop-shadow-lg" />
         <h2 className="mb-6 text-3xl font-extrabold text-[#3a3d6c]">تسجيل دخول الأدمن</h2>
         <input
-          type="email"
+          type="text"
           placeholder="البريد الإلكتروني"
           value={email}
           onChange={e => setEmail(e.target.value)}

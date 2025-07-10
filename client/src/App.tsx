@@ -53,6 +53,8 @@ import "@fortawesome/fontawesome-svg-core/styles.css";
 import Dashboard from "./pages/Dashboard";
 import Home from "./pages/Home";
 import BeneficiaryDetails from "./pages/BeneficiaryDetails";
+import { MoonLoader } from "react-spinners";
+import { DashboardProvider } from "./contexts/DashboardContext";
  
 const Login = lazy(() => import("./pages/Login"));
 const SignFamily = lazy(() => import("./pages/SignFamily/testIndex"));
@@ -61,32 +63,35 @@ const AdminLayout = lazy(() => import("./layouts/AdminLayout"));
 const AdminLogin = lazy(() => import("./pages/AdminLogin"));
 const AboutUs =   lazy(()=>import("./pages/AboutUs"))
 const Goals =   lazy(()=>import("./pages/Goals"))
+const Album = lazy(()=>import("./pages/Album"))
 
-import { MoonLoader } from "react-spinners";
 axios.defaults.withCredentials = true;   
 config.autoAddCss = false;
 
 function App() {
   return (
     <BrowserRouter>
-      <Suspense fallback={<div className="w-full h-screen flex justify-center items-center">
-        <MoonLoader />
-      </div>}>
-        <Routes>
-          <Route element={<Layout ><UserLayout /></Layout>}>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<AboutUs />} />
-            <Route path="/goals" element={<Goals />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/sign-family" element={<SignFamily />} />
-          </Route>
-          <Route element={<Layout><AdminLayout /></Layout>}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/dashboard/login" element={<AdminLogin />} />
-            <Route path="/dashboard/beneficiary/:id" element={<BeneficiaryDetails />} />
-          </Route>
-        </Routes>
-      </Suspense>
+      <DashboardProvider>
+        <Suspense fallback={<div className="w-full h-screen flex justify-center items-center">
+          <MoonLoader />
+        </div>}>
+          <Routes>
+            <Route element={<Layout ><UserLayout /></Layout>}>
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<AboutUs />} />
+              <Route path="/goals" element={<Goals />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/album" element={<Album />} />
+              <Route path="/sign-family" element={<SignFamily />} />
+            </Route>
+            <Route element={<Layout><AdminLayout /></Layout>}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/dashboard/login" element={<AdminLogin />} />
+              <Route path="/dashboard/beneficiary/:id" element={<BeneficiaryDetails />} />
+            </Route>
+          </Routes>
+        </Suspense>
+      </DashboardProvider>
     </BrowserRouter>
   );
 }

@@ -10,17 +10,34 @@ import path from "path";
 
 export const singupAdmin = async (req, res) => {
   try {
-    const { name, email, password, rule } = req.body;
+    const { name, email, password,identityNumber,phone, rule } = req.body;
+   console.log(req.body)
 
+     if(!identityNumber && !phone && !email ) {
+      return res.status(400).json({error:"يحب علي الاقل اعطاء واحد من  بيانات التعريف"})
+     }
+   
     const checkName = String(name).split(" ").length >= 3;
     if (!checkName)
       return res
         .status(400)
         .json({ error: "الاسم يجب ان يكون علي الاقل ثلاثي" });
-
-    const checkEmail = validator.isEmail(email);
+   if(email){
+       const checkEmail = validator.isEmail(email);
     if (!checkEmail)
       return res.status(400).json({ error: "برجاء ادخال بريد الكتروني صالح" });
+   }
+   
+   if(identityNumber){
+      if(String(identityNumber).length !== 10){
+        return res.status(400).json({error:"رقم الهويه يجب ان يكون  10 ارقام"})
+      }
+   }
+   if(phone){
+      if(String(phone).length !== 10){
+        return res.status(400).json({error:"رقم الجوال يجب ان يكون 10 ارقام"})
+      }
+   }
 
     const checkPassword = String(password).length > 8;
     if (!checkPassword) {
@@ -35,9 +52,16 @@ export const singupAdmin = async (req, res) => {
     } else {
       return res.status(400).json({ error: "من فضلك قم باختيار صلاحيه متاحه" });
     }
-    const checkUserExists = await Admin.findOne({ email });
-    if (checkUserExists) {
-      return res.status(400).json({ error: "هذا الحساب موجود بالفعل" });
+    const checkUserExists = await Admin.findOne({
+      $or: [
+        email ? { email } : null,
+        identityNumber ? { identityNumber } : null,
+        phone ? { phone } : null
+      ].filter(Boolean) // يشيل العناصر اللي قيمتها null
+    });
+ console.log(checkUserExists) 
+    if (checkUserExists) { 
+      return res.status(400).json({ error: "هذا الحساب موجود بالفعل" }); 
     }
 
     const createdUser = await Admin.create({
@@ -45,6 +69,8 @@ export const singupAdmin = async (req, res) => {
       email,
       password: hash,
       rule,
+      identityNumber,
+      phone
     });
     return res.status(200).json(createdUser);
   } catch (error) {
@@ -55,9 +81,13 @@ export const singupAdmin = async (req, res) => {
 
 export const loginAdmin = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { identifier, password } = req.body;
 
-    const currentAdmin = await Admin.findOne({ email });
+    const currentAdmin = await Admin.findOne({$or:[
+      {email:identifier},
+      {identityNumber:identifier},
+      {phone:identifier},
+    ]});
     if (!currentAdmin) {
       return res.status(400).json({ error: "بيانات الادمن هذا غير موجوده" });
     }
@@ -714,7 +744,7 @@ export const acceptReportByManager = async (req,res)=>{
  export const  getFinalAcceptedReports = async (req,res) =>{
 
   try {
-    const reports = await Report.find({reportStatus:"accepted_manager"}).populate("user")
+    const reports = await Report.find({reportStatus:{$in:["accepted_manager","rejected_manager"]}}).populate("user")
    
     const currentAdmin = await Admin.findById(req.adminId)
   
@@ -725,3 +755,26 @@ export const acceptReportByManager = async (req,res)=>{
     
   }
  }
+
+
+
+  export const getProcess = async (req,res) =>{
+
+
+    try {
+      
+      const currentAdmin = await Admin.findById(req.adminId)
+      if(!currentAdmin){
+        return res.status(400).json({error:"بيانات الادمن الحالي غير موجوده"})
+      }
+      if(currentAdmin.rule !== "manager"){
+        return res.status(400).json({error:"المدير فقط القادر علي رؤية سير العمليات"})
+      }
+      const reports = await Report.find({status:{$nin:["done"]}}).populate("user")
+      
+       return res.status(200).json({success:true,reports})
+    } catch (error) {
+      console.log("error in get process")
+      console.log(error.message)
+    }
+  }
