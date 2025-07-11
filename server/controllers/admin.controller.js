@@ -245,6 +245,79 @@ export const deleteBeneficiary = async (req, res) => {
   }
 };
 
+export const deleteTemporary = async (req,res) =>{
+
+  try {
+    
+    const {userId} = req.params
+    
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ error: "رقم المعرف هذا غير صالح" });
+    }
+  
+     const currentAdmin = await Admin.findById(req.adminId)
+     if(currentAdmin.rule !== "reviewer"){
+      return res.status(400).json({error:"المستفيد فقط من يمكنه حذف المستفيد مؤقتا"})
+     }
+     const currentReport = await Report.findOne({user:userId})
+     currentReport.status = "deleted_temp"
+     if(!currentReport){
+      return res.status(400).json({error:"التقرير هذا غير موجود"})
+     }
+     await currentReport.save()
+     return res.status(200).json({success:true,message:"تم حذف المستفيد مؤقتا"})
+  } catch (error) {
+    console.log("error in delete  temporary ");
+    console.log(error.message);
+  }
+}
+export const returnReportFromDeleted = async (req,res) =>{
+
+  try {
+    
+    const {userId} = req.params
+    
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ error: "رقم المعرف هذا غير صالح" });
+    }
+  
+     const currentAdmin = await Admin.findById(req.adminId)
+     if(currentAdmin.rule !== "reviewer"){
+      return res.status(400).json({error:"المستفيد فقط من يمكنه ارجاع المستفيد "})
+     }
+     const currentReport = await Report.findOne({user:userId})
+     currentReport.status = "under_review"
+     if(!currentReport){
+      return res.status(400).json({error:"التقرير هذا غير موجود"})
+     }
+     await currentReport.save()
+     return res.status(200).json({success:true,message:"تم ارجاع المستفيد"})
+  } catch (error) {
+    console.log("error in delete  temporary ");
+    console.log(error.message);
+  }
+}
+
+export const getDeletedReports = async (req, res) => {
+  try {
+    const currentAdmin = await Admin.findById(req.adminId);
+    if (!currentAdmin) {
+      return res.status(404).json({ error: "الادمن غير موجود" });
+    }
+
+    if (currentAdmin.rule !== "reviewer") {
+      return res.status(403).json({ error: "المراجع فقط من يمكنه رؤية بيانات المحذوفين" });
+    }
+
+    const reports = await Report.find({ status: "deleted_temp" }).populate("user");
+    return res.status(200).json({ success: true, reports });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "حدث خطأ في الخادم" });
+  }
+};
+
+
 export const editBeneficiaryData = async (req, res) => {
   try {
     const { reportId } = req.params;
@@ -615,10 +688,45 @@ export const rejectReportByManager = async (req,res)=>{
       currentReport.status = "done"
       currentReport.reportStatus = "rejected_manager"
       await currentReport.save()
-      
+      const currentUser = await User.findById(userId)
+      if(!currentUser){
+        return res.status(400).json({error:"المستفيد هذا  غير موجود"})
+      }
+    
+       const fullName = `${currentUser.firstName} ${currentUser.secondName} ${currentUser.thirdName} ${currentUser.lastName}`
+       const response = await fetch(
+        'https://docs.google.com/forms/u/0/d/e/1FAIpQLSes3YzeohGIQgi4BgdlTC0M8hC5Jmerw_AN6VnYTTKhZ1FUNA/formResponse',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'User-Agent': 'Mozilla/5.0', // مهم جداً
+          },
+          body: new URLSearchParams({
+            'entry.632883458': fullName,
+            'entry.1521491824': currentUser.identityNumber,
+            'entry.769005645': currentUser.email,
+            'entry.454562335': currentUser.phone,
+            'entry.329154882': currentUser.gender,
+            'entry.1264741513': currentUser.birthDate,
+            'entry.1411876552': currentUser.healthStatus,
+            'entry.1814924951': currentUser.maritalStatus,
+            'entry.591200882': currentUser.disabilityType,
+            'entry.1115239241': currentUser.nationality,
+            'entry.1403970143': currentUser.cityOfResidence,
+            'entry.1340897065': currentUser.district,
+            'entry.1124638915': currentUser.bankName,
+          }),
+        }
+      );
+      if (!response.ok) {
+        console.log("Google Form may be closed or unavailable");
+        return res.status(500).json({error: "لم يتم إرسال البيانات إلى Google Form، قد يكون النموذج مغلقاً."});
+      }
       return res.status(200).json({message:"تم رفض التقرير"})
 
   } catch (error) {
+    
     console.log('error in reject report by manager')
     console.log(error.message)
   }
@@ -728,7 +836,7 @@ export const acceptReportByManager = async (req,res)=>{
  export const  getFinalReports = async (req,res) =>{
 
   try {
-    const reports = await Report.find({status:"done"}).populate("user")
+    const reports = await Report.find({status:"done"}).sort({createdAt:-1}).populate("user")
    
     const currentAdmin = await Admin.findById(req.adminId)
     if(currentAdmin.rule !== "manager"){
@@ -744,7 +852,7 @@ export const acceptReportByManager = async (req,res)=>{
  export const  getFinalAcceptedReports = async (req,res) =>{
 
   try {
-    const reports = await Report.find({reportStatus:{$in:["accepted_manager","rejected_manager"]}}).populate("user")
+    const reports = await Report.find({reportStatus:{$in:["accepted_manager","rejected_manager"]}}).sort({createdAt:-1}).populate("user")
    
     const currentAdmin = await Admin.findById(req.adminId)
   

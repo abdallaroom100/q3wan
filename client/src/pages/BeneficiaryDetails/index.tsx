@@ -13,6 +13,7 @@ import { useRejectCommitteeToReport } from "../Dashboard/hooks/useRejectCommitte
 import { useDeleteBeneficiary } from "../Dashboard/hooks/useDeleteBeneficiary";
 import { useRejectManagerReport } from "../Dashboard/hooks/useRejectManagerReport";
 import { useAcceptManagerReport } from "../Dashboard/hooks/useAcceptManagerReport";
+import { useDeleteTemporaryBeneficiary } from "../Dashboard/hooks/useDeleteBeneficiary";
 
 
 
@@ -51,6 +52,8 @@ const BeneficiaryDetailsPage = () => {
   const {deleteBeneficiary,isDeleted,deleteBeneficiaryError} = useDeleteBeneficiary()
   const {rejectManagerReport,rejectManagerError,isManagerReject,rejectManagerLoading} = useRejectManagerReport()
   const {acceptManagerLoading,acceptManagerReport,isManagerAccept,acceptManagerError} = useAcceptManagerReport()
+  const { deleteTemporaryLoading, deleteTemporaryBeneficiary, isTemporaryDeleted, deleteTemporaryError } = useDeleteTemporaryBeneficiary();
+  const [showTempDeletePopup, setShowTempDeletePopup] = useState(false);
   
   // الحصول على دور المستخدم الحالي
   useEffect(() => {
@@ -162,6 +165,21 @@ const BeneficiaryDetailsPage = () => {
       hotToast({type:"error",message:rejectManagerError})
     }
   }, [rejectManagerError]);
+
+  useEffect(() => {
+    if (isTemporaryDeleted) {
+      hotToast({type:"success",message:"تم حذف المستفيد مؤقتا"})
+      setTimeout(() => {
+        navigate("/dashboard")
+      }, 260);
+    }
+  }, [isTemporaryDeleted, navigate]);
+
+  useEffect(() => {
+    if (deleteTemporaryError) {
+      hotToast({type:"error",message:deleteTemporaryError})
+    }
+  }, [deleteTemporaryError]);
 
   // تحديد أسماء الأزرار حسب الدور
   const getButtonLabels = () => {
@@ -577,6 +595,15 @@ const BeneficiaryDetailsPage = () => {
   // ... existing code ...
   // في زر التأكيد في popup استبدل onClick={handleConfirmAction} بـ onClick={handleConfirmPopup}
   // ... existing code ...
+
+  // زر الحذف المؤقت للمراجع فقط
+  const handleTemporaryDelete = () => {
+    setShowTempDeletePopup(true);
+  };
+  const confirmTemporaryDelete = async () => {
+    await deleteTemporaryBeneficiary(beneficiary?.id);
+    setShowTempDeletePopup(false);
+  };
 
   return (
     <div className={styles.pageWrapper}>
@@ -2070,6 +2097,10 @@ const BeneficiaryDetailsPage = () => {
                     <span className={styles.buttonIcon}>🗑️</span>
                     <span className={styles.buttonText}>حذف</span>
                   </button>
+                  <button className={styles.tempDeleteButton} onClick={handleTemporaryDelete} title="حذف مؤقت للمستفيد" disabled={deleteTemporaryLoading}>
+                    <span className={styles.buttonIcon}>🗑️</span>
+                    <span className={styles.buttonText}>حذف مؤقت</span>
+                  </button>
                 </>
               )}
               {currentAdmin?.rule === 'committee' && (
@@ -2147,6 +2178,23 @@ const BeneficiaryDetailsPage = () => {
           </div>
         )} */}
       </div>
+      {/* Popup حذف مؤقت */}
+      {showTempDeletePopup && (
+        <div className={styles.popupOverlay}>
+          <div className={styles.popupContent}>
+            <h4>هل أنت متأكد من حذف المستفيد مؤقتا؟</h4>
+            {deleteTemporaryError && <div className={styles.errorMsg}>{deleteTemporaryError}</div>}
+            <div className={styles.popupActions}>
+              <button onClick={confirmTemporaryDelete} disabled={deleteTemporaryLoading} className={styles.confirmButton}>
+                نعم، حذف مؤقت
+              </button>
+              <button onClick={() => setShowTempDeletePopup(false)} className={styles.cancelButton}>
+                إلغاء
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

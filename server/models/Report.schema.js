@@ -26,7 +26,7 @@ const reportModel = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["under_review", "under_committee", "under_manager","done"],
+      enum: ["under_review", "under_committee", "under_manager","done","deleted_temp"],
       required: true,
     },
     comments: {

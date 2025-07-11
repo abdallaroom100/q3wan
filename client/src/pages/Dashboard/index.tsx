@@ -10,6 +10,7 @@ import FinalReportsTable from "./components/FinalReportsTable";
 import AcceptedRecords from "./components/AcceptedRecords";
 import ProcessFlow from "./components/ProcessFlow";
 import { usePersistentState } from "../../hooks/usePersistentState";
+import DeletedList from "./components/DeletedList";
 
 const Dashboard = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -52,6 +53,14 @@ const Dashboard = () => {
           return <ProcessFlow />;
         } else {
           // Redirect to beneficiaries if not manager
+          setActiveTab("beneficiaries");
+          return <BeneficiariesList />;
+        }
+      case "deletedList":
+        // Only allow access to DeletedList if user is reviewer
+        if (admin && admin.rule === "reviewer") {
+          return <DeletedList />;
+        } else {
           setActiveTab("beneficiaries");
           return <BeneficiariesList />;
         }
@@ -165,28 +174,46 @@ const Dashboard = () => {
               تعديل التقارير
             </button>
           )}
+          {/* قائمة المحذوفين */}
+          {admin && admin.rule === "reviewer" && (
+            <button
+              className={`w-full p-4 rounded-xl text-lg font-semibold text-right transition-all duration-300 transform hover:scale-105 ${
+                activeTab === "deletedList"
+                  ? "bg-gradient-to-r from-red-400 to-red-600 text-white shadow-lg shadow-red-500/30"
+                  : "text-slate-300 hover:text-white hover:bg-slate-700/50 hover:shadow-md"
+              }`}
+              onClick={() => handleTabClick("deletedList")}
+            >
+              قائمة المحذوفين
+            </button>
+          )}
           
           <div className="pt-2 space-y-3">
-            {/* <button
-              className="w-full p-3 rounded-xl text-sm font-semibold text-right bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/30 transition-all duration-300 transform hover:scale-105 hover:from-orange-600 hover:to-orange-700"
-                             onClick={() => {
-                 // Clear all persistent states
-                 localStorage.removeItem('dashboard_activeTab');
-                 localStorage.removeItem('processFlow_currentPage');
-                 localStorage.removeItem('acceptedRecords_currentPage');
-                 localStorage.removeItem('acceptedRecords_filters');
-                 localStorage.removeItem('acceptedRecords_viewMode');
-                 localStorage.removeItem('acceptedRecords_showFilters');
-                 localStorage.removeItem('editReports_currentPage');
-                 // Reset to default tab
-                 setActiveTab('beneficiaries');
-                 setIsMenuOpen(false);
-                 // Show success message
-                 alert('تم إعادة تعيين جميع الإعدادات بنجاح!');
-               }}
-            >
-              إعادة تعيين الإعدادات
-            </button> */}
+            {/* External Links Section */}
+            <div className="border-t border-slate-700 pt-4 mt-4">
+              <h4 className="text-sm font-semibold text-slate-400 mb-3 px-2">روابط خارجية</h4>
+              
+              <a
+                href="https://docs.google.com/spreadsheets/d/1waHivw7Fh5_bbfk4WRQv0VCdfBk5iGRipE4FhS5mO3w/edit?resourcekey=&gid=1648509551#gid=1648509551"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full p-3 rounded-xl text-sm font-semibold text-right bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg shadow-red-500/30 transition-all duration-300 transform hover:scale-105 hover:from-red-600 hover:to-red-700 flex items-center justify-center gap-2"
+              >
+                <span>📊</span>
+                شيت المرفوضين
+              </a>
+              
+              <a
+                href="https://docs.google.com/spreadsheets/d/1PfXGfu5ByUYymI8qYyd6TG7PDxjbCMqS1NOG0eD1GGc/edit?resourcekey=&gid=1831758013#gid=1831758013"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full p-3 rounded-xl text-sm font-semibold text-right bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/30 transition-all duration-300 transform hover:scale-105 hover:from-green-600 hover:to-green-700 flex items-center justify-center gap-2 mt-3"
+              >
+                <span>📈</span>
+                شيت المقبولين
+              </a>
+            </div>
+            
             <button
               className="w-full p-4 rounded-xl text-lg font-semibold text-right bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg shadow-red-500/30 transition-all duration-300 transform hover:scale-105 hover:from-red-600 hover:to-red-700"
               onClick={() => {

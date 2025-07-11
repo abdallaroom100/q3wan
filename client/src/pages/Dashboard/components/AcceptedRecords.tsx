@@ -507,7 +507,7 @@ const AcceptedRecords = () => {
         
                   <div className="flex items-center gap-4">
             {/* View Mode Toggle */}
-            <div className="flex bg-gray-200 rounded-lg p-1">
+            <div className="flex bg-gray-200  rounded-lg p-1">
               <button
                 onClick={() => setViewMode('beneficiaries')}
                 className={`px-4 py-2 rounded-md transition-colors duration-300 ${

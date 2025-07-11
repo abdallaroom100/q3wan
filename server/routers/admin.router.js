@@ -3,7 +3,7 @@
 
 import {Router} from "express"
 import { protectedAdminRoute } from "../utils/protectedRoute.js"
-import { acceptReportByCommittee, acceptReportByManager, confirmBeneficiary, currentAdminTask, decideIfBeneficiaryIsDeserve, deleteBeneficiary, editBeneficiaryData, editReportByManager, getCurrentAdmin, getCurrentReportData, getFinalAcceptedReports, getFinalReports, getManagerTasks, getProcess, loginAdmin, rejectReportByCommittee, rejectReportByManager, searchForReport, singupAdmin } from "../controllers/admin.controller.js"
+import { acceptReportByCommittee, acceptReportByManager, confirmBeneficiary, currentAdminTask, decideIfBeneficiaryIsDeserve, deleteBeneficiary, deleteTemporary, editBeneficiaryData, editReportByManager, getCurrentAdmin, getCurrentReportData, getDeletedReports, getFinalAcceptedReports, getFinalReports, getManagerTasks, getProcess, loginAdmin, rejectReportByCommittee, rejectReportByManager, returnReportFromDeleted, searchForReport, singupAdmin } from "../controllers/admin.controller.js"
 const router =  Router()
 
 
@@ -23,8 +23,9 @@ router.post("/search",protectedAdminRoute,searchForReport)
 
 router.post("/confirm/:userId",protectedAdminRoute,confirmBeneficiary)
 router.delete("/delete/:userId",protectedAdminRoute,deleteBeneficiary)
-
-
+router.post("/trash/:userId",protectedAdminRoute,deleteTemporary)
+router.post("/back/:userId",protectedAdminRoute,returnReportFromDeleted)
+router.get("/deleted",protectedAdminRoute,getDeletedReports)
 
 router.post("/decide/:reportId",protectedAdminRoute,decideIfBeneficiaryIsDeserve)
 router.get("/manager",protectedAdminRoute,getManagerTasks)
