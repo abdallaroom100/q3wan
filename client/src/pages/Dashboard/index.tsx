@@ -70,7 +70,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-100 to-blue-50 flex" dir="rtl">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-100 to-blue-50 flex overflow-hidden" dir="rtl">
       
       {/* Mobile Overlay */}
       {isMenuOpen && (
@@ -91,16 +91,16 @@ const Dashboard = () => {
       {/* Sidebar */}
       <aside
         className={`
-          fixed top-0 right-0  w-80 h-screen bg-gradient-to-b from-slate-800 via-slate-900 to-slate-800 shadow-2xl z-50
-          transform transition-transform duration-300 ease-in-out
+          fixed top-0 right-0 w-80 h-screen bg-gradient-to-b from-slate-800 via-slate-900 to-slate-800 shadow-2xl z-50
+          transform transition-transform duration-300 ease-in-out flex flex-col
           ${isMenuOpen ? "translate-x-0" : "translate-x-full"}
           lg:sticky lg:top-0 lg:translate-x-0 lg:w-80 lg:h-screen
         `}
       >
         {/* Header */}
-        <div className="p-6 border-b border-slate-700">
+        <div className="px-6 border-b border-slate-700">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold !text-white">لوحة التحكم</h2>
+            <h2 className="text-2xl font-bold !text-white !mb-[20px] !mt-[19px]">لوحة التحكم</h2>
             {/* Close button for mobile */}
             <button
               className="lg:hidden p-2 rounded-lg hover:bg-slate-700 transition-colors text-white"
@@ -109,13 +109,54 @@ const Dashboard = () => {
               <X size={20} />
             </button>
           </div>
-          <div className="w-16 h-1 bg-gradient-to-r from-blue-400 to-green-400 rounded-full mt-3"></div>
+        
         </div>
 
+        {/* Admin Info Section */}
+        {admin && (
+          <div className="p-4 border-b border-slate-700 bg-gradient-to-r from-slate-700/50 to-slate-800/50">
+            <div className="flex items-center gap-4">
+              {/* Admin Avatar */}
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
+                <span className="text-white text-lg font-bold">
+                  {admin.name ? admin.name.split(' ')[0]?.charAt(0) : 'أ'}
+                </span>
+              </div>
+              
+              {/* Admin Details */}
+              <div className="flex-1">
+                <h3 className="text-white font-bold text-lg leading-tight">
+                  {admin.name || 'غير محدد'}
+                </h3>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-slate-300 text-sm">الدور:</span>
+                  <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                    admin.rule === 'manager' 
+                      ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white' 
+                      : admin.rule === 'committee' 
+                      ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white'
+                      : admin.rule === 'reviewer'
+                      ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'
+                      : 'bg-slate-600 text-white'
+                  }`}>
+                    {admin.rule === 'manager' ? 'المدير' : 
+                     admin.rule === 'committee' ? 'اللجنة' : 
+                     admin.rule === 'reviewer' ? 'المراجع' : 
+                     'غير محدد'}
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Decorative line */}
+            <div className="w-full h-0.5 bg-gradient-to-r from-blue-400 via-purple-400 to-green-400 rounded-full mt-4"></div>
+          </div>
+        )}
+
         {/* Navigation */}
-        <nav className="p-6 space-y-3  overflow-y-auto pb-24">
+        <nav className="flex-1 p-6 space-y-3 overflow-y-auto">
           <button
-            className={`w-full p-4 rounded-xl text-lg font-semibold text-right transition-all duration-300 transform hover:scale-105 ${
+            className={`w-full p-3 mb-2  md:px-4 md:py-3 rounded-xl text-lg font-semibold text-right transition-all duration-300 transform hover:scale-105 ${
               activeTab === "beneficiaries"
                 ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/30"
                 : "text-slate-300 hover:text-white hover:bg-slate-700/50 hover:shadow-md"
@@ -126,7 +167,7 @@ const Dashboard = () => {
           </button>
           
           <button
-            className={`w-full p-4 rounded-xl text-lg font-semibold text-right transition-all duration-300 transform hover:scale-105 ${
+            className={`w-full p-3 mb-1 md:px-4 md:py-3 rounded-xl text-lg font-semibold text-right transition-all duration-300 transform hover:scale-105 ${
               activeTab === "reports"
                 ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/30"
                 : "text-slate-300 hover:text-white hover:bg-slate-700/50 hover:shadow-md"
@@ -137,7 +178,7 @@ const Dashboard = () => {
           </button>
 
           <button
-            className={`w-full p-4 rounded-xl text-lg font-semibold text-right transition-all duration-300 transform hover:scale-105 ${
+            className={`w-full p-3 mb-1 md:px-4 md:py-3 rounded-xl text-lg font-semibold text-right transition-all duration-300 transform hover:scale-105 ${
               activeTab === "acceptedRecords"
                 ? "bg-gradient-to-r from-cyan-500 to-cyan-600 text-white shadow-lg shadow-cyan-500/30"
                 : "text-slate-300 hover:text-white hover:bg-slate-700/50 hover:shadow-md"
@@ -150,7 +191,7 @@ const Dashboard = () => {
           {/* Only show Process Flow button if admin.rule === 'manager' */}
           {admin && admin.rule === "manager" && (
             <button
-              className={`w-full p-4 rounded-xl text-lg font-semibold text-right transition-all duration-300 transform hover:scale-105 ${
+              className={`w-full p-3 mb-1 md:px-4 md:py-3 rounded-xl text-lg font-semibold text-right transition-all duration-300 transform hover:scale-105 ${
                 activeTab === "processFlow"
                   ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-500/30"
                   : "text-slate-300 hover:text-white hover:bg-slate-700/50 hover:shadow-md"
@@ -164,7 +205,7 @@ const Dashboard = () => {
           {/* Only show this button if admin.rule === 'manager' */}
           {admin && admin.rule === "manager" && (
             <button
-              className={`w-full p-4 rounded-xl text-lg font-semibold text-right transition-all duration-300 transform hover:scale-105 ${
+              className={`w-full p-3  md:px-4 md:py-3 rounded-xl text-lg font-semibold text-right transition-all duration-300 transform hover:scale-105 ${
                 activeTab === "editReports"
                   ? "bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg shadow-purple-500/30"
                   : "text-slate-300 hover:text-white hover:bg-slate-700/50 hover:shadow-md"
@@ -177,7 +218,7 @@ const Dashboard = () => {
           {/* قائمة المحذوفين */}
           {admin && admin.rule === "reviewer" && (
             <button
-              className={`w-full p-4 rounded-xl text-lg font-semibold text-right transition-all duration-300 transform hover:scale-105 ${
+              className={`w-full p-3  md:px-4 md:py-3 mb-0 rounded-xl text-lg font-semibold text-right transition-all duration-300 transform hover:scale-105 ${
                 activeTab === "deletedList"
                   ? "bg-gradient-to-r from-red-400 to-red-600 text-white shadow-lg shadow-red-500/30"
                   : "text-slate-300 hover:text-white hover:bg-slate-700/50 hover:shadow-md"
@@ -190,7 +231,7 @@ const Dashboard = () => {
           
           <div className="pt-2 space-y-3">
             {/* External Links Section */}
-            <div className="border-t border-slate-700 pt-4 mt-4">
+            <div className="border-t border-slate-700 pt-4 ">
               <h4 className="text-sm font-semibold text-slate-400 mb-3 px-2">روابط خارجية</h4>
               
               <a
@@ -215,7 +256,7 @@ const Dashboard = () => {
             </div>
             
             <button
-              className="w-full p-4 rounded-xl text-lg font-semibold text-right bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg shadow-red-500/30 transition-all duration-300 transform hover:scale-105 hover:from-red-600 hover:to-red-700"
+              className="w-full p-3  md:px-4 md:py-3 rounded-xl text-lg font-semibold text-right bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg shadow-red-500/30 transition-all duration-300 transform hover:scale-105 hover:from-red-600 hover:to-red-700"
               onClick={() => {
                 setIsMenuOpen(false);
                 
@@ -248,10 +289,11 @@ const Dashboard = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1  md:p-6 lg:p-8 overflow-y-auto pt-20 lg:pt-8 min-h-screen">
-        <div className="max-w-6xl mx-auto">
-          {renderContent()}
-          {/* تم حذف سيكشن القرارات النهائية من هنا */}
+      <main className="flex-1 overflow-y-auto">
+        <div className="p-4 md:p-6 lg:p-8 pt-20 lg:pt-8">
+          <div className="max-w-6xl mx-auto">
+            {renderContent()}
+          </div>
         </div>
       </main>
     </div>
