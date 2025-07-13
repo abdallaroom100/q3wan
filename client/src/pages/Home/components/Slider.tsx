@@ -21,7 +21,7 @@ const Slider = () => {
         {/* <img loading='lazy'  className='!object-fill' src="img/بنر.gif" alt="صورة 1" /> */}
       </SwiperSlide>
       <SwiperSlide>
-        <img   className='!object-fill'   src="img/banner2.gif" alt="صورة 3" />
+        <img   className='!object-fill'   src="img/banner2.webp" alt="صورة 3" />
       </SwiperSlide>
       <SwiperSlide>
         <img  className='!object-fill'   src="img/بنرر.webp" alt="صورة 2" />
