@@ -8,21 +8,50 @@ const Goals: React.FC = () => {
       {/* Header Section */}
     
 
-      <div className="max-w-6xl mx-auto px-5 py-12">
+      <div className="w-screen mx-auto px-5 py-12">
         {/* مقدمة */}
-        <section className="mb-12 text-center">
-          <p className="text-lg leading-8 text-gray-700 max-w-3xl mx-auto">
-            تسعى جمعية مبرة القعوان الخيرية إلى تحقيق مجموعة من الأهداف الاستراتيجية 
-            التي تهدف إلى خدمة المجتمع وتقديم الدعم للمحتاجين من خلال برامج ومشاريع 
-            متنوعة ومستدامة.
-          </p>
+        {/* <div className='contianer mx-auto w-full'>
+            <img src="/goals.png" alt="" className="w-[89%] md:h-[80vh] mx-auto rounded-xl mt-2 " />
+           </div> */}
+      
+
+        {/* أهداف المبرة */}
+        <section className="mb-16 w-full max-w-5xl mx-auto">
+          <div className="flex flex-col items-center mb-10">
+           <span className='flex items-center justify-center'>
+           <h2 className="text-4xl md:text-5xl font-extrabold text-yellow-400 text-center mb-2 tracking-tight drop-shadow">أهداف المبرة</h2>
+           {/* <span className="text-5xl md:text-6xl mb-2">🎯</span> */}
+           </span>
+            <div className="border-t-4 border-yellow-400 w-24 mx-auto mb-4"></div>
+            <p className="text-lg leading-8 text-black max-w-2xl text-center mb-2">
+              تسعى  مبرة القعوان الخيرية إلى تحقيق مجموعة من الأهداف الاستراتيجية التي تهدف إلى خدمة المجتمع وتقديم الدعم للمحتاجين من خلال برامج ومشاريع متنوعة ومستدامة.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-2 gap-4 md:gap-8 px-2">
+            <div className="bg-gradient-to-br from-[rgb(24,29,44)] to-[rgb(34,39,59)] border border-yellow-400 rounded-xl p-6 shadow-lg flex items-start gap-4 ">
+              <span className="text-yellow-400 text-3xl mt-1">&#x27A4;</span>
+              <span className="text-lg text-gray-100">إشاعة التكافل بين أفراد المجتمع ونشر الرحمة والأخوة بينهم.</span>
+            </div>
+            <div className="bg-gradient-to-br from-[rgb(24,29,44)] to-[rgb(34,39,59)] border border-yellow-400 rounded-xl p-6 shadow-lg flex items-start gap-4">
+              <span className="text-yellow-400 text-3xl mt-1">&#x27A4;</span>
+              <span className="text-lg text-gray-100">الإسهام في سد حاجات الناس وتفريج كربهم وتحسين معيشتهم وإدخال السرور على قلوبهم</span>
+            </div>
+            <div className="bg-gradient-to-br from-[rgb(24,29,44)] to-[rgb(34,39,59)] border border-yellow-400 rounded-xl p-6 shadow-lg flex items-start gap-4">
+              <span className="text-yellow-400 text-3xl mt-1">&#x27A4;</span>
+              <span className="text-lg text-gray-100">الحرص على إيصال الصدقات والزكوات لأكثر الناس حاجة وذلك من خلال لجان متخصصة تقوم بدراسة أحوال واحتياج الأسر بما يتناسب مع خصوصيتها، ويرعى كرامتها وعفّتها</span>
+            </div>
+            <div className="bg-gradient-to-br from-[rgb(24,29,44)] to-[rgb(34,39,59)] border border-yellow-400 rounded-xl p-6 shadow-lg flex items-start gap-4">
+              <span className="text-yellow-400 text-3xl mt-1">&#x27A4;</span>
+              <span className="text-lg text-gray-100">الاهتمام بالجيل الثاني من أبناء الأسر المستفيدة لتطويرهم وإزالة فكر ثقافة الفقر عنهم</span>
+            </div>
+          </div>
         </section>
 
         {/* أهداف الجمعية */}
-        <GoalsSection />
+        {/* <GoalsSection /> */}
 
         {/* معلومات إضافية */}
-        <section className="mb-12">
+        {/* <section className="mb-12">
           <div className="bg-white rounded-lg p-8 shadow-md">
             <h2 className="text-2xl font-bold text-[rgb(58,61,108)] mb-6 border-b-2 border-[rgb(58,61,108)] inline-block pb-2">
               كيف نحقق أهدافنا؟
@@ -50,7 +79,7 @@ const Goals: React.FC = () => {
               </div>
             </div>
           </div>
-        </section>
+        </section> */}
 
         {/* دعوة للعمل */}
         {/* <section className="text-center">

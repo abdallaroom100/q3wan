@@ -55,6 +55,7 @@ import Home from "./pages/Home";
 import BeneficiaryDetails from "./pages/BeneficiaryDetails";
 import { MoonLoader } from "react-spinners";
 import { DashboardProvider } from "./contexts/DashboardContext";
+import Says from "./pages/Says";
  
 const Login = lazy(() => import("./pages/Login"));
 const SignFamily = lazy(() => import("./pages/SignFamily/testIndex"));
@@ -80,6 +81,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<AboutUs />} />
               <Route path="/goals" element={<Goals />} />
+              <Route path="/says" element={<Says />} />
               <Route path="/login" element={<Login />} />
               <Route path="/album" element={<Album />} />
               <Route path="/sign-family" element={<SignFamily />} />

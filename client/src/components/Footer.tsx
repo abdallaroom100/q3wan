@@ -9,7 +9,10 @@ const Footer = () => {
       <div className="footer-container">
         <div className="footer-logo">
           <img className='bg-white ' style={{filter:"none",margin:"0 0"}} src="/img/logo.webp" loading='lazy' alt="شعار الجمعية" />
-          <p> مبرة القعوان الخيرية<br />عطاء يستمر</p>
+          <p className='!px-1 md:!pr-[1rem]'> مبرة القعوان الخيرية<br />عطاء يستمر</p>
+          <p className='!px-1 md:!pr-[1rem] max-w-[400px]'>
+          ترخيص صادر من الهيئة العامة للأوقاف برقم 1157 بتاريخ ١١ - ٣ - ١٤٤٥ هـ وهي خاضعة للشروط والأحكام المبينة في صك الوقفية رقم  ٣٨٤٣١٧٣٠ الذي تم إصداره بتاريخ ٢٩ - ٧ - ١٤٣٨ هـ
+          </p>
         </div>
 
         <div className="footer-links">
@@ -23,7 +26,7 @@ const Footer = () => {
           </ul>
         </div>
 
-        <div className="footer-social">
+        <div className="footer-social w-fit">
           <h4>تابعنا</h4>
           <div className="social-icons">
             <a href="#"><FontAwesomeIcon icon={faTwitter} /></a>
@@ -36,7 +39,7 @@ const Footer = () => {
       </div>
 
       <div className="footer-bottom">
-        <p>© 2025 جمعية مبرة القعوان الخيرية - جميع الحقوق محفوظة.</p>
+        <p>© 2025 مبرة القعوان الخيرية - جميع الحقوق محفوظة.</p>
       </div>
     </footer>
   )

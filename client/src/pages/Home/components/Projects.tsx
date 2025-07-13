@@ -82,7 +82,7 @@ const projects = [
     },
     {
       img: "img/condition.jpg",
-      title: "توزيع المكيفات وصيانتها",
+      title: "توزيع الأجهزة الكهربائية وصيانتها",
       cost: "معدل 30 الف ريال سنويا",
       beneficiaries: "الأسر المحتاجة",
       card: "تنفيذ مباشر",

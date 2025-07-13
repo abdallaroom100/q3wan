@@ -97,10 +97,13 @@ const Header = () => {
     { href: "/", label: "الرئيسية" },
     { href: "/about", label: "معلومات عنا" },
     { href: "/goals", label: "أهدافنا" },
+    { href: "/says", label: "قالو عنا" },
     { href: "/album", label: "معرض الصور" },
   ];
   const navItemsMobile = [
     { href: "/", label: "الرئيسية" },
+    { href: "/says", label: "قالو عنا" },
+    { href: "/album", label: "معرض الصور" },
 
   ];
 

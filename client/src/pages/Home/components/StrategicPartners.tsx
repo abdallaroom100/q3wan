@@ -258,12 +258,15 @@ const partners = [
     logo: '/contributer/card7.webp',
     name: 'مؤسسة بوعود',
   },
+  {
+    logo: '/contributer/maher.jpg',
+    name: 'شركة ماهر',
+  },
 ];
 
 const noImagePartners = [
   'بابطين للحلويات',
   'مؤسسة حسن عويد للمواشي',
-  'شركة الماهر',
   'مؤسسة سليمان بن محمد النملة الخيرية',
 ];
 
