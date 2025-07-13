@@ -161,7 +161,7 @@ const AboutUs: React.FC = () => {
 
         {/* رسالة إضافية */}
         <section className="mb-12">
-          <div className="bg-gradient-to-r from-[rgb(58,61,108)] to-[rgb(78,81,128)] rounded-2xl p-8 text-white">
+          <div className="bg-[#3C3F6E] rounded-2xl p-8 text-white">
             <div className="text-center">
               <h3 className="text-2xl font-bold mb-4">رسالة الجسد الواحد</h3>
               <p className="text-lg leading-8 opacity-90">

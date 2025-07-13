@@ -28,19 +28,19 @@ const Goals: React.FC = () => {
             </p>
           </div>
           <div className="grid md:grid-cols-2 gap-4 md:gap-8 px-2">
-            <div className="bg-gradient-to-br from-[rgb(24,29,44)] to-[rgb(34,39,59)] border border-yellow-400 rounded-xl p-6 shadow-lg flex items-start gap-4 ">
+            <div className="bg-[#1E2336] border border-yellow-400 rounded-xl p-6 shadow-lg flex items-start gap-4 ">
               <span className="text-yellow-400 text-3xl mt-1">&#x27A4;</span>
               <span className="text-lg text-gray-100">إشاعة التكافل بين أفراد المجتمع ونشر الرحمة والأخوة بينهم.</span>
             </div>
-            <div className="bg-gradient-to-br from-[rgb(24,29,44)] to-[rgb(34,39,59)] border border-yellow-400 rounded-xl p-6 shadow-lg flex items-start gap-4">
+            <div className="bg-[#1E2336] border border-yellow-400 rounded-xl p-6 shadow-lg flex items-start gap-4">
               <span className="text-yellow-400 text-3xl mt-1">&#x27A4;</span>
               <span className="text-lg text-gray-100">الإسهام في سد حاجات الناس وتفريج كربهم وتحسين معيشتهم وإدخال السرور على قلوبهم</span>
             </div>
-            <div className="bg-gradient-to-br from-[rgb(24,29,44)] to-[rgb(34,39,59)] border border-yellow-400 rounded-xl p-6 shadow-lg flex items-start gap-4">
+            <div className="bg-[#1E2336] border border-yellow-400 rounded-xl p-6 shadow-lg flex items-start gap-4">
               <span className="text-yellow-400 text-3xl mt-1">&#x27A4;</span>
               <span className="text-lg text-gray-100">الحرص على إيصال الصدقات والزكوات لأكثر الناس حاجة وذلك من خلال لجان متخصصة تقوم بدراسة أحوال واحتياج الأسر بما يتناسب مع خصوصيتها، ويرعى كرامتها وعفّتها</span>
             </div>
-            <div className="bg-gradient-to-br from-[rgb(24,29,44)] to-[rgb(34,39,59)] border border-yellow-400 rounded-xl p-6 shadow-lg flex items-start gap-4">
+            <div className="bg-[#1E2336] border border-yellow-400 rounded-xl p-6 shadow-lg flex items-start gap-4">
               <span className="text-yellow-400 text-3xl mt-1">&#x27A4;</span>
               <span className="text-lg text-gray-100">الاهتمام بالجيل الثاني من أبناء الأسر المستفيدة لتطويرهم وإزالة فكر ثقافة الفقر عنهم</span>
             </div>
