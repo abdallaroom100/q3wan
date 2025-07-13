@@ -131,7 +131,7 @@ const Header = () => {
                 }}
                 className="group flex items-center"
               >
-                <div className="lg:w-[130px] xl:w-[230px]">
+                <div className="lg:w-[110px] xl:!w-[180px]">
                 <picture>
                   <source srcSet="img/logo.webp" type="image/webp" />
                   <img
