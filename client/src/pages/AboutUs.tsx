@@ -171,7 +171,7 @@ const AboutUs: React.FC = () => {
           </div>
         </section>
       </div>
-
+ 
       {/* Footer */}
       <Footer />
     </div>
