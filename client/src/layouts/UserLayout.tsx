@@ -6,6 +6,7 @@ import { setUser, setIsLoading } from "../store/slices/user";
 import { MoonLoader } from "react-spinners";
 import Header from "../components/Header";
 import { Toaster } from "react-hot-toast";
+import ScrollToTop from "../pages/ScrollToTop";
 
 function UserLayout() {
   const dispatch = useDispatch();
@@ -36,6 +37,7 @@ function UserLayout() {
   }
 
   return <div>
+    <ScrollToTop />
       <Header />
     <Outlet />
     <Toaster />

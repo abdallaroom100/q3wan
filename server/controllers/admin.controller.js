@@ -830,12 +830,12 @@ export const acceptReportByManager = async (req,res)=>{
     console.log("error in search for report")
   }
  }
-
-
-
+  
+ 
+ 
  export const  getFinalReports = async (req,res) =>{
 
-  try {
+  try { 
     const reports = await Report.find({status:"done"}).sort({createdAt:-1}).populate("user")
    
     const currentAdmin = await Admin.findById(req.adminId)

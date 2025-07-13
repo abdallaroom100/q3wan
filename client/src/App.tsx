@@ -5,7 +5,7 @@ import Layout from "./Layout";
 // import "@fortawesome/fontawesome-svg-core/styles.css";
 import axios from "axios";
 import { Suspense, lazy } from "react";
-
+import ScrollToTop from "./pages/ScrollToTop";
 // Import all components directly
 
 
@@ -70,13 +70,14 @@ axios.defaults.withCredentials = true;
 config.autoAddCss = false;
 
 function App() {
-  return (
+  return ( 
     <BrowserRouter>
       <DashboardProvider>
         <Suspense fallback={<div className="w-full h-screen flex justify-center items-center">
           <MoonLoader />
         </div>}>
           <Routes>
+          
             <Route element={<Layout ><UserLayout /></Layout>}>
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<AboutUs />} />

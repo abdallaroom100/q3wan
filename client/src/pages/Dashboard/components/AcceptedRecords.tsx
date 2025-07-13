@@ -43,7 +43,7 @@ const CustomSelect = ({ value, onChange, options, placeholder = "اختر...", l
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="w-full bg-white border-2 border-gray-200 rounded-xl px-4 py-3 text-right text-gray-700 font-medium shadow-sm hover:border-blue-300 focus:border-blue-500 focus:outline-none transition-all duration-200 flex items-center justify-between"
+          className="w-full bg-white border-2 border-gray-200 rounded-xl px-4 py-2 text-right text-gray-700 font-medium shadow-sm hover:border-blue-300 focus:border-blue-500 focus:outline-none transition-all duration-200 flex items-center justify-between"
         >
           <span className={selectedOption ? "text-gray-900" : "text-gray-500"}>
             {selectedOption ? selectedOption.label : placeholder}
@@ -97,6 +97,7 @@ const AcceptedRecords = () => {
   const [showCommentsModal, setShowCommentsModal] = useState(false);
   const [selectedComments, setSelectedComments] = useState<any>(null);
   const [showFilters, setShowFilters] = usePersistentState('acceptedRecords_showFilters', false);
+  const [identitySearch, setIdentitySearch] = useState(""); // إضافة state للبحث بالرقم القومي
   // Remove this line as viewMode is now from context
   
   // Pagination states
@@ -122,7 +123,7 @@ const AcceptedRecords = () => {
   // Reset to first page when filters or view mode changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [filters, viewMode, setCurrentPage]);
+  }, [filters, viewMode, setCurrentPage, identitySearch]);
 
   // Process family members data
   useEffect(() => {
@@ -177,6 +178,11 @@ const AcceptedRecords = () => {
         const user = report.user;
         if (!user) return false;
 
+        // Identity Number Search Filter
+        if (identitySearch && !user.identityNumber?.includes(identitySearch)) {
+          return false;
+        }
+
         // Location Filters
         if (filters.cityOfResidence && user.cityOfResidence !== filters.cityOfResidence) {
           return false;
@@ -230,12 +236,19 @@ const AcceptedRecords = () => {
       });
       setFilteredReports(filtered);
     }
-  }, [filters, finalAcceptedReports, viewMode]);
+  }, [filters, finalAcceptedReports, viewMode, identitySearch]);
 
   // Apply filters for family members
   useEffect(() => {
     if (viewMode === 'familyMembers' && familyMembersData.length > 0) {
       const filtered = familyMembersData.filter(member => {
+        // Identity Number Search Filter (for both member and beneficiary)
+        if (identitySearch && 
+            !member.identityNumber?.includes(identitySearch) && 
+            !member.beneficiaryIdentityNumber?.includes(identitySearch)) {
+          return false;
+        }
+
         // Location Filters (based on beneficiary location)
         if (filters.cityOfResidence && member.cityOfResidence !== filters.cityOfResidence) {
           return false;
@@ -298,7 +311,7 @@ const AcceptedRecords = () => {
       });
       setFilteredFamilyMembers(filtered);
     }
-  }, [filters, familyMembersData, viewMode]);
+  }, [filters, familyMembersData, viewMode, identitySearch]);
 
   // Pagination calculations
   const getCurrentData = () => {
@@ -392,6 +405,7 @@ const AcceptedRecords = () => {
       status: "",
       incomeSource: "",
     });
+    setIdentitySearch(""); // Clear identity search when filters are cleared
   };
 
   const handleRowClick = (reportId: string) => {
@@ -505,9 +519,25 @@ const AcceptedRecords = () => {
           <p className="text-gray-600 mt-2">عرض جميع المستفيدين المقبولين والمرافقين</p>
         </div>
         
-                  <div className="flex items-center gap-4">
+        <div className="flex flex-col gap-4">
+          {/* Identity Search - Above other buttons */}
+          <div className="flex items-center gap-2 justify-end">
+            <label className="text-sm font-semibold text-gray-700 whitespace-nowrap">
+              🔍 بحث برقم الهوية:
+            </label>
+            <input
+              type="text"
+              value={identitySearch}
+              onChange={(e) => setIdentitySearch(e.target.value)}
+              placeholder="اكتب رقم الهوية..."
+              className="w-48 bg-white border-2 border-gray-200 rounded-xl px-3 py-2 text-gray-700 font-medium shadow-sm hover:border-blue-300 focus:border-blue-500 focus:outline-none transition-all duration-200"
+            />
+          </div>
+
+          {/* View Mode Toggle and Filters Button */}
+          <div className="flex items-center gap-4 justify-center md:justify-end">
             {/* View Mode Toggle */}
-            <div className="flex bg-gray-200  rounded-lg p-1">
+            <div className="flex bg-gray-200  rounded-lg">
               <button
                 onClick={() => setViewMode('beneficiaries')}
                 className={`px-4 py-2 rounded-md transition-colors duration-300 ${
@@ -519,7 +549,7 @@ const AcceptedRecords = () => {
                 المستفيدين ({finalAcceptedReports.length})
               </button>
               <button
-                onClick={() => setViewMode('familyMembers')}
+                onClick={() => setViewMode('familyMembers')} 
                 className={`px-4 py-2 rounded-md transition-colors duration-300 ${
                   viewMode === 'familyMembers' 
                     ? 'bg-blue-600 text-white' 
@@ -531,12 +561,13 @@ const AcceptedRecords = () => {
             </div>
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 md:!block text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 !flex items-center gap-2"
+              className="bg-gradient-to-r from-blue-600 to-blue-700 !hidden  hover:from-blue-700 hover:to-blue-800 md:!block text-white px-6 py-2 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105  items-center gap-2"
             >
               <span>{showFilters ? "👁️ " : "🔍 "}</span>
               {showFilters ? "إخفاء الفلاتر" : "عرض الفلاتر"}
             </button>
           </div>
+        </div>
         <button
             onClick={() => setShowFilters(!showFilters)}
             className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 mt-5  md:!hidden text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 !flex items-center justify-center gap-2"
@@ -548,13 +579,13 @@ const AcceptedRecords = () => {
 
       {/* Filters Section */}
       {showFilters && (
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-8 rounded-2xl mb-8 border border-blue-200 shadow-lg">
-          <div className="flex items-center gap-3 mb-6">
+        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-8 px-8 py-4 rounded-2xl mb-8 border border-blue-200 shadow-lg">
+          {/* <div className="flex items-center gap-3 mb-6">
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
               <span className="text-white text-lg">🔍</span>
             </div>
             <h3 className="text-xl font-bold text-gray-800">فلاتر البحث</h3>
-          </div>
+          </div> */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
              {/* Status Filter */}
              <CustomSelect
@@ -724,10 +755,10 @@ const AcceptedRecords = () => {
           </div>
 
           {/* Filter Actions */}
-          <div className="flex flex-col sm:flex-row gap-4 mt-8 pt-6 border-t border-blue-200">
+          <div className="flex flex-col sm:flex-row gap-4 mt- pt-3 border-t border-blue-200">
             <button
               onClick={clearFilters}
-              className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center  text-[15px] md:text-[18px] justify-center gap-2"
+              className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-5 py-2 rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center  text-[15px] md:text-[18px] justify-center gap-2"
             >
               <span>🗑️</span>
               مسح جميع الفلاتر

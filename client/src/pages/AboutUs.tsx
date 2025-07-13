@@ -46,7 +46,11 @@ const AboutUs: React.FC = () => {
                   <ul className="space-y-2 text-gray-700">
                     <li className="flex items-center">
                       <span className="w-2 h-2 bg-green-500 rounded-full ml-2"></span>
-                      الأسر الفقيرة والمتعففة
+                      الأسر الفقيرة 
+                    </li>
+                    <li className="flex items-center">
+                      <span className="w-2 h-2 bg-green-500 rounded-full ml-2"></span>
+                      الأسر  المتعففة
                     </li>
                     <li className="flex items-center">
                       <span className="w-2 h-2 bg-green-500 rounded-full ml-2"></span>
@@ -60,21 +64,53 @@ const AboutUs: React.FC = () => {
                 </div>
                 
                 <div className="bg-purple-50 p-6 rounded-xl">
-                  <h4 className="text-lg font-semibold text-purple-800 mb-3">برامجنا</h4>
-                  <ul className="space-y-2 text-gray-700">
-                    <li className="flex items-center">
-                      <span className="w-2 h-2 bg-purple-500 rounded-full ml-2"></span>
-                      كفالة الأيتام
-                    </li>
-                    <li className="flex items-center">
-                      <span className="w-2 h-2 bg-purple-500 rounded-full ml-2"></span>
-                      السلة الغذائية
-                    </li>
-                    <li className="flex items-center">
-                      <span className="w-2 h-2 bg-purple-500 rounded-full ml-2"></span>
-                      كسوة الشتاء
-                    </li>
-                  </ul>
+                  <h4 className="text-lg font-semibold text-purple-800 mb-3">مشاريعنا</h4>
+                  <div className="space-y-2 text-gray-700 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <ul className="space-y-2 text-gray-700">
+                      <li className="flex items-center">
+                        <span className="w-2 h-2 bg-purple-500 rounded-full ml-2"></span>
+                        كفالة الأيتام
+                      </li>
+                      <li className="flex items-center">
+                        <span className="w-2 h-2 bg-purple-500 rounded-full ml-2"></span>
+                        السلة الغذائية
+                      </li>
+                      <li className="flex items-center">
+                        <span className="w-2 h-2 bg-purple-500 rounded-full ml-2"></span>
+                        سقيا الماء
+                      </li>
+                      <li className="flex items-center">
+                        <span className="w-2 h-2 bg-purple-500 rounded-full ml-2"></span>
+                        كسوة العيد
+                      </li>
+                      <li className="flex items-center">
+                        <span className="w-2 h-2 bg-purple-500 rounded-full ml-2"></span>
+                        الكسوة والحقيبة المدرسية
+                      </li>
+                    </ul>
+                    <ul className="space-y-2 text-gray-700 ">
+                      <li className="flex items-center">
+                        <span className="w-2 h-2 bg-purple-500 rounded-full ml-2"></span>
+                        كسوة الشتاء
+                      </li>
+                      <li className="flex items-center">
+                        <span className="w-2 h-2 bg-purple-500 rounded-full ml-2"></span>
+                        توزيع التمور
+                      </li>
+                      <li className="flex items-center">
+                        <span className="w-2 h-2 bg-purple-500 rounded-full ml-2"></span>
+                        توزيع اللحوم
+                      </li>
+                      <li className="flex items-center">
+                        <span className="w-2 h-2 bg-purple-500 rounded-full ml-2"></span>
+                        توزيع المكيفات وصيانتها
+                      </li>
+                      <li className="flex items-center">
+                        <span className="w-2 h-2 bg-purple-500 rounded-full ml-2"></span>
+                        زكاة الفطر
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               </div>
 

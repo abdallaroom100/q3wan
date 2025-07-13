@@ -10,12 +10,12 @@ const NewsSection = () => (
         {[
           {
             img: "/img/q3wan2.webp",
-            title: " نبادر بالأضاحي.. لنرسم فرحة العيد" ,
+            title: "مشروع توزيع لحوم الأضاحي" ,
             text: "",
           },
           {
             img: "/img/q3wan1.webp",
-            title: "دعمكم جعل صيفهم أطيب",
+            title: "دعمكم جعل صيفهم أبرد",
             text: "",
           },
           {

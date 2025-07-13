@@ -31,12 +31,12 @@ router.post("/decide/:reportId",protectedAdminRoute,decideIfBeneficiaryIsDeserve
 router.get("/manager",protectedAdminRoute,getManagerTasks)
 
 router.get("/reportDetails/:reportId",protectedAdminRoute,getCurrentReportData)
-
+ 
 
 router.post("/rejectc/:userId",protectedAdminRoute,rejectReportByCommittee)
 router.post("/acceptc/:userId",protectedAdminRoute,acceptReportByCommittee)
 
-
+ 
 
 router.get("/manageredit/:reportId",protectedAdminRoute,editReportByManager)
 router.post("/rejectm/:userId",protectedAdminRoute,rejectReportByManager)
@@ -46,4 +46,4 @@ router.get("/archive",protectedAdminRoute,getFinalAcceptedReports)
 router.get("/process",protectedAdminRoute,getProcess)
 
 router.patch("/edit/:reportId",protectedAdminRoute,editBeneficiaryData)
-export default router
+export default router 

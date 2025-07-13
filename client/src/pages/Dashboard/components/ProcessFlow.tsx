@@ -34,13 +34,13 @@ const ProcessFlow = () => {
   const getStatusText = (status: string) => {
     switch (status) {
       case "under_review":
-        return "قيد المراجعة";
+        return "عند المراجع";
       case "under_committee":
-        return "قيد اللجنة";
+        return "عند اللجنة";
       case "under_manager":
-        return "قيد المدير";
+        return "عند المدير";
       default:
-        return "قيد المراجعة";
+        return "عند المراجعة";
     }
   };
 

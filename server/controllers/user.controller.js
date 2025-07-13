@@ -68,6 +68,7 @@ const validateHomeData = (homeData) => {
   }
   if (homeData.housemates && homeData.housemates.length > 0) {
     for (const housemate of homeData.housemates) {
+      console.log( housemate.studyGrade)
       if (
         !housemate.name ||
         !housemate.identityNumber ||
@@ -75,9 +76,9 @@ const validateHomeData = (homeData) => {
         !housemate.kinship ||
         !housemate.dateType ||
         !housemate.studyLevel ||
-        !housemate.studyLevel != "جامعي" && !housemate.studyGrade ||
+        housemate.studyLevel?.trim() == "جامعي" && housemate.studyGrade ||
         !housemate.healthStatus || 
-        housemate.healthStatus == "غير سليم" && !housemate.disabilityType
+        housemate.healthStatus?.trim() == "غير سليم" && !housemate.disabilityType
       ) {
         return { isValid: false, error: "بيانات المرافقين غير كاملة" };
       }

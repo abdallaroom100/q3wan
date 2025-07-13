@@ -70,8 +70,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-100 to-blue-50 flex overflow-hidden" dir="rtl">
-      
+    <div className="flex h-screen bg-gray-50" style={{ direction: 'rtl' }}>
       {/* Mobile Overlay */}
       {isMenuOpen && (
         <div
@@ -89,14 +88,9 @@ const Dashboard = () => {
       </button>
 
       {/* Sidebar */}
-      <aside
-        className={`
-          fixed top-0 right-0 w-80 h-screen bg-gradient-to-b from-slate-800 via-slate-900 to-slate-800 shadow-2xl z-50
-          transform transition-transform duration-300 ease-in-out flex flex-col
-          ${isMenuOpen ? "translate-x-0" : "translate-x-full"}
-          lg:sticky lg:top-0 lg:translate-x-0 lg:w-80 lg:h-screen
-        `}
-      >
+      <aside className={`fixed lg:static inset-y-0 right-0 z-50 w-80 bg-gradient-to-b from-slate-800 to-slate-900 shadow-2xl transform transition-transform duration-300 ease-in-out ${
+        isMenuOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'
+      } flex flex-col h-full`}>
         {/* Header */}
         <div className="px-6 border-b border-slate-700">
           <div className="flex items-center justify-between">
@@ -154,7 +148,7 @@ const Dashboard = () => {
         )}
 
         {/* Navigation */}
-        <nav className="flex-1 p-6 space-y-3 overflow-y-auto">
+        <nav className="flex-1 p-6 space-y-3 overflow-y-auto max-h-[calc(100vh-200px)]">
           <button
             className={`w-full p-3 mb-2  md:px-4 md:py-3 rounded-xl text-lg font-semibold text-right transition-all duration-300 transform hover:scale-105 ${
               activeTab === "beneficiaries"
@@ -241,7 +235,7 @@ const Dashboard = () => {
                 className="w-full p-3 rounded-xl text-sm font-semibold text-right bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg shadow-red-500/30 transition-all duration-300 transform hover:scale-105 hover:from-red-600 hover:to-red-700 flex items-center justify-center gap-2"
               >
                 <span>📊</span>
-                شيت المرفوضين
+                قائمة المرفوضين
               </a>
               
               <a
@@ -251,7 +245,7 @@ const Dashboard = () => {
                 className="w-full p-3 rounded-xl text-sm font-semibold text-right bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg shadow-green-500/30 transition-all duration-300 transform hover:scale-105 hover:from-green-600 hover:to-green-700 flex items-center justify-center gap-2 mt-3"
               >
                 <span>📈</span>
-                شيت المقبولين
+                قائمة المقبولين
               </a>
             </div>
             
@@ -289,7 +283,7 @@ const Dashboard = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 overflow-y-auto h-screen">
         <div className="p-4 md:p-6 lg:p-8 pt-20 lg:pt-8">
           <div className="max-w-6xl mx-auto">
             {renderContent()}

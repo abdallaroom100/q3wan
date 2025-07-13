@@ -10,7 +10,7 @@ const projects = [
     bgGradient: "from-amber-600 to-orange-500"
   },
   {
-    img: "img/سلة.jpg",
+    img: "img/سلة.png",
     title: "السلة الغذائية",
     cost: "معدل 3600 ريال شهريا",
     beneficiaries: "جميع الأسر",
