@@ -23,8 +23,8 @@ const Dashboard = () => {
       const adminData = JSON.parse(localStorage.getItem("admin") || "null");
       setAdmin(adminData);
       
-      // If user is not manager and current tab is processFlow, redirect to beneficiaries
-      if (adminData && adminData.rule !== "manager" && activeTab === "processFlow") {
+      // If user is not manager or committee and current tab is processFlow, redirect to beneficiaries
+      if (adminData && adminData.rule !== "manager" && adminData.rule !== "committee" && activeTab === "processFlow") {
         setActiveTab("beneficiaries");
       }
     } catch (e) {
@@ -48,11 +48,10 @@ const Dashboard = () => {
       case "acceptedRecords":
         return <AcceptedRecords />;
       case "processFlow":
-        // Only allow access to ProcessFlow if user is manager
-        if (admin && admin.rule === "manager") {
+        // Only allow access to ProcessFlow if user is manager or committee
+        if (admin && (admin.rule === "manager" || admin.rule === "committee")) {
           return <ProcessFlow />;
         } else {
-          // Redirect to beneficiaries if not manager
           setActiveTab("beneficiaries");
           return <BeneficiariesList />;
         }
@@ -183,7 +182,7 @@ const Dashboard = () => {
           </button>
 
           {/* Only show Process Flow button if admin.rule === 'manager' */}
-          {admin && admin.rule === "manager" && (
+          {admin && (admin.rule === "manager" || admin.rule === "committee") && (
             <button
               className={`w-full p-3 mb-1 md:px-4 md:py-3 rounded-xl text-lg font-semibold text-right transition-all duration-300 transform hover:scale-105 ${
                 activeTab === "processFlow"

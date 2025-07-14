@@ -875,8 +875,8 @@ export const acceptReportByManager = async (req,res)=>{
       if(!currentAdmin){
         return res.status(400).json({error:"بيانات الادمن الحالي غير موجوده"})
       }
-      if(currentAdmin.rule !== "manager"){
-        return res.status(400).json({error:"المدير فقط القادر علي رؤية سير العمليات"})
+      if(currentAdmin.rule !== "manager" && currentAdmin.rule !== "committee"){
+        return res.status(400).json({error:"المدير أو اللجنة فقط القادران علي رؤية سير العمليات"})
       }
       const reports = await Report.find({status:{$nin:["done"]}}).populate("user")
       
