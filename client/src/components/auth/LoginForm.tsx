@@ -34,7 +34,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ loginData, onLoginChange, onLogin
 
       <button
         onClick={onLogin}
-        className="w-full py-4 px-6 bg-gradient-to-r from-[rgb(58,61,108)] to-[rgb(149,122,77)] text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
+        className="w-full py-4 px-6 bg-[#323665] text-white font-semibold rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
       >
         دخول
       </button>
