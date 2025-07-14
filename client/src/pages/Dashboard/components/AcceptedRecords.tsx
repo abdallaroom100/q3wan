@@ -951,7 +951,7 @@ const AcceptedRecords = () => {
               </table>
 
               {/* Pagination */}
-              {getTotalPages() > 1 && (
+              {/* {getTotalPages() > 1 && (
                 <div className="flex justify-between items-center mt-6 px-4">
                   <div className="text-sm text-gray-600">
                     عرض {((currentPage - 1) * itemsPerPage) + 1} إلى {Math.min(currentPage * itemsPerPage, getTotalItems())} من {getTotalItems()} نتيجة
@@ -991,7 +991,7 @@ const AcceptedRecords = () => {
                     </button>
                   </div>
                 </div>
-              )}
+              )} */}
             </>
           )
         )}
