@@ -32,7 +32,7 @@ const DeletedList = () => {
       }
 
       const response = await axios.post(
-        `/admin/returnDeleted/${userId}`,
+        `/admin/back/${userId}`,
         {},
         {
           headers: {

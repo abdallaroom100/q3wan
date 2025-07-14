@@ -32,12 +32,14 @@ const ProcessFlow = () => {
   };
 
   const getStatusText = (status: string) => {
+    console.log(status)
     switch (status) {
       case "under_review":
         return "عند المراجع";
       case "under_committee":
         return "عند اللجنة";
       case "under_manager":
+      case "accepted":
         return "عند المدير";
       default:
         return "عند المراجعة";
@@ -45,12 +47,13 @@ const ProcessFlow = () => {
   };
 
   const getStatusIcon = (status: string) => {
-    switch (status) {
+    switch (status?.trim()) {
       case "under_review":
         return " 👀 ";
       case "under_committee":
         return "🏛️";
       case "under_manager":
+        case "accepted":
         return "👨‍💼";
       default:
         return "⏳";
@@ -133,13 +136,13 @@ const ProcessFlow = () => {
           <div className="text-xl font-bold text-blue-600">{reports.length}</div>
           <div className="flex gap-1 mt-2 text-xs flex-wrap justify-center md:justify-end">
             <span className="bg-blue-500 text-white px-2 py-1 rounded">
-              {reports.filter(r => (r.reportStatus || r.status) === 'under_review').length} مراجعة
+              {reports.filter(r => (r.status) === 'under_review').length} مراجعة
             </span>
             <span className="bg-yellow-500 text-white px-2 py-1 rounded">
-              {reports.filter(r => (r.reportStatus || r.status) === 'under_committee').length} لجنة
+              {reports.filter(r => ( r.status) === 'under_committee').length} لجنة
             </span>
             <span className="bg-purple-500 text-white px-2 py-1 rounded">
-              {reports.filter(r => (r.reportStatus || r.status) === 'under_manager').length} مدير
+              {reports.filter(r => ( r.status) === 'under_manager').length} مدير
             </span>
           </div>
         </div>
@@ -214,11 +217,11 @@ const ProcessFlow = () => {
                     </td>
                     <td className="text-nowrap py-3">
                       <button
-                        className={getStatusButtonClass(item.reportStatus || item.status)}
+                        className={getStatusButtonClass( item.status)}
                         style={{ pointerEvents: "none" }}
                       >
-                        <span className="mr-1">{getStatusIcon(item.reportStatus || item.status)}</span>
-                        {getStatusText(item.reportStatus || item.status)}
+                        <span className="mr-1">{getStatusIcon( item.status)}</span>
+                        {getStatusText(item.status)}
                       </button>
                     </td>
                     <td className="text-nowrap py-3">

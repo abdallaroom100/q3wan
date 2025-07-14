@@ -46,4 +46,4 @@ router.get("/archive",protectedAdminRoute,getFinalAcceptedReports)
 router.get("/process",protectedAdminRoute,getProcess)
 
 router.patch("/edit/:reportId",protectedAdminRoute,editBeneficiaryData)
-export default router 
+export default router   
