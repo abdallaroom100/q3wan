@@ -40,9 +40,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ loginData, onLoginChange, onLogin
       </button>
 
       <div className="text-center">
-        <button className="text-gray-500 hover:text-[rgb(58,61,108)] text-sm transition-colors duration-300 hover:underline">
+        {/* <button className="text-gray-500 hover:text-[rgb(58,61,108)] text-sm transition-colors duration-300 hover:underline">
           نسيت كلمة المرور؟
-        </button>
+        </button> */}
       </div>
     </div>
   );
