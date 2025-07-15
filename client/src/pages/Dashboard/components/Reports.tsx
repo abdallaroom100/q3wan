@@ -74,7 +74,7 @@ const Reports = () => {
   const getStatusText = (status: string) => {
     switch (status) {
       case "accepted":
-        return " مقبول من اللحنة";
+        return " مقبول من اللجنة";
       case "rejected":
         return "مرفوض من اللجنه";
       case "accepted_manager":

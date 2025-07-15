@@ -810,7 +810,6 @@ export const rejectReportByManager = async (req,res)=>{
             'entry.1403970143': currentUser.cityOfResidence,
             'entry.1340897065': currentUser.district,
             'entry.1124638915': currentUser.bankName,
-            'entry.2098247779': currentUser.maritalStatus,
             'entry.784277999': currentUser.jobStatus,
             'entry.1739289472': currentUser.housingType,
             'entry.958126596': currentUser.rentAmount,

@@ -49,7 +49,7 @@ const ProcessFlow = () => {
   const getStatusIcon = (status: string) => {
     switch (status?.trim()) {
       case "under_review":
-        return " 👀 ";
+        return "  ";
       case "under_committee":
         return "🏛️";
       case "under_manager":

@@ -1468,6 +1468,97 @@ const BeneficiaryDetailsPage = () => {
                     </span>
                   </span>
                 </div>
+                <div className={styles.infoItem} style={{ position: 'relative' }}>
+                  <span className={styles.infoLabel}>البريد الإلكتروني</span>
+                  <span
+                    className={styles.infoValue}
+                    style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}
+                  >
+                    <a href={`mailto:${editedBeneficiary?.email}`} className={styles.fileLink}>
+                      <span className={styles.linkIcon}>✉️</span>
+                      <span className={styles.editableField}>{editedBeneficiary?.email}</span>
+                    </a>
+                  </span>
+                </div>
+                <div className={styles.infoItem} style={{ position: 'relative' }}>
+                  <span className={styles.infoLabel}>المهنة</span>
+                  <span
+                    className={styles.infoValue}
+                    style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}
+                    onMouseEnter={e => {
+                      const icon = e.currentTarget.querySelector('.edit-icon') as HTMLElement;
+                      if (icon) icon.style.visibility = 'visible';
+                    }}
+                    onMouseLeave={e => {
+                      const icon = e.currentTarget.querySelector('.edit-icon') as HTMLElement;
+                      if (icon) icon.style.visibility = 'hidden';
+                    }}
+                  >
+                    {editingField === 'jobStatus' ? (
+                      <Select
+                        options={jobStatusOptions}
+                        value={jobStatusOptions.find(opt => opt.value === editedBeneficiary?.jobStatus)}
+                        onChange={option => handleEditChange('jobStatus', option?.value)}
+                        onBlur={() => setEditingField(null)}
+                        classNamePrefix="customSelect"
+                        autoFocus
+                        menuPlacement="auto"
+                        styles={{
+                          control: (base) => ({
+                            ...base,
+                            borderRadius: 8,
+                            borderColor: '#b0c4de',
+                            minHeight: 44,
+                            fontSize: 16,
+                            fontWeight: 500,
+                            background: '#f0f6ff',
+                            color: '#374151',
+                            boxShadow: 'none',
+                            '&:hover': { borderColor: 'rgb(58, 61, 108)' }
+                          }),
+                          option: (base, state) => ({
+                            ...base,
+                            background: state.isSelected
+                              ? '#e8f2ff'
+                              : state.isFocused
+                              ? '#d1e7ff'
+                              : '#fff',
+                            color: '#374151',
+                            fontSize: 16,
+                            fontWeight: 500,
+                            direction: 'rtl',
+                            textAlign: 'right',
+                            cursor: 'pointer',
+                          }),
+                          menu: (base) => ({
+                            ...base,
+                            borderRadius: 8,
+                            zIndex: 9999,
+                            direction: 'rtl',
+                            textAlign: 'right'
+                          })
+                        }}
+                        isRtl
+                        placeholder="اختر المهنة"
+                      />
+                    ) : (
+                      <span className={styles.editableField}>{editedBeneficiary?.jobStatus}</span>
+                    )}
+                    <span
+                      className={`edit-icon ${styles.editIcon}`}
+                      style={{
+                        marginRight: 8,
+                        cursor: 'pointer',
+                        visibility: 'hidden',
+                        position: 'static',
+                        display: 'inline-block',
+                      }}
+                      onClick={() => setEditingField('jobStatus')}
+                    >
+                      ✏️
+                    </span>
+                  </span>
+                </div>
               </div>
             </div>
           </div>
