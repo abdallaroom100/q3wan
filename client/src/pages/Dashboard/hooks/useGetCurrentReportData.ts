@@ -50,6 +50,7 @@ export const useGetCurrentReportData = (reportId: string) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [reportDetails, setReportDetails] = useState<Record<string, any>>();
+  const [fullReport, setFullReport] = useState<Record<string, any>>();
   const navigate = useNavigate();
   const isMounted = useRef(true);
 
@@ -81,6 +82,7 @@ export const useGetCurrentReportData = (reportId: string) => {
       });
       if (isMounted.current) {
         setReportDetails(res.data?.user);
+        setFullReport(res.data)
       }
     } catch (error: any) {
       if (isMounted.current) {
@@ -105,5 +107,5 @@ export const useGetCurrentReportData = (reportId: string) => {
     };
   }, [reportId]);
 
-  return { getReportDetails, loading, error, reportDetails };
+  return { getReportDetails, loading, error,fullReport, reportDetails };
 };

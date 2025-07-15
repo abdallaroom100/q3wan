@@ -30,7 +30,7 @@ const useIsMobile = () => {
 const BeneficiaryDetailsPage = () => {
    const history = useNavigate()
   const { id } = useParams<{ id: string }>();
-  const { error, loading, reportDetails } = useGetCurrentReportData(id || "");
+  const { error, loading, reportDetails,fullReport } = useGetCurrentReportData(id || "");
   const navigate = useNavigate();
   const [beneficiary, setBeneficiary] = useState<Beneficiary | null>(null);
   const [editedBeneficiary, setEditedBeneficiary] = useState<Beneficiary | null>(null);
@@ -58,11 +58,11 @@ const BeneficiaryDetailsPage = () => {
   // الحصول على دور المستخدم الحالي
   useEffect(() => {
     try {
-      const adminData = JSON.parse(localStorage.getItem("admin") || "null");
+      const adminData = JSON.parse(localStorage.getItem("admin") || "{}");
       setCurrentAdmin(adminData);
     } catch (e) {
       setCurrentAdmin(null);
-    }
+    }  
   }, []);
 
 
@@ -261,7 +261,7 @@ const BeneficiaryDetailsPage = () => {
       companions: (data.facilitiesInfo || []).map((h: any) => `${h.name} - ${h.kinship}`).join("، ") || "",
     };
   };
-
+  
   useEffect(() => {
     if (reportDetails) {
       const mapped = mapReportDetailsToBeneficiary(reportDetails);
@@ -592,6 +592,7 @@ const BeneficiaryDetailsPage = () => {
       }
     }
   };
+
   // ... existing code ...
   // في زر التأكيد في popup استبدل onClick={handleConfirmAction} بـ onClick={handleConfirmPopup}
   // ... existing code ...
@@ -2051,7 +2052,12 @@ const BeneficiaryDetailsPage = () => {
             </table>
           </div>
         </div>
-        {!printing && (
+        {/* كارت الإجراءات يظهر فقط إذا كان هناك إجراء متاح لهذا الدور */}
+        {(
+          (currentAdmin?.rule === 'reviewer' && fullReport?.status === 'under_review') ||
+          (currentAdmin?.rule === 'committee' && fullReport?.status === 'under_committee') ||
+          (currentAdmin?.rule === 'manager')
+        ) && (
           <div className={styles.card}>
             <div className={styles.cardHeader}>
               <h3 className={styles.cardTitle}>
@@ -2086,8 +2092,8 @@ const BeneficiaryDetailsPage = () => {
                   )}
                 </button>
               )}
-              {/* أزرار الإجراءات حسب الدور */}
-              {currentAdmin?.rule === 'reviewer' && (
+              {/* أزرار الإجراءات حسب الدور والحالة */}
+              {currentAdmin?.rule === 'reviewer' && fullReport?.status === 'under_review' && (
                 <>
                   <button className={styles.approveButton} style={{background:'#22c55e'}} onClick={() => {setConfirmAction('approve'); setShowConfirmPopup(true);}}>
                     <span className={styles.buttonIcon}>✔</span>
@@ -2103,7 +2109,7 @@ const BeneficiaryDetailsPage = () => {
                   </button>
                 </>
               )}
-              {currentAdmin?.rule === 'committee' && (
+              {currentAdmin?.rule === 'committee' && fullReport?.status === 'under_committee' && (
                 <>
                   <button className={styles.approveButton} style={{background:'#10b981', color:'#fff'}} onClick={() => {setConfirmAction('approve'); setShowConfirmPopup(true);}}>
                     <span className={styles.buttonIcon}>✔</span>

@@ -8,6 +8,82 @@ import Report from "../models/Report.schema.js";
 import fs from "fs";
 import path from "path";
 
+// دالة لحساب العمر من تاريخ الميلاد (ميلادي أو هجري)
+function calculateAge(birthDate, dateType) {
+  if (!birthDate || !dateType) return '';
+  const parts = birthDate.split('-');
+  if (parts.length < 3) return '';
+  const [yearStr, monthStr, dayStr] = parts;
+  if (!yearStr || !monthStr || !dayStr) return '';
+  const year = Number(yearStr);
+  const month = Number(monthStr);
+  const day = Number(dayStr);
+  // تحقق أن كل جزء رقم صحيح وموجب
+  const FIXED_CURRENT_YEAR = new Date().getFullYear();
+  function getCurrentHijriYear() { return 1447; } // عدلها إذا أردت سنة هجرية ديناميكية
+  if (
+    (dateType === 'ميلادي' && (
+      !Number.isInteger(year) || year < 1900 || year > FIXED_CURRENT_YEAR ||
+      !Number.isInteger(month) || month < 1 || month > 12 ||
+      !Number.isInteger(day) || day < 1 || day > 31
+    )) ||
+    (dateType === 'هجري' && (
+      !Number.isInteger(year) || year < 1300 || year > getCurrentHijriYear() ||
+      !Number.isInteger(month) || month < 1 || month > 12 ||
+      !Number.isInteger(day) || day < 1 || day > 30
+    ))
+  ) {
+    return '';
+  }
+  let years = 0, months = 0, days = 0;
+  if (dateType === 'ميلادي') {
+    const birth = new Date(year, month - 1, day);
+    const today = new Date();
+    if (birth > today) return 'عمر غير صالح';
+    years = today.getFullYear() - birth.getFullYear();
+    months = today.getMonth() - birth.getMonth();
+    days = today.getDate() - birth.getDate();
+    if (days < 0) {
+      months--;
+      const prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+      days += prevMonth.getDate();
+    }
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
+  } else {
+    // هجري: نفس المنطق لكن بدون تحويل حقيقي للتقويم، فقط طرح مباشر
+    const hijriNow = getCurrentHijriYear();
+    const hijriMonth = 1;
+    const hijriDay = 13;
+    if (
+      year > hijriNow ||
+      (year === hijriNow && month > hijriMonth) ||
+      (year === hijriNow && month === hijriMonth && day > hijriDay)
+    ) {
+      return 'عمر غير صالح';
+    }
+    years = hijriNow - year;
+    months = hijriMonth - month;
+    days = hijriDay - day;
+    if (days < 0) {
+      months--;
+      days += 30;
+    }
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
+  }
+  let result = '';
+  if (years > 0) result += `${years} سنة`;
+  if (months > 0) result += (result ? '، ' : '') + `${months} شهر`;
+  if (days > 0) result += (result ? '، ' : '') + `${days} يوم`;
+  if (!result) result = 'أقل من يوم';
+  return result;
+}
+
 export const singupAdmin = async (req, res) => {
   try {
     const { name, email, password,identityNumber,phone, rule } = req.body;
@@ -652,7 +728,7 @@ export const getCurrentReportData = async (req, res) => {
     console.log("error in get current report data");
   }
 };
-
+   
 
 export const rejectReportByManager = async (req,res)=>{
 
@@ -694,7 +770,25 @@ export const rejectReportByManager = async (req,res)=>{
       }
     
        const fullName = `${currentUser.firstName} ${currentUser.secondName} ${currentUser.thirdName} ${currentUser.lastName}`
-       const response = await fetch(
+      const ageString = calculateAge(currentUser.birthDate, currentUser.birthDatetype);
+    
+      let normalIncome , ta2Income, daman , mowaten = ""
+      for(let i = 0 ; i < currentUser.incomeSources?.length ; i++){
+       if(currentUser.incomeSources[i].sourceType == "راتب عادي"){
+         normalIncome = currentUser.incomeSources[i].sourceAmount
+       }
+       if(currentUser.incomeSources[i].sourceType == "راتب تقاعدي"){
+         ta2Income = currentUser.incomeSources[i].sourceAmount
+       }
+       if(currentUser.incomeSources[i].sourceType == "ضمان اجتماعي"){
+         daman = currentUser.incomeSources[i].sourceAmount
+       }
+       if(currentUser.incomeSources[i].sourceType == "حساب مواطن"){
+         mowaten = currentUser.incomeSources[i].sourceAmount
+       }
+      }
+   
+      const response = await fetch(
         'https://docs.google.com/forms/u/0/d/e/1FAIpQLSes3YzeohGIQgi4BgdlTC0M8hC5Jmerw_AN6VnYTTKhZ1FUNA/formResponse',
         {
           method: 'POST',
@@ -708,7 +802,7 @@ export const rejectReportByManager = async (req,res)=>{
             'entry.769005645': currentUser.email,
             'entry.454562335': currentUser.phone,
             'entry.329154882': currentUser.gender,
-            'entry.1264741513': currentUser.birthDate,
+            'entry.1264741513': ageString,
             'entry.1411876552': currentUser.healthStatus,
             'entry.1814924951': currentUser.maritalStatus,
             'entry.591200882': currentUser.disabilityType,
@@ -716,6 +810,15 @@ export const rejectReportByManager = async (req,res)=>{
             'entry.1403970143': currentUser.cityOfResidence,
             'entry.1340897065': currentUser.district,
             'entry.1124638915': currentUser.bankName,
+            'entry.2098247779': currentUser.maritalStatus,
+            'entry.784277999': currentUser.jobStatus,
+            'entry.1739289472': currentUser.housingType,
+            'entry.958126596': currentUser.rentAmount,
+            'entry.689294380': normalIncome,
+            'entry.1211769585': ta2Income,
+            'entry.1044641433': daman,
+            'entry.531249219': mowaten,
+          
           }),
         }
       );
@@ -770,6 +873,24 @@ export const acceptReportByManager = async (req,res)=>{
       }
   
        const fullName = `${currentUser.firstName} ${currentUser.secondName} ${currentUser.thirdName} ${currentUser.lastName}`
+      const ageString = calculateAge(currentUser.birthDate, currentUser.birthDatetype);
+     
+       let normalIncome , ta2Income, daman , mowaten = ""
+       for(let i = 0 ; i < currentUser.incomeSources?.length ; i++){
+        if(currentUser.incomeSources[i].sourceType == "راتب عادي"){
+          normalIncome = currentUser.incomeSources[i].sourceAmount
+        }
+        if(currentUser.incomeSources[i].sourceType == "راتب تقاعدي"){
+          ta2Income = currentUser.incomeSources[i].sourceAmount
+        }
+        if(currentUser.incomeSources[i].sourceType == "ضمان اجتماعي"){
+          daman = currentUser.incomeSources[i].sourceAmount
+        }
+        if(currentUser.incomeSources[i].sourceType == "حساب مواطن"){
+          mowaten = currentUser.incomeSources[i].sourceAmount
+        }
+       }
+    
       await fetch(
         'https://docs.google.com/forms/u/0/d/e/1FAIpQLScZENQrc4KaduzNxyXQPV8x8V9kKCwpHSfi6RoNgQs4Q7xwGg/formResponse',
         {
@@ -783,7 +904,7 @@ export const acceptReportByManager = async (req,res)=>{
             'entry.203280853': currentUser.email,
             'entry.542114087': currentUser.phone,
             'entry.578281773': currentUser.gender,
-            'entry.1421137157': currentUser.birthDate,
+            'entry.1421137157': ageString,
             'entry.1336825014': currentUser.healthStatus,
             'entry.1259049428': currentUser.maritalStatus,
             'entry.405675625': currentUser.disabilityType,
@@ -791,6 +912,15 @@ export const acceptReportByManager = async (req,res)=>{
             'entry.1206000277': currentUser.cityOfResidence,
             'entry.193983254': currentUser.district,
             'entry.340266036': currentUser.bankName,
+            'entry.832698271': currentUser.nationality,
+            'entry.1106151499': currentUser.maritalStatus,
+            'entry.1315145992': currentUser.jobStatus,
+            'entry.1985786162': currentUser.housingType,
+            'entry.797316702': currentUser.rentAmount,
+            'entry.1280974618': normalIncome,
+            'entry.1019766714': ta2Income,
+            'entry.1995391417': daman,
+            'entry.1328191098': mowaten,
           })
         }
       );
@@ -835,7 +965,7 @@ export const acceptReportByManager = async (req,res)=>{
  
  export const  getFinalReports = async (req,res) =>{
 
-  try { 
+  try {  
     const reports = await Report.find({status:"done"}).sort({createdAt:-1}).populate("user")
    
     const currentAdmin = await Admin.findById(req.adminId)

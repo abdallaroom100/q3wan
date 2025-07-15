@@ -56,7 +56,7 @@ export interface Beneficiary {
   housemates: Housemate[];
   incomeSources: IncomeSource[];
   requestDate: string;
-  status: "pending" | "approved" | "rejected";
+  status: "under_review" | "under_manager" | "under_committee";
   companions: string;
 }
 
