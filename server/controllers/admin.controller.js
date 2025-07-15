@@ -819,7 +819,7 @@ export const rejectReportByManager = async (req,res)=>{
             'entry.531249219': mowaten,
           
           }),
-        }
+        } 
       );
       if (!response.ok) {
         console.log("Google Form may be closed or unavailable");
