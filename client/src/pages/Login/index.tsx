@@ -81,11 +81,37 @@ export default function ArabicAuthForm() {
         message: "يرجي ملئ جميع الحقول المطلوبة",
       });
 
-    const checkFullName = signupData.fullName.split(" ").filter((_) => _ != "");
-    if (checkFullName.length != 4)
-      return hotToast({ type: "error", message: "يرجي إدخال الاسم رباعي" });
+    // دمج "بن" و "عبد" مع الكلمة التالية
+    let processedName = signupData.fullName.trim();
+    processedName = processedName.replace(/\b(بن|عبد)\s+/g, '$1');
+    
+    const nameParts = processedName.split(" ").filter((_) => _ != "");
+    if (nameParts.length < 4)
+      return hotToast({ type: "error", message: "يرجي إدخال الاسم رباعي علي الأقل" });
 
-    signupData.fullName = checkFullName.join(" ");
+    // إعادة دمج "بن" و "عبد" مع الكلمة التالية في الأجزاء
+    const finalNameParts = [];
+    for (let i = 0; i < nameParts.length; i++) {
+      if (nameParts[i] === 'بن' || nameParts[i] === 'عبد') {
+        if (i + 1 < nameParts.length) {
+          finalNameParts.push(nameParts[i] + ' ' + nameParts[i + 1]);
+          i++; // تخطي الكلمة التالية لأنها تم دمجها
+        } else {
+          finalNameParts.push(nameParts[i]);
+        }
+      } else {
+        finalNameParts.push(nameParts[i]);
+      }
+    }
+
+    if (finalNameParts.length < 4)
+      return hotToast({ type: "error", message: "يرجي إدخال الاسم رباعي علي الأقل" });
+
+    // إرسال الاسم المعالج للخادم
+    const processedSignupData = {
+      ...signupData,
+      fullName: finalNameParts.join(" ")
+    };
 
     if (!validator.isEmail(signupData.email)) {
       return hotToast({
@@ -115,7 +141,7 @@ export default function ArabicAuthForm() {
         message: "يرجي إدخال كلمة مرور مطابقة للتأكيد",
       });
     }
-    const { error, userData } = await SignUpUser(signupData);
+    const { error, userData } = await SignUpUser(processedSignupData);
     console.log(error);
     if (error) return hotToast({ type: "error", message: error });
     console.log(userData);

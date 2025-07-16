@@ -169,7 +169,7 @@ const facilitiesSchema = new mongoose.Schema({
   studyLevel:{
     type:String,
     required:true,
-    enum:["ابتدائي","متوسط","ثانوي" ,"جامعي"]
+    enum:["رضيع","ابتدائي","متوسط","ثانوي","جامعي","متخرج","غير متعلم"]
   },
   studyGrade:Number,
   healthStatus:{

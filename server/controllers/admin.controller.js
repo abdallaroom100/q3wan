@@ -912,14 +912,13 @@ export const acceptReportByManager = async (req,res)=>{
             'entry.193983254': currentUser.district,
             'entry.340266036': currentUser.bankName,
             'entry.832698271': currentUser.nationality,
-            'entry.1106151499': currentUser.maritalStatus,
-            'entry.1315145992': currentUser.jobStatus,
-            'entry.1985786162': currentUser.housingType,
-            'entry.797316702': currentUser.rentAmount,
-            'entry.1280974618': normalIncome,
-            'entry.1019766714': ta2Income,
-            'entry.1995391417': daman,
-            'entry.1328191098': mowaten,
+            'entry.784277999': currentUser.jobStatus,
+            'entry.1739289472': currentUser.housingType,
+            'entry.958126596': currentUser.rentAmount,
+            'entry.689294380': normalIncome,
+            'entry.1211769585': ta2Income,
+            'entry.1044641433': daman,
+            'entry.531249219': mowaten,
           })
         }
       );

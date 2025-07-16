@@ -1,10 +1,19 @@
+export type StudyLevel =
+  | "رضيع"
+  | "ابتدائي"
+  | "متوسط"
+  | "ثانوي"
+  | "جامعي"
+  | "متخرج"
+  | "غير متعلم";
+
 export interface Housemate {
   name: string;
   birthDate: string;
   identityNumber: string;
   gender: "ذكر" | "أنثى";
   kinship: string;
-  studyLevel?: string;
+  studyLevel?: StudyLevel;
   studyGrade?: string;
   healthStatus?: "سليم" | "غير سليم";
   disabilityType?: "مريض" | "ذوي احتياجات خاصة";

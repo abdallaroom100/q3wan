@@ -24,13 +24,27 @@ const gregorianDays: number[] = Array.from({length: 31}, (_, i) => i + 1); // 1-
 
 const steps = ["البيانات الشخصية", "بيانات عامة", " بيانات المرافقين"];
 
+type StudyLevel =
+  | "رضيع"
+  | "ابتدائي"
+  | "متوسط"
+  | "ثانوي"
+  | "جامعي"
+  | "متخرج"
+  | "غير متعلم";
+
 type Housemate = {
   name: string;
   birthDate: string;
   identityNumber: string;
   gender: "ذكر" | "أنثى";
   kinship: string;
-};``
+  studyLevel?: StudyLevel;
+  studyGrade?: string;
+  healthStatus?: "سليم" | "غير سليم";
+  disabilityType?: "مريض" | "ذوي احتياجات خاصة";
+  dateType?: 'هجري' | 'ميلادي';
+};
 
 type Home = {
   homeNickname: string;
@@ -239,13 +253,25 @@ function validateStep3(formData: UserData, companions: any[], companionsCount: n
   if (companionsCount > 0) {
     for (let i = 0; i < companionsCount; i++) {
       const companion = companions[i];
-      if (!companion.name) return { valid: false, message: `يرجى ملء الاسم الرباعي للمرافق ${i + 1}` }; 
+      if (!companion.name) return { valid: false, message: `يرجى ملء الاسم الرباعي للمرافق ${i + 1}` };
+      // دمج "بن" و "عبد" مع الكلمة التالية في الأجزاء
+      let nameParts = companion.name.trim().split(/\s+/).filter((name: string) => name !== "");
+      const finalNameParts = [];
+      for (let j = 0; j < nameParts.length; j++) {
+        if ((nameParts[j] === 'بن' || nameParts[j] === 'عبد') && j + 1 < nameParts.length) {
+          finalNameParts.push(nameParts[j] + ' ' + nameParts[j + 1]);
+          j++; // تخطي الكلمة التالية لأنها تم دمجها
+        } else {
+          finalNameParts.push(nameParts[j]);
+        }
+      }
+      if (finalNameParts.length < 4) return { valid: false, message: `اسم المرافق ${i + 1} يجب أن يكون رباعي` };
+      
       const idValue = (companion?.identityNumber && (String(companion?.identityNumber))) || (companion.id && companion.id.trim());
       if (!idValue) return { valid: false, message: `يرجى ملء رقم الهوية للمرافق ${i + 1}` };
       if (!companion.birthDate) return { valid: false, message: `يرجى ملء تاريخ الميلاد للمرافق ${i + 1}` };
       if (!companion.dateType) return { valid: false, message: `يرجى اختيار نوع تاريخ الميلاد للمرافق ${i + 1}` };
-      if (!companion.studyLevel) return { valid: false, message: `يرجى اختيار المرحلة الدراسية للمرافق ${i + 1}` };
-      if (companion.studyLevel && companion.studyLevel !== 'جامعي' && !companion.studyGrade) {
+      if (companion.studyLevel && !['جامعي','رضيع','متخرج','غير متعلم'].includes(companion.studyLevel as string) && !companion.studyGrade) {
         return { valid: false, message: `يرجى اختيار الصف للمرافق ${i + 1}` };
       }
       if (!companion.healthStatus) return { valid: false, message: `يرجى اختيار الحالة الصحية للمرافق ${i + 1}` };
@@ -383,7 +409,12 @@ const SignFamily = () => {
           identityNumber: housemate.identityNumber || "",
           birthDate: housemate.birthDate ? new Date(housemate.birthDate).toISOString().split('T')[0] : "",
           gender: housemate.gender || "ذكر",
-          kinship: housemate.kinship || ""
+          kinship: housemate.kinship || "",
+          studyLevel: housemate.studyLevel,
+          studyGrade: housemate.studyGrade,
+          healthStatus: housemate.healthStatus,
+          disabilityType: housemate.disabilityType,
+          dateType: housemate.dateType
         })) || [],
         addtionalHomes: userData?.home?.addtionalHomes?.map((home: Home) => ({
           homeNickname: home.homeNickname || "",
@@ -394,7 +425,12 @@ const SignFamily = () => {
             identityNumber: housemate.identityNumber || "",
             birthDate: housemate.birthDate ? new Date(housemate.birthDate).toISOString().split('T')[0] : "",
             gender: housemate.gender || "ذكر",
-            kinship: housemate.kinship || ""
+            kinship: housemate.kinship || "",
+            studyLevel: housemate.studyLevel,
+            studyGrade: housemate.studyGrade,
+            healthStatus: housemate.healthStatus,
+            disabilityType: housemate.disabilityType,
+            dateType: housemate.dateType
           })) || []
         })) || [],
       },
@@ -2247,7 +2283,7 @@ const SignFamily = () => {
                         value={companion.studyLevel}
                         onChange={e => {
                           const arr = [...companions];
-                          arr[idx].studyLevel = e.target.value;
+                          arr[idx].studyLevel = e.target.value as StudyLevel;
                           arr[idx].studyGrade = '';
                           setCompanions(arr);
                         }}
@@ -2258,10 +2294,13 @@ const SignFamily = () => {
                         }}
                       >
                         <option value="">اختر المرحلة</option>
+                        <option value="رضيع">رضيع</option>
                         <option value="ابتدائي">ابتدائي</option>
                         <option value="متوسط">متوسط</option>
                         <option value="ثانوي">ثانوي</option>
                         <option value="جامعي">جامعي</option>
+                        <option value="متخرج">متخرج</option>
+                        <option value="غير متعلم">غير متعلم</option>
                       </select>
                     </div>
                     {/* تفاصيل الصف */}

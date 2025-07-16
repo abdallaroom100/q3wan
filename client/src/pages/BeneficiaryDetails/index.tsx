@@ -15,7 +15,15 @@ import { useRejectManagerReport } from "../Dashboard/hooks/useRejectManagerRepor
 import { useAcceptManagerReport } from "../Dashboard/hooks/useAcceptManagerReport";
 import { useDeleteTemporaryBeneficiary } from "../Dashboard/hooks/useDeleteBeneficiary";
 
-
+// أعلى الملف بعد الاستيرادات:
+type StudyLevel =
+  | "رضيع"
+  | "ابتدائي"
+  | "متوسط"
+  | "ثانوي"
+  | "جامعي"
+  | "متخرج"
+  | "غير متعلم";
 
 const useIsMobile = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -396,11 +404,16 @@ const BeneficiaryDetailsPage = () => {
     for (let i = 0; i < editedBeneficiary.housemates.length; i++) {
       const h = editedBeneficiary.housemates[i];
       if (!h.name) return `اسم المرافق رقم ${i + 1} مطلوب.`;
-      if (h.name.trim().split(/\s+/).length < 4) return `اسم المرافق رقم ${i + 1} يجب أن يكون رباعي.`;
+      
+      // دمج "بن" و "عبد" مع الكلمة التالية
+      let processedName = h.name.trim();
+      processedName = processedName.replace(/\b(بن|عبد)\s+/g, '$1');
+      
+      if (processedName.split(/\s+/).length < 4) return `اسم المرافق رقم ${i + 1} يجب أن يكون رباعي.`;
       if (!/^[0-9]{10}$/.test(h.identityNumber)) return `رقم هوية المرافق رقم ${i + 1} يجب أن يكون 10 أرقام.`;
       if (!h.kinship) return `صلة القرابة للمرافق رقم ${i + 1} مطلوبة.`;
       if (!h.studyLevel) return `المرحلة الدراسية للمرافق رقم ${i + 1} مطلوبة.`;
-      if (h.studyLevel !== 'جامعي' && !h.studyGrade) return `صف المرافق رقم ${i + 1} مطلوب.`;
+      if (["ابتدائي","متوسط","ثانوي"].includes(h.studyLevel ?? "") && !h.studyGrade) return `صف المرافق رقم ${i + 1} مطلوب.`;
       if (!h.healthStatus) return `الحالة الصحية للمرافق رقم ${i + 1} مطلوبة.`;
       if (h.healthStatus === 'غير سليم' && !h.disabilityType) return `نوع الإعاقة للمرافق رقم ${i + 1} مطلوب إذا كانت الحالة الصحية غير سليم.`;
     }
@@ -1967,7 +1980,7 @@ const BeneficiaryDetailsPage = () => {
                           autoFocus
                           onChange={e => {
                             const newHousematesStudyLevel = editedBeneficiary.housemates.map((h, i) =>
-                              i === index ? { ...h, studyLevel: e.target.value, studyGrade: e.target.value === 'جامعي' ? '' : h.studyGrade } : h
+                              i === index ? { ...h, studyLevel: e.target.value as StudyLevel, studyGrade: ['جامعي','رضيع','متخرج','غير متعلم'].includes(e.target.value) ? '' : h.studyGrade } : h
                             );
                             setEditedBeneficiary({ ...editedBeneficiary, housemates: newHousematesStudyLevel });
                           }}
@@ -1975,10 +1988,13 @@ const BeneficiaryDetailsPage = () => {
                           className={styles.editInput}
                         >
                           <option value="">اختر</option>
+                          <option value="رضيع">رضيع</option>
                           <option value="ابتدائي">ابتدائي</option>
                           <option value="متوسط">متوسط</option>
                           <option value="ثانوي">ثانوي</option>
                           <option value="جامعي">جامعي</option>
+                          <option value="متخرج">متخرج</option>
+                          <option value="غير متعلم">غير متعلم</option>
                         </select>
                       ) : (
                         <span className={styles.infoValue}>
@@ -1993,7 +2009,7 @@ const BeneficiaryDetailsPage = () => {
                       )}
                     </td>
                     <td style={{ position: 'relative' }}>
-                      {housemate.studyLevel === 'جامعي' ? (
+                      {(['ابتدائي','متوسط','ثانوي'].includes(housemate.studyLevel ?? '')) ? (
                         <span className={styles.infoValue}>-</span>
                       ) : editingField === `studyGrade-${index}` ? (
                         <select

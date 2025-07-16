@@ -525,9 +525,32 @@ export const signUpUser = async (req, res) => {
     if (user)
       return res.status(400).json({ error: "البريد الإلكتروني مستخدم من قبل" });
 
-    fullName = fullName.split(" ").filter((name) => name !== "");
-    if (fullName.length != 4) {
-      return res.status(400).json({ error: "اسم المستخدم يجب أن يكون رباعيا" });
+    // دمج "بن" و "عبد" مع الكلمة التالية قبل تقسيم الاسم
+    let processedName = fullName.trim();
+    processedName = processedName.replace(/\b(بن|عبد)\s+/g, '$1');
+    
+    const nameParts = processedName.split(" ").filter((name) => name !== "");
+    if (nameParts.length < 4) {
+      return res.status(400).json({ error: " اسم المستخدم يجب أن يكون رباعيا علي الأقل" });
+    }
+
+    // إعادة دمج "بن" و "عبد" مع الكلمة التالية في الأجزاء
+    const finalNameParts = [];
+    for (let i = 0; i < nameParts.length; i++) {
+      if (nameParts[i] === 'بن' || nameParts[i] === 'عبد') {
+        if (i + 1 < nameParts.length) {
+          finalNameParts.push(nameParts[i] + ' ' + nameParts[i + 1]);
+          i++; // تخطي الكلمة التالية لأنها تم دمجها
+        } else {
+          finalNameParts.push(nameParts[i]);
+        }
+      } else {
+        finalNameParts.push(nameParts[i]);
+      }
+    }
+
+    if (finalNameParts.length < 4) {
+      return res.status(400).json({ error: " اسم المستخدم يجب أن يكون رباعيا علي الأقل" });
     }
 
     if (String(phone).length != 9) {
@@ -557,10 +580,10 @@ export const signUpUser = async (req, res) => {
 
     const hash = bcrypt.hashSync(password, 10);
     const newUser = await User.create({
-      firstName: fullName[0],
-      secondName: fullName[1],
-      thirdName: fullName[2],
-      lastName: fullName[3],
+      firstName: finalNameParts[0],
+      secondName: finalNameParts[1],
+      thirdName: finalNameParts[2],
+      lastName: finalNameParts[3],
       email: String(email).toLowerCase(),
       password: hash,
       phone,
