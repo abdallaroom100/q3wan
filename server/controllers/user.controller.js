@@ -534,7 +534,7 @@ export const signUpUser = async (req, res) => {
       return res.status(400).json({ error: " اسم المستخدم يجب أن يكون رباعيا علي الأقل" });
     }
 
-    // إعادة دمج "بن" و "عبد" مع الكلمة التالية في الأجزاء
+    // إعادة دمج "بن" و "عبد" مع الكلمة التالية في الأجزاء 
     const finalNameParts = [];
     for (let i = 0; i < nameParts.length; i++) {
       if (nameParts[i] === 'بن' || nameParts[i] === 'عبد') {
