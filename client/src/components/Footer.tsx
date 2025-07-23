@@ -2,6 +2,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTwitter, faFacebookF, faInstagram, faYoutube,faWhatsapp } from '@fortawesome/free-brands-svg-icons'
 import './Footer.css'
+import { Link } from 'react-router-dom'
 
 const Footer = () => {
   return (
@@ -18,11 +19,16 @@ const Footer = () => {
         <div className="footer-links">
           <h4>روابط سريعة</h4>
           <ul className=''>
-            <li><a href="#">الرئيسية</a></li>
-            <li><a href="#">عن الجمعية</a></li>
-            <li><a href="#">مشاريع ثابتة</a></li>
-            <li><a href="#">مشاريع موسمية</a></li>
-            <li><a href="#">اتصل بنا</a></li>
+            <li><a href="/">الرئيسية</a></li>
+           
+            
+       
+                <li><Link to="/about">معلومات عنا</Link></li>
+                <li><Link to="/goals">أهدافنا</Link></li>
+             
+         
+              <li><a href="/says">قالو عنا</a></li>
+              <li><a href="/album">معرض الصور</a></li>
           </ul>
         </div>
 
