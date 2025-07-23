@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 interface LoginFormProps {
   loginData: {
@@ -60,13 +61,14 @@ const LoginForm: React.FC<LoginFormProps> = ({ loginData, onLoginChange, onLogin
       </button>
 
       <div className="text-center">
-        <button
-          type="button"
-          className="text-gray-500 hover:text-[rgb(58,61,108)] text-sm transition-colors duration-300 hover:underline mt-2"
-          onClick={() => window.location.href = '/forgot-password'}
-        >
-          نسيت كلمة المرور؟
-        </button>
+        <Link to="/forgot-password">
+          <button
+            type="button"
+            className="text-gray-500 cursor-pointer hover:text-[rgb(58,61,108)] text-sm transition-colors duration-300 hover:underline mt-2"
+          >
+            نسيت كلمة المرور؟
+          </button>
+        </Link>
       </div>
     </div>
   );

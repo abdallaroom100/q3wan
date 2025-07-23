@@ -71,13 +71,21 @@ transporter.verify((error, success) => {
 // دالة لإرسال رسالة نسيان كلمة المرور
 export const sendForgetPassowrdMessage = async (email, message) => {
   const mailOptions = {
-    from: '"Al Madrasa" <abdallaroom25@gmail.com>', // تأكد أن هذا البريد مُصرّح به في Brevo
+    from: '"مبرة القعوان" <abdallaroom25@gmail.com>', // تأكد أن هذا البريد مُصرّح به في Brevo
     to: email,
-    subject: "Forget your Password",
-    html: `<b>
-      Please use this link to update your account password. Notice that the link will expire after 15 minutes.<br/>
-      Link: <a href="${message}">${message}</a>
-    </b>`,
+    subject: "تحديث كلمة المرور",
+    html: `
+      <div style="background:#f7f7fa;padding:32px 0;font-family:'Cairo',Arial,sans-serif;">
+        <div style="max-width:480px;margin:0 auto;background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.07);padding:32px 24px;text-align:center;">
+          <img src="https://store.alqawan.com/img/logo.png" alt="شعار مبرة القعوان" style="width:100px;margin-bottom:16px;border:2px solid #eee;"/>
+          <h2 style="color:#1a237e;margin-bottom:8px;">تحديث كلمة المرور</h2>
+          <p style="color:#333;font-size:17px;margin-bottom:24px;">عزيزي المستخدم،<br>لقد طلبت تحديث كلمة المرور الخاصة بحسابك في <b>مبرة القعوان</b>.<br>اضغط على الزر أدناه لتعيين كلمة مرور جديدة. سينتهي صلاحية الرابط بعد <b>15 دقيقة</b>.</p>
+          <a href="${message}" style="display:inline-block;padding:12px 32px;background:#1a237e;color:#fff;text-decoration:none;font-size:18px;border-radius:6px;font-weight:bold;transition:background 0.2s;">تحديث كلمة المرور</a>
+          <p style="color:#888;font-size:13px;margin-top:24px;">إذا لم تطلب تغيير كلمة المرور، يمكنك تجاهل هذه الرسالة.<br>مع تحيات فريق <b>مبرة القعوان</b></p>
+        </div>
+        <div style="text-align:center;color:#aaa;font-size:12px;margin-top:18px;">© 2024 مبرة القعوان. جميع الحقوق محفوظة.</div>
+      </div>
+    `,
     headers: {
       "X-Priority": "1", // إعطاء الأولوية للرسالة
     },
