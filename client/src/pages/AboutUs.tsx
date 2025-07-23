@@ -24,7 +24,7 @@ const AboutUs: React.FC = () => {
                 </svg>
               </div>
               <h2 className="text-3xl font-bold text-[rgb(58,61,108)] !mb-[20px]">
-                نبذة عن الجمعية
+                نبذة عن المبرة
               </h2>
             </div>
             

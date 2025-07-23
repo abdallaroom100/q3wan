@@ -78,4 +78,4 @@ import GoalsPreview from '../components/GoalsPreview';
 
 ## التحديثات في Header.tsx
 
-تم إضافة رابط "أهدافنا" في dropdown menu تحت "عن الجمعية". 
+تم إضافة رابط "أهدافنا" في dropdown menu تحت "عن المبرة". 

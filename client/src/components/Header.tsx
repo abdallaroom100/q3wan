@@ -239,7 +239,7 @@ const Header = () => {
                   className="flex items-center justify-between w-full text-gray-700 bg-[#f4f3fb] hover:text-[rgb(58,61,108)] hover:underline hover:underline-offset-4 font-bold text-lg transition-all duration-300 px-6 py-4  hover:bg-gray-50 focus:outline-none border border-gray-100 cursor-pointer z-10 relative"
                   style={{ fontSize: '1.125rem', fontFamily: 'inherit', zIndex: 10, position: 'relative' }}
                 >
-                  <span>عن الجمعية</span>
+                  <span>عن المبرة</span>
                   <RiArrowDownSLine className={`transition-transform duration-200 ${aboutDropdown ? 'rotate-180' : ''}`} size={24} />
                 </button>
                 {aboutDropdownVisible && (
