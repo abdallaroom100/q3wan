@@ -18,11 +18,11 @@ const Home = () => {
   <link rel="canonical" href="https://store.alqawan.com/" />
   
   <meta name="description" content="مبرة القعوان الخيرية: مبرة خيرية سعودية تهدف إلى دعم الأسر المحتاجة، كفالة الأيتام، وتنمية المجتمع من خلال مشاريع إنسانية وتنموية متنوعة في منطقة القعوان وما حولها." />
-  <meta name="keywords" content="جمعية خيرية, مبرة القعوان, كفالة أيتام, دعم الأسر, مشاريع خيرية, السعودية, العمل الخيري, التنمية المجتمعية, تبرع, صدقة, مشاريع موسمية, مشاريع تنموية, مبرة القعوان, q3wan charity, q3wan, q3wan.org" />
+  <meta name="keywords" content=" خيرية, مبرة القعوان, كفالة أيتام, دعم الأسر, مشاريع خيرية, السعودية, العمل الخيري, التنمية المجتمعية, تبرع, صدقة, مشاريع موسمية, مشاريع تنموية, مبرة القعوان, q3wan charity, q3wan, q3wan.org" />
   <meta name="author" content=" مبرة القعوان الخيرية" />
 
   <meta property="og:title" content=" مبرة القعوان الخيرية" />
-  <meta property="og:description" content="جمعية سعودية غير ربحية تهدف إلى تقديم الدعم والرعاية للأسر المحتاجة والأيتام وتنفيذ مشاريع خيرية وتنموية في منطقة القعوان." />
+  <meta property="og:description" content=" سعودية غير ربحية تهدف إلى تقديم الدعم والرعاية للأسر المحتاجة والأيتام وتنفيذ مشاريع خيرية وتنموية في منطقة القعوان." />
   <meta property="og:image" content="https://store.alqawan.com/img/logo.png" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="مبرة القعوان الخيرية" />
