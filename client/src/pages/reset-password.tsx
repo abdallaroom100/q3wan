@@ -75,7 +75,8 @@ const ResetPassword: React.FC = () => {
         hotToast({ type: 'success', message: 'تم تغيير كلمة المرور بنجاح' });
         setTimeout(() => navigate('/login'), 800);
       } else {
-        hotToast({ type: 'error', message: data.message || 'حدث خطأ، حاول مرة أخرى' });
+        hotToast({ type: 'error', message: data.message || 'انتهت صلاحية الرابط' });
+        setTimeout(() => navigate('/login'), 800);
       }
     } catch {
       hotToast({ type: 'error', message: 'حدث خطأ أثناء تغيير كلمة المرور' });
