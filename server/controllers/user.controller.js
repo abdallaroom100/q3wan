@@ -628,7 +628,7 @@ export const loginUser = async (req, res) => {
     }
     const Vpassword = bcrypt.compareSync(password, user.password);
     if (!Vpassword) {
-      return res.status(401).json({ error: "بيانات التسجيل هذه غير موجوده" });
+      return res.status(401).json({ error: "كلمة المرور غير صحيحة" });
     }
     generateToken(user._id, res, req);
     return res.status(200).json({
