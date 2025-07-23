@@ -1341,7 +1341,7 @@ const SignFamily = () => {
             <div className={styles.inputGroup}>
               <label>رقم الجوال</label>
               <input
-                type="number"
+                type="text"
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}

@@ -400,7 +400,7 @@ export const testUpdate = async (req, res) => {
       secondName,
       thirdName,
       lastName,
-      phone: parseInt(phone),
+      phone: phone,
       gender,
       birthDate,
       birthDatetype: birthDatetypeValue,
@@ -552,8 +552,8 @@ export const signUpUser = async (req, res) => {
     if (finalNameParts.length < 4) {
       return res.status(400).json({ error: " اسم المستخدم يجب أن يكون رباعيا علي الأقل" });
     }
-
-    if (String(phone).length != 9) {
+   
+    if (String(phone).length != 9 && String(phone).length != 10) {
       return res.status(400).json({ error: "ادخل رقم هاتف صحيح" });
     }
 
@@ -609,23 +609,23 @@ export const loginUser = async (req, res) => {
   const { loginDetails, password } = req.body;
   try {
     let user;
-    if (!loginDetails || !password) {
+    if (!loginDetails || !password) { 
       return res.status(400).json({ error: "من فضلك قم بملئ جميع الحقول" });
     }
-    if (validator.isEmail(loginDetails)) {
-      user = await User.findOne({ email: String(loginDetails).toLowerCase() });
-      console.log(user);
-    } else {
-      if (!Number(loginDetails)) {
-        return res.status(401).json({ error: "بيانات التسجيل هذه غير موجوده" });
-      }
-      user = await User.findOne({ phone: loginDetails });
-    }
 
-    if (!user) {
+
+
+    let orConditions = [
+      { email: String(loginDetails).toLowerCase() },
+      { identityNumber: Number(loginDetails) }
+    ];
+    
+    user = await User.findOne({ $or: orConditions });
+
+ 
+    if (!user) { 
       return res.status(401).json({ error: "بيانات التسجيل هذه غير موجوده" });
     }
-    console.log(user.password);
     const Vpassword = bcrypt.compareSync(password, user.password);
     if (!Vpassword) {
       return res.status(401).json({ error: "بيانات التسجيل هذه غير موجوده" });
@@ -634,9 +634,9 @@ export const loginUser = async (req, res) => {
     return res.status(200).json({
       ...user._doc,
       password: undefined,
-      rule: undefined,
+      rule: undefined, 
       token: req.token,
-    });
+    }); 
   } catch (error) {
     console.log(`error in login user function`);
     console.log(error.message);
@@ -794,59 +794,17 @@ export const loginAdmin = async (req, res) => {
   }
 };
 
-export const getAdminPageDetails = async (req, res) => {
-  try {
-    const totalCompalints = await Complaint.find({}).countDocuments();
-    const last3Complaints = await Complaint.find({})
-      .sort({ createdAt: -1 })
-      .limit(3)
-      .populate("user", "name");
-    const last8Students = await User.find({ rule: "student" })
-      .sort({ createdAt: -1 })
-      .limit(8)
-      .select("name email subscription");
 
-    // 2. عدد الطلاب اللي مش Admin
-    const studentCount = await User.countDocuments({ rule: "student" });
-
-    // 3. إجمالي الربح من الاشتراكات
-    const totalRevenue = await User.aggregate([
-      {
-        $match: { "subscription.price": { $gt: 0 } },
-      },
-      {
-        $group: {
-          _id: null,
-          total: { $sum: "$subscription.price" },
-        },
-      },
-    ]);
-
-    return res.status(200).json({
-      totalRevenue: totalRevenue[0]?.total || 0,
-      studentCount,
-      last8Students,
-      last3Complaints,
-      totalCompalints,
-    });
-  } catch (error) {
-    console.log(error);
-  }
-};
 
 export const forgetPassword = async (req, res) => {
   try {
-    const { email, port } = req.body;
+    const { email } = req.body;
 
     // التحقق من وجود البريد الإلكتروني والـ port
     if (!email) {
       return res.status(400).json({ message: "email is required" });
     }
-    if (!port) {
-      return res.status(400).json({
-        message: "missing port!, please open the project with live server",
-      });
-    }
+   
 
     // البحث عن المستخدم
     const user = await User.findOne({ email });
@@ -893,13 +851,16 @@ export const forgetPassword = async (req, res) => {
     console.log("Generated/Used Token:", token);
 
     // تحديث التوكن في قاعدة البيانات
-    user.updateToken = token;
+    user.updateToken = token; 
     await user.save();
 
     // إرسال البريد الإلكتروني مع رابط التوكن
+    // احصل على الدومين من الريكوست
+    const domain = req.get('origin') || req.protocol + '://' + req.get('host');
+    const resetUrl = `${domain}/reset-password?token=${user.updateToken}&email=${user.email}`;
     const result = await sendForgetPassowrdMessage(
       user.email,
-      `http://localhost:${port}/pages/updatePassword.html?token=${user.updateToken}?email=${user.email}`
+      resetUrl
     );
 
     // التحقق من نجاح إرسال البريد
@@ -982,3 +943,8 @@ export const checkUpdatePassword = async (req, res) => {
     console.log(error);
   }
 };
+
+
+
+
+

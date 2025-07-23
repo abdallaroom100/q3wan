@@ -1,6 +1,6 @@
 import express from "express"
 import { protectRoute } from "../utils/protectedRoute.js"
-import { checkUpdatePassword, createAdmin, deleteUser, findUser, forgetPassword, getAdminPageDetails, getAllUsers, getCurrentUser, loginAdmin, loginUser, logOut, signUpUser, subscribe, testUpdate, updatePageProtected, updateUser } from "../controllers/user.controller.js"
+import { checkUpdatePassword, createAdmin, deleteUser, findUser, forgetPassword, getAllUsers, getCurrentUser, loginAdmin, loginUser, logOut, signUpUser, subscribe, testUpdate, updatePageProtected, updateUser } from "../controllers/user.controller.js"
 import multer from "multer" 
 import path from "path"
 import {dirname} from "path"
@@ -136,20 +136,15 @@ router.post("/forgetPassword",forgetPassword)
 router.post('/updatePassword',checkUpdatePassword)
 router.post('/updateprotect',updatePageProtected)
 
-// router.post("/uploadImage",upload.single("images"),(req,res)=>{ 
-//     const host  =  req.get("host")
-//     console.log(req.protocol,host)
-     
-//     console.log(req.file)
-//     return res.status(200).json({message:"تم تحميل الصورة بنجاح",success:true})
-// })
 
 
-// router.patch("/update",protectRoute,upload.single("idImagePath"),updateUser)
+router.post("/forget",forgetPassword)
+router.post("/checkforget",updatePageProtected)
+router.post("/updatePassword",checkUpdatePassword)
 
- 
 
-router.get("/adminPageDetial",getAdminPageDetails) // for admin page
+
+
 router.delete("/delete/:userId",protectRoute,deleteUser)
 
 router.post("/logout",protectRoute,logOut)

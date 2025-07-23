@@ -65,6 +65,8 @@ const AdminLogin = lazy(() => import("./pages/AdminLogin"));
 const AboutUs =   lazy(()=>import("./pages/AboutUs"))
 const Goals =   lazy(()=>import("./pages/Goals"))
 const Album = lazy(()=>import("./pages/Album"))
+const ForgotPassword = lazy(() => import("./pages/forgot-password"));
+const ResetPassword = lazy(() => import("./pages/reset-password"));
 
 axios.defaults.withCredentials = true;   
 config.autoAddCss = false;
@@ -86,6 +88,9 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/album" element={<Album />} />
               <Route path="/sign-family" element={<SignFamily />} />
+              {/* Forgot/Reset Password Routes */}
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
             </Route>
             <Route element={<Layout><AdminLayout /></Layout>}>
               <Route path="/dashboard" element={<Dashboard />} />

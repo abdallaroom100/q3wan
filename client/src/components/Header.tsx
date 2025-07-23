@@ -89,7 +89,7 @@ const Header = () => {
     localstorageList.forEach((item) => localStorage.removeItem(item));
     hotToast({ type: "success", message: "تم تسجيل الخروج" });
     history("/login");
-    closeMenu();
+    closeMenu(); 
   };
 
   // navItems without 'عن الجمعية'

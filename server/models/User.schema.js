@@ -274,12 +274,15 @@ const userSchema = new mongoose.Schema(
       type:String,
       defulat:"",
     },
-
+   updateToken:{
+    type:String,
+    default:"",
+   },
     facilitiesInfo:[facilitiesSchema],
     hasAFamily: { type: Boolean, default: false },
     gender: { type: String, enum: ["ذكر", "أنثى"] },
     rule: { type: String, default: "user", enum: ["user", "admin"] },
-    phone: { type: Number, required: true },
+    phone: { type: String, required: true },
     maritalStatus: { type: String,
       enum:["أعزب","مطلق","متزوج","أرمل",""],
       default: "" },

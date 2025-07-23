@@ -19,8 +19,8 @@ export default function ArabicAuthForm() {
   const history = useNavigate();
   const [activeTab, setActiveTab] = useState("login");
   const [loginData, setLoginData] = useState({
-    loginDetails: "",
-    password: "",
+    loginDetails: localStorage.getItem('savedLoginDetails') || "",
+    password: localStorage.getItem('savedPassword') || "",
   });
   const [signupData, setSignupData] = useState({
     fullName: "",
@@ -59,10 +59,12 @@ export default function ArabicAuthForm() {
 
     if (userData) {
       hotToast({ type: "success", message: "تم تسجيل الدخول بنجاح!" });
-      localStorage.setItem("user", JSON.stringify(userData))
+      localStorage.setItem("user", JSON.stringify(userData));
+      // حفظ بيانات الدخول
+      localStorage.setItem('savedLoginDetails', loginData.loginDetails);
+      localStorage.setItem('savedPassword', loginData.password);
       // dispatch(setUser(userData))
-        // window.location.reload();
-    
+      // window.location.reload();
     }
     return;
   };
@@ -120,7 +122,7 @@ export default function ArabicAuthForm() {
       });
     }
 
-    if (signupData.phone.length !== 9) {
+    if (signupData.phone.length !== 9 && signupData.phone.length !== 10) {
       return hotToast({ type: "error", message: "يرجي إدخال رقم هاتف صالح" });
     }
 
@@ -145,6 +147,20 @@ export default function ArabicAuthForm() {
     console.log(error);
     if (error) return hotToast({ type: "error", message: error });
     console.log(userData);
+
+    // حفظ بيانات التسجيل في localStorage بنفس منطق تسجيل الدخول
+    let loginValue = '';
+    if (validator.isEmail(signupData.email)) {
+      loginValue = signupData.email;
+    } else if (signupData.phone) {
+      loginValue = signupData.phone;
+    } else if (signupData.identityNumber) {
+      loginValue = signupData.identityNumber;
+    }
+    localStorage.setItem('savedLoginDetails', loginValue);
+    localStorage.setItem('savedPassword', signupData.password);
+    // تحديث قيمة loginData في الstate مباشرة
+    setLoginData({ loginDetails: loginValue, password: signupData.password });
 
     setTimeout(() => {
       setActiveTab("login");
