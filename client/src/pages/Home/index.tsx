@@ -14,8 +14,8 @@ const Home = () => {
     <>
    <Helmet>
   <title>مبرة القعوان الخيرية</title>
-  <link rel="icon" type="image/png" href="https://store.alqawan.com/img/logo.png" />
-  <link rel="canonical" href="https://store.alqawan.com/" />
+  <link rel="icon" type="image/png" href="https://alqawan.com/img/logo.png" />
+  <link rel="canonical" href="https://alqawan.com/" />
   
   <meta name="description" content="مبرة القعوان الخيرية: مبرة خيرية سعودية تهدف إلى دعم الأسر المحتاجة، كفالة الأيتام، وتنمية المجتمع من خلال مشاريع إنسانية وتنموية متنوعة في منطقة القعوان وما حولها." />
   <meta name="keywords" content=" خيرية, مبرة القعوان, كفالة أيتام, دعم الأسر, مشاريع خيرية, السعودية, العمل الخيري, التنمية المجتمعية, تبرع, صدقة, مشاريع موسمية, مشاريع تنموية, مبرة القعوان, q3wan charity, q3wan, q3wan.org" />
@@ -23,16 +23,16 @@ const Home = () => {
 
   <meta property="og:title" content=" مبرة القعوان الخيرية" />
   <meta property="og:description" content=" سعودية غير ربحية تهدف إلى تقديم الدعم والرعاية للأسر المحتاجة والأيتام وتنفيذ مشاريع خيرية وتنموية في منطقة القعوان." />
-  <meta property="og:image" content="https://store.alqawan.com/img/logo.png" />
+  <meta property="og:image" content="https://alqawan.com/img/logo.png" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="مبرة القعوان الخيرية" />
   <meta property="og:locale" content="ar_SA" />
-  <meta property="og:url" content="https://store.alqawan.com/" />
+  <meta property="og:url" content="https://alqawan.com/" />
 
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="مبرة القعوان الخيرية" />
   <meta name="twitter:description" content="مبرة سعودية غير ربحية تهدف إلى تقديم الدعم والرعاية للأسر المحتاجة والأيتام وتنفيذ مشاريع خيرية وتنموية في منطقة القعوان." />
-  <meta name="twitter:image" content="https://store.alqawan.com/img/logo.png" />
+  <meta name="twitter:image" content="https://alqawan.com/img/logo.png" />
   <meta name="twitter:site" content="@q3wan_charity" />
 
   <script type="application/ld+json">
@@ -41,8 +41,8 @@ const Home = () => {
         "@context": "https://schema.org",
         "@type": "Organization",
         "name": "مبرة القعوان",
-        "url": "https://store.alqawan.com",
-        "logo": "https://store.alqawan.com/img/logo.png",
+        "url": "https://alqawan.com",
+        "logo": "https://alqawan.com/img/logo.png",
         "sameAs": [
           "https://twitter.com/q3wan_charity",
           "https://facebook.com/q3wan_charity"
