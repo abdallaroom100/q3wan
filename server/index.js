@@ -1,5 +1,5 @@
 import express from "express"
-
+import worker from "worker_threads" 
 import connectDb from "./models/config.js"
 import cors from "cors"
 import path from "path"
@@ -8,7 +8,6 @@ import userRouter from "./routers/user.router.js"
 import adminRouter from "./routers/admin.router.js"
 
 import dotenv from "dotenv"
-
 
 
 dotenv.config()
@@ -49,7 +48,7 @@ app.get("*",(req,res)=>{
 
 connectDb()
 // connection
-const port = process.env.PORT || 4000;
+const port = process.env.PORT || 4000; 
 app.listen(port, () => console.log(`Listening to port ${port}`));
 
  

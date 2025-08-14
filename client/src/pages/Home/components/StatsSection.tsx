@@ -3,13 +3,13 @@ import { useEffect } from "react";
 import { useRef } from "react";
 
 const stats = [
-  { label: "الأسر المستفيدة", target: 84610 },
-  { label: "الأسر المكفولة", target: 594 },
-  { label: "الجمعيات المشاركة", target: 201 },
-  { label: "الساعات التطوعية", target: 50563 },
-  { label: "المتطوعين", target: 2245 },
-  { label: "المبادرات المنفذة", target: 104 },
-  { label: "مستفيدي البرامج التمويلية", target: 1348 },
+  { label: "الأسر المستفيدة", target: 133 },
+  { label: "الأيتام المكفولين", target: 57 },
+  // { label: "الجمعيات المشاركة", target: 201 },
+  { label: "الساعات التطوعية", target: 371  },
+  { label: "المتطوعين", target: 54  },
+  // { label: "المبادرات المنفذة", target: 104 },
+  { label: "مستفيدي البرامج الإغاثية", target: 28757 },
 ];
 
 const StatsSection = () => {

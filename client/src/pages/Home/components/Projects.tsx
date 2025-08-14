@@ -1,8 +1,8 @@
 const projects = [
   {
     img: "img/كفالة.png",
-    title: "كفالة يتيم",
-    cost: "معدل 3600 ريال شهريا",
+    title: "كفالة الأيتام ",
+    cost: "معدل 3600 ريال سنويا",
     beneficiaries: "فئة الأيتام حسب المعايير",
     card: "تحويل بنكي",
     period: "فترة الصرف شهرياً",
@@ -12,7 +12,7 @@ const projects = [
   {
     img: "img/سلة.png",
     title: "السلة الغذائية",
-    cost: "معدل 3600 ريال شهريا",
+    cost: "معدل 60 الف ريال كل شهرين",
     beneficiaries: "جميع الأسر",
     card: "تحويل بنكي",
     period: "فترة الصرف كل شهرين",
@@ -22,8 +22,8 @@ const projects = [
   
   {
     img: "img/ماء.jpg",
-    title: "مشروع سقيا المياه",
-    cost: "معدل 40 الف ريال",
+    title: "مشروع سقيا الماء",
+    cost: "معدل 40 الف ريال سنويا",
     beneficiaries: "المناطق المحتاجة",
     card: "تنفيذ مباشر",
     period: "يومي",
@@ -32,7 +32,7 @@ const projects = [
   },
   {
     img: "img/مشروع الحقيبة المدرسية.jpg",
-    title: "الحقيبة المدرسية",
+    title: "الكسوة و الحقيبة المدرسية",
   cost: "معدل 500 ريال",
   beneficiaries: "الطلاب المحتاجين",
   card: "توزيع مباشر",
@@ -42,7 +42,7 @@ const projects = [
   },
   {
     img: "img/مشروع توزيع اللحوم.jpg",
-    title: "اللحوم",
+    title: "توزيع اللحوم",
     cost: "معدل 700 ذبيحة سنويا ",
     beneficiaries: " الأسر المحتاجة",
     card: "توزيع مباشر",
@@ -53,7 +53,7 @@ const projects = [
   {
     img: "img/كسوة الشتاء.jpg",
     title: "كسوة الشتاء",
-      cost: "معدل 16 الف ريال",
+      cost: "معدل 20 الف ريال سنويا",
       beneficiaries: " الأسر المحتاجة",
       card: "توزيع مباشر",
       period: "مرة واحدة سنوياً",
@@ -63,8 +63,8 @@ const projects = [
   {
     img: "img/SLID 2.jpg",
     title: "كسوة العيد",
-    cost: "معدل 500 ريال",
-    beneficiaries: "الأطفال والأسر المحتاجة",
+    cost: "معدل 500 ريال لكل يتيم",
+    beneficiaries: "الأيتام",
     card: "الحوالة البنكية",
     period: "مرة واحدة سنوياً",
     bgColor: "bg-purple-600",

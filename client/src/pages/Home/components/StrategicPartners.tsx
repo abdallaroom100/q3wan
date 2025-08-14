@@ -262,17 +262,26 @@ const partners = [
     logo: '/contributer/maher.jpg',
     name: 'شركة ماهر',
   },
+  {
+    logo: '/contributer/ehsan.JPG',
+    name: 'مبرة إحسان الوقفية',
+  },
+  {
+    logo: '/contributer/wakf.jpg',
+    name: '  وقف السند',
+  },
 ];
 
-const noImagePartners = [
-  'بابطين للحلويات',
-  'مؤسسة حسن عويد للمواشي',
-  'مؤسسة سليمان بن محمد النملة الخيرية',
+const noImagePartners: string[] = [
+  
+  // 'بابطين للحلويات',
+  // 'مؤسسة حسن عويد للمواشي',
+  // 'مؤسسة سليمان بن محمد النملة الخيرية',
 ];
 
 const allPartners = [
   ...partners,
-  ...noImagePartners.map(name => ({ name, noImage: true })),
+  ...noImagePartners.map((name: string): { name: string; noImage: true } => ({ name, noImage: true })),
 ];
 
 const StrategicPartners: React.FC = () => {
@@ -287,6 +296,7 @@ const StrategicPartners: React.FC = () => {
               <PartnerCard key={partner.name}>
                 <PartnerLogoWrapper>
                   <PartnerLogo
+                  className='md:!w-[250px] !w-[156px] !h-[130px] md:!h-[220px] !rounded-none object-contain '
                   loading='lazy'
                     src={partner.logo}
                     alt={partner.name}

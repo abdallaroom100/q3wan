@@ -64,7 +64,7 @@ export default function SocialMediaIcons() {
     {
       icon: <MdEmail />,
      
-      link:  `https://mail.google.com/mail/?view=cm&fs=1&to=info@alqawan.com&su=التواصل مع مبرة قعوان`,
+      link:  `https://mail.google.com/mail/?view=cm&fs=1&to=info@alqawan.com&su=التواصل مع مبرة القعوان الخيرية`,
       color: "bg-[#3A3D6C]",
       size: "60px",
     },

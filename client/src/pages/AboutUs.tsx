@@ -30,7 +30,7 @@ const AboutUs: React.FC = () => {
             
             <div className="prose prose-lg max-w-none">
               <p className="text-lg leading-8 text-gray-700 mb-6">
-                نحن <strong className="text-[rgb(58,61,108)]">وقف مبرة القعوان الخيرية</strong>، مسجل تحت إشراف الهيئة العامة للأوقاف بتصريح رقم <span className="bg-yellow-100 px-2 py-1 rounded">(١١٥٧)</span> أنشئ وقف مبرة بتاريخ <span className="bg-blue-100 px-2 py-1 rounded">١٤٣٨/٧/٢٩هـ</span> بمبادرة من أبناء قبيلة القعوان.
+                نحن <strong className="text-[rgb(58,61,108)]">وقف مبرة القعوان الخيرية</strong>، مسجل تحت إشراف الهيئة العامة للأوقاف بتصريح رقم <span className="bg-yellow-100 px-2 py-1 rounded">(١١٥٧)</span> أنشئ وقف مبرة القعوان الخيرية بتاريخ <span className="bg-blue-100 px-2 py-1 rounded">١٤٣٨/٧/٢٩هـ</span> بمبادرة من أبناء قبيلة القعوان.
               </p>
               
               <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl mb-6">
@@ -143,7 +143,7 @@ const AboutUs: React.FC = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-2xl font-bold text-[rgb(58,61,108)] mb-2">١٤٣٨</h3>
+              <h3 className="text-2xl font-bold text-[rgb(58,61,108)] mb-2">١٤٣٨ هـ</h3>
               <p className="text-gray-600">سنة التأسيس</p>
             </div>
             

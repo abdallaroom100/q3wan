@@ -17,14 +17,14 @@ const Slider = () => {
       loop={true}
     >
       <SwiperSlide>
-        <img   className='!object-fill'  src="img/بنر.webp" alt="صورة 1" />
+        <img   className='!object-fill'  src="img/1.jpg" alt="صورة 1" />
         {/* <img loading='lazy'  className='!object-fill' src="img/بنر.gif" alt="صورة 1" /> */}
       </SwiperSlide>
       <SwiperSlide>
-        <img   className='!object-fill'   src="img/banner2.webp" alt="صورة 3" />
+        <img   className='!object-fill'   src="img/2.jpg" alt="صورة 3" />
       </SwiperSlide>
       <SwiperSlide>
-        <img  className='!object-fill'   src="img/بنرر.webp" alt="صورة 2" />
+        <img  className='!object-fill'   src="img/3.jpg" alt="صورة 2" />
       </SwiperSlide>
     </Swiper>
   );
