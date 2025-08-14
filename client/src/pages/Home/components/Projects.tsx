@@ -14,7 +14,7 @@ const projects = [
     title: "السلة الغذائية",
     cost: "معدل 60 الف ريال كل شهرين",
     beneficiaries: "جميع الأسر",
-    card: "تحويل بنكي",
+    card: "بطاقات العثيم",
     period: "فترة الصرف كل شهرين",
     bgColor: "bg-emerald-600",
     bgGradient: "from-emerald-600 to-emerald-500"
