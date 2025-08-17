@@ -8,6 +8,10 @@ const images = [
   { image: "/img/q3wan1.jpg", text: "" },
   { image: "/img/q3wan2.jpg", text: "" },
   { image: "/img/q3wan3.jpg", text: "" },
+  { image: "/img/q3wan6.jpg", text: "" },
+  { image: "/img/q3wan4.jpg", text: "" },
+  { image: "/img/q3wan5.jpg", text: "" },
+  { image: "/img/q3wan7.jpg", text: "" },
   // ... باقي الصور
 ];
 

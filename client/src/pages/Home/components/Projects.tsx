@@ -33,7 +33,7 @@ const projects = [
   {
     img: "img/مشروع الحقيبة المدرسية.jpg",
     title: "الكسوة و الحقيبة المدرسية",
-  cost: "معدل 400 ريال",
+  cost: "معدل 400 ريال لكل يتيم",
   beneficiaries: "الطلاب المحتاجين",
   card: "تحويل بنكي",
   period: "بداية العام الدراسي",
@@ -109,9 +109,10 @@ const projects = [
                 <div className={` h-64 relative overflow-hidden rounded-t-2xl`}>
                   <img 
                   loading="lazy"
+                  
                     src={project.img} 
                     alt={project.title}
-                    className="w-full h-full  "
+                    className={`w-full h-full  ${index == 7 ? "object-cover":""} `}
                   />
                   
                   {/* Logo in top right corner */}
