@@ -76,29 +76,33 @@ const Footer = () => {
           <div className="social-icons">
             <a
               href="https://x.com/alqawan1"
-              target="_blank"
+              target="twitter"
               rel="noopener noreferrer"
+                aria-label="تابعنا على تويتر"
+
             >
               <FontAwesomeIcon icon={faTwitter} />
             </a>
             <a
               href="https://t.me/+LH3RxTa8mGw1NTk0"
-              target="_blank"
+              target="telegram"
               rel="noopener noreferrer"
+               aria-label="انضم لنا على تليجرام"
             >
               <FontAwesomeIcon icon={faTelegram} />
             </a>
             <a
               href="https://www.instagram.com/alqawan1/"
-              target="_blank"
+              target="instagram"
               rel="noopener noreferrer"
             >
               <FontAwesomeIcon icon={faInstagram} />
             </a>
-            {/* <a href="#"><FontAwesomeIcon icon={faYoutube} /></a> */}
+            {/* <a href=""><FontAwesomeIcon icon={faYoutube} /></a> */}
             <a
               href="https://whatsapp.com/channel/0029VaieUZI6buMKL5HrsN3L"
-              target="_blank"
+              target="whatsapp"
+                aria-label="تابعنا على واتساب"
               rel="noopener noreferrer"
             >
               <FontAwesomeIcon icon={faWhatsapp} />

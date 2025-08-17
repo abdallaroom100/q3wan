@@ -14,17 +14,15 @@ import { IoChatboxEllipses } from "react-icons/io5";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import { FaVoicemail } from "react-icons/fa";
 
-
 export default function SocialMediaIcons() {
   const [visible, setVisible] = useState(true);
   const [open, setOpen] = useState(false);
   const iconsRef = useRef<HTMLAnchorElement[]>([]);
 
-//   setVisible(true);
+  //   setVisible(true);
   // Show button on scroll
   useEffect(() => {
-    const handleScroll = () => {
-    };
+    const handleScroll = () => {};
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -63,12 +61,15 @@ export default function SocialMediaIcons() {
   const socialLinks = [
     {
       icon: <MdEmail />,
-     
-      link:  `https://mail.google.com/mail/?view=cm&fs=1&to=info@alqawan.com&su=التواصل مع مبرة القعوان الخيرية`,
+
+      link:
+        window.innerWidth > 991
+          ? "https://mail.google.com/mail/?view=cm&fs=1&to=info@alqawan.com&su=التواصل مع مبرة القعوان الخيرية"
+          : "mailto:info@alqawan.com?subject=التواصل مع مبرة القعوان الخيرية",
       color: "bg-[#3A3D6C]",
       size: "60px",
     },
-  
+
     {
       icon: <FaWhatsapp />,
       link: "https://api.whatsapp.com/send?phone=966537410089",
@@ -84,7 +85,7 @@ export default function SocialMediaIcons() {
       {/* Social Icons */}
       {open &&
         socialLinks.map((item, index) => {
-          const isMail = item.link.startsWith('mailto:');
+          const isMail = item.link.startsWith("mailto:");
           return (
             <a
               key={index}
@@ -92,7 +93,7 @@ export default function SocialMediaIcons() {
               {...(!isMail && { target: "_blank", rel: "noopener noreferrer" })}
               className={`text-white cursor-pointer rounded-full flex items-center justify-center text-2xl shadow-md ${item.color} w-12 h-12 sm:w-[60px] sm:h-[60px]`}
               title={item.link}
-              ref={el => {
+              ref={(el) => {
                 if (el) iconsRef.current[index] = el;
               }}
             >
@@ -108,12 +109,14 @@ export default function SocialMediaIcons() {
         aria-label="Toggle Chat"
       >
         {open ? (
-          <IoIosCloseCircleOutline size={32} className="sm:w-[38px] sm:h-[38px]" />
+          <IoIosCloseCircleOutline
+            size={32}
+            className="sm:w-[38px] sm:h-[38px]"
+          />
         ) : (
           <IoChatboxEllipses size={32} className="sm:w-[38px] sm:h-[38px]" />
         )}
       </button>
- 
     </div>
   );
 }
