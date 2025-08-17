@@ -10,13 +10,13 @@ const projects = [
     bgGradient: "from-amber-600 to-orange-500"
   },
   {
-    img: "img/سلة.png",
+    img: "img/sala.jpg",
     title: "السلة الغذائية",
     cost: "معدل 60 الف ريال كل شهرين",
     beneficiaries: "جميع الأسر",
     card: "بطاقات العثيم",
     period: "فترة الصرف كل شهرين",
-    bgColor: "bg-emerald-600",
+    bgColor: "bg-emerald-600", 
     bgGradient: "from-emerald-600 to-emerald-500"
   },
   
@@ -33,9 +33,9 @@ const projects = [
   {
     img: "img/مشروع الحقيبة المدرسية.jpg",
     title: "الكسوة و الحقيبة المدرسية",
-  cost: "معدل 500 ريال",
+  cost: "معدل 400 ريال",
   beneficiaries: "الطلاب المحتاجين",
-  card: "توزيع مباشر",
+  card: "تحويل بنكي",
   period: "بداية العام الدراسي",
   bgColor: "bg-rose-600",
   bgGradient: "from-rose-600 to-pink-500"
@@ -65,13 +65,13 @@ const projects = [
     title: "كسوة العيد",
     cost: "معدل 500 ريال لكل يتيم",
     beneficiaries: "الأيتام",
-    card: "الحوالة البنكية",
+    card: "تحويل بنكي",
     period: "مرة واحدة سنوياً",
     bgColor: "bg-purple-600",
     bgGradient: "from-purple-600 to-purple-500"
   },
     {
-      img: "img/مشروع توزيع التمور.jpg",
+      img: "img/tmor.jpg",
       title: "توزيع التمور",
       cost: "كمية التمور الموزعة: 5600 كيلو جرام",
       beneficiaries: "الأسر المحتاجة ",

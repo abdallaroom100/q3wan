@@ -58,7 +58,11 @@ const Footer = () => {
             <li>
               <a
                 target="_blank"
-                href="https://mail.google.com/mail/?view=cm&fs=1&to=info@alqawan.com&su=التواصل مع مبرة القعوان الخيرية"
+                href={
+                  window.innerWidth > 991
+                    ? "https://mail.google.com/mail/?view=cm&fs=1&to=info@alqawan.com&su=التواصل مع مبرة القعوان الخيرية"
+                    : "mailto:info@alqawan.com?subject=التواصل مع مبرة القعوان الخيرية"
+                }
               >
                 {" "}
                 للشكاوي والمقترحات
@@ -67,7 +71,7 @@ const Footer = () => {
           </ul>
         </div>
 
-        <div className="footer-social w-fit">
+        <div className="footer-social w-fit  mx-auto">
           <h4>تابعنا</h4>
           <div className="social-icons">
             <a
