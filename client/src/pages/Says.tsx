@@ -126,7 +126,7 @@ const Says: React.FC = () => {
                 <div
                 style={{ color: "#323666", fontWeight: "bold", fontSize: 21 }}
               >
-                {idx !== 0 ? "":<p className="bg-[#323666] w-fit mx-auto text-[16px]  px-4 text-white rounded-xl">شيخ قبيلة الفعوان</p>}
+                {idx !== 0 ? "":<p className="bg-[#323666] w-fit mx-auto text-[16px]  px-4 text-white rounded-xl">شيخ قبيلة القعوان</p>}
                 {t.name}
               </div>
               </div>
