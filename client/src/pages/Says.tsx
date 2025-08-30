@@ -91,7 +91,7 @@ const Says: React.FC = () => {
                     borderRadius: "50%",
                     objectFit: "cover",
                     border: "0px solid #444340",
-                    objectPosition:`${idx == 0 ? "top": idx == 2 ?"38% -3px":""}`
+                    objectPosition:`${idx == 1 ? "top": idx == 2 ?"38% -3px":""}`
                   }}
                 />
               </div>
