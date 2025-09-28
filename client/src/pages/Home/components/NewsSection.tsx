@@ -20,8 +20,8 @@ const NewsSection = () => (
           },
           {
             img: "/img/قعوان.jpg",
-            title:" مبادرة فرحة نجاح يتيم",
-            text: "توزيع بطاقات العاب مجانية",
+            title:"تم إيداع مبلغ كفالة الأيتام",
+            text: "لشهر سبتمبر 2025م ",
           },
         ].map(({ img, title, text }, i) => (
           <div className={styles.card} key={i}>

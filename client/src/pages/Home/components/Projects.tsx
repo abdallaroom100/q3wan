@@ -1,6 +1,7 @@
 const projects = [
   {
-    img: "img/كفالة.png",
+    // img: "img/كفالة.png",
+    img: "img/كفالة_جديد.jpg",
     title: "كفالة الأيتام ",
     cost: "معدل 3600 ريال سنويا",
     beneficiaries: "فئة الأيتام حسب المعايير",
@@ -14,7 +15,7 @@ const projects = [
     title: "السلة الغذائية",
     cost: "معدل 60 الف ريال كل شهرين",
     beneficiaries: "جميع الأسر",
-    card: "بطاقات العثيم",
+    card: "بطاقات العثيم", 
     period: "فترة الصرف كل شهرين",
     bgColor: "bg-emerald-600", 
     bgGradient: "from-emerald-600 to-emerald-500"
