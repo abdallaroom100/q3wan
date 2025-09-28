@@ -1,7 +1,7 @@
 const projects = [
   {
-    // img: "img/كفالة.png",
-    img: "img/كفالة_جديد.jpg",
+    img: "img/كفالة.png",
+    // img: "img/كفالة_جديد.jpg",
     title: "كفالة الأيتام ",
     cost: "معدل 3600 ريال سنويا",
     beneficiaries: "فئة الأيتام حسب المعايير",

@@ -19,14 +19,14 @@ const NewsSection = () => (
             text: "",
           },
           {
-            img: "/img/قعوان.jpg",
+            img: "/img/كفالة_جديد.jpg",
             title:"تم إيداع مبلغ كفالة الأيتام",
             text: "لشهر سبتمبر 2025م ",
           },
         ].map(({ img, title, text }, i) => (
           <div className={styles.card} key={i}>
             <span className={styles.badge}>جديد</span>
-            <img className={styles.cardImg} src={img} alt={`خبر ${i + 1}`}  />
+            <img style={{objectFit: i == 0 ?'fill':"unset"}} className={styles.cardImg} src={img} alt={`خبر ${i + 1}`}  />
             <div className={styles.cardContent}>
               <h2 className={styles.cardTitle + ' ' + styles.centerCardTitle}>{title}</h2>
    
