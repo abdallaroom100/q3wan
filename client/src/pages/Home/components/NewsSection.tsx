@@ -14,9 +14,9 @@ const NewsSection = () => (
             text: "",
           },
           {
-            img: "/img/q3wan1.webp",
-            title: "دعمكم جعل صيفهم أبرد",
-            text: "",
+            img: "/img/ataa.jpg",
+            title: "تم توزيع السلال الغذائية",
+            text: "لشهر ربيع الثاني ١٤٤٧هـ",
           },
           {
             img: "/img/كفالة_جديد.jpg",
@@ -25,8 +25,8 @@ const NewsSection = () => (
           },
         ].map(({ img, title, text }, i) => (
           <div className={styles.card} key={i}>
-            <span className={styles.badge}>جديد</span>
-            <img style={{objectFit: i == 0 ?'fill':"unset"}} className={styles.cardImg} src={img} alt={`خبر ${i + 1}`}  />
+            <span className={styles.badge}>{i == 1  ? "جديدنا" : "جديد"}</span>
+            <img style={{objectFit: i == 0  ?'fill':"unset"}} className={styles.cardImg} src={img} alt={`خبر ${i + 1}`}  />
             <div className={styles.cardContent}>
               <h2 className={styles.cardTitle + ' ' + styles.centerCardTitle}>{title}</h2>
    
