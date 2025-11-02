@@ -21,7 +21,7 @@ const NewsSection = () => (
           {
             img: "/img/يتيم.jpg",
             title:"تم إيداع مبلغ كفالة الأيتام",
-            text: "لشهر سبتمبر 2025م ",
+            text: "لشهر جماد الاول 1447هـ ",
           },
         ].map(({ img, title, text }, i) => (
           <div className={styles.card} key={i}>
