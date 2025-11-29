@@ -30,7 +30,7 @@ app.use(cors({
     allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-
+app.set('trust proxy', true)
 app.use("/uploads", express.static(path.join(__dirname, "uploads")))
 
 
