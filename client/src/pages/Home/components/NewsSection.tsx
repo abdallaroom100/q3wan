@@ -14,12 +14,12 @@ const NewsSection = () => (
             text: "",
           },
           {
-            img: "/img/ataa.jpg",
+            img: "/img/jamad.jpg",
             title: "تم توزيع السلال الغذائية",
-            text: "لشهر ربيع الثاني ١٤٤٧هـ",
+            text: "لشهر جماد الآخرة ١٤٤٧هـ",
           },
           {
-            img: "/img/jamad.jpg",
+            img: "/img/gamad.jpg",
             title:"تم إيداع مبلغ كفالة الأيتام",
             text: "لشهر جماد الآخرة 1447هـ ",
           },
