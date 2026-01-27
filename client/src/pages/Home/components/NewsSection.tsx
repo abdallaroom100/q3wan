@@ -19,9 +19,9 @@ const NewsSection = () => (
             text: "لشهر جماد الآخرة ١٤٤٧هـ",
           },
           {
-            img: "/img/gamad.jpg",
+            img: "/img/kfalashaban.jpeg",
             title:"تم إيداع مبلغ كفالة الأيتام",
-            text: "لشهر جماد الآخرة 1447هـ ",
+            text: "لشهر  شعبان   1447هـ ",
           },
         ].map(({ img, title, text }, i) => (
           <div className={styles.card} key={i}>
