@@ -9,14 +9,14 @@ const NewsSection = () => (
       <div className={styles.cards} style={{direction:"rtl"}}>
         {[
           {
-            img: "/img/q3wan2.webp",
-            title: "مشروع توزيع لحوم الأضاحي" ,
+            img: "/img/counts.jpeg",
+            title: "تم بحمد الله  توزيع بطاقات السلال الغذائية الرمضانية" ,
             text: "",
           },
           {
-            img: "/img/jamad.jpg",
+            img: "/img/ramadan.jpeg",
             title: "تم توزيع السلال الغذائية",
-            text: "لشهر جماد الآخرة ١٤٤٧هـ",
+            text: "لشهر  رمضان ١٤٤٧هـ",
           },
           {
             img: "/img/kfalashaban.jpeg",
