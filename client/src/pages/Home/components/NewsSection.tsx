@@ -19,7 +19,7 @@ const NewsSection = () => (
             text: "لشهر  رمضان ١٤٤٧هـ",
           },
           {
-            img: "/img/kfalashaban.jpeg",
+            img: "/img/lhom.jpeg",
             title:"تم إيداع مبلغ كفالة الأيتام",
             text: "لشهر  شعبان   1447هـ ",
           },
