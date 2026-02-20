@@ -20,8 +20,8 @@ const NewsSection = () => (
           },
           {
             img: "/img/lhom.jpeg",
-            title:"تم إيداع مبلغ كفالة الأيتام",
-            text: "لشهر  شعبان   1447هـ ",
+            title:"مع بداية الشهر الكريم",
+            text: "تم توزيع 120 ذبيحة",
           },
         ].map(({ img, title, text }, i) => (
           <div className={styles.card} key={i}>
