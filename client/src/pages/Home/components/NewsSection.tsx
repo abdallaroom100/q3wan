@@ -9,9 +9,9 @@ const NewsSection = () => (
       <div className={styles.cards} style={{direction:"rtl"}}>
         {[
           {
-            img: "/img/counts.jpeg",
-            title: "تم بحمد الله  توزيع بطاقات السلال الغذائية الرمضانية" ,
-            text: "",
+            img: "/img/saif.jpeg",
+            title: "بالأرقام حصاد وإنجازات" ,
+            text: "نضع بين أيديكم ثمار العطاء",
           },
           {
             img: "/img/ramadan.jpeg",
