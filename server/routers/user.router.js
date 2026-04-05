@@ -104,7 +104,7 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage,
   fileFilter,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  limits: { fileSize: 50 * 1024 * 1024 }, // 50MB limit
 }).fields([
   { name: "idImagePath", maxCount: 1 },
   { name: "familyCardFile", maxCount: 1 },
