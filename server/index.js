@@ -19,8 +19,8 @@ import {fileURLToPath} from "url"
 const app = express();
 
 // sendForgetPassowrdMessage()
-app.use(express.json({limit: "50mb", extended: true, parameterLimit: 50000}));
-app.use(express.urlencoded({ extended: true, limit: "50mb", parameterLimit: 50000 }));
+app.use(express.json({limit: "200mb", extended: true, parameterLimit: 200000}));
+app.use(express.urlencoded({ extended: true, limit: "200mb", parameterLimit: 200000 }));
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 app.use(cors({
