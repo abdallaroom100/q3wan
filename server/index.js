@@ -34,7 +34,6 @@ app.set('trust proxy', true)
 app.use("/uploads", express.static(path.join(__dirname, "uploads")))
 
 
- 
 
 app.use("/user", userRouter);
 app.use("/admin",adminRouter)
@@ -43,6 +42,8 @@ app.use(express.static(path.join(__dirname,"../client/dist")))
 app.get("*",(req,res)=>{
     res.sendFile(path.join(__dirname,"../client/dist/index.html"))
 })
+app.use(express.json({limit: "10mb", extended: true}))
+app.use(express.urlencoded({limit: "10mb", extended: true, parameterLimit: 50000}))
 // Routes
 
 
