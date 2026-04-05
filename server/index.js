@@ -42,8 +42,8 @@ app.use(express.static(path.join(__dirname,"../client/dist")))
 app.get("*",(req,res)=>{
     res.sendFile(path.join(__dirname,"../client/dist/index.html"))
 })
-app.use(express.json({limit: "10mb", extended: true}))
-app.use(express.urlencoded({limit: "10mb", extended: true, parameterLimit: 50000}))
+app.use(express.json({limit: "50mb", extended: true}))
+app.use(express.urlencoded({limit: "50mb", extended: true, parameterLimit: 50000}))
 // Routes
 
 
