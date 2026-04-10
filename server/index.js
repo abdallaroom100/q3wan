@@ -47,8 +47,7 @@ if (process.env.DEV_MODE == "true") {
 } else {
   app.use("/uploads", express.static("/home/ec2-user/gdrive/uploads"));
 }
-console.log(process.env.DEV_MODE);
-app.use("/uploads", express.static("X:\\uploads"));
+
 
 app.use("/user", userRouter);
 app.use("/admin", adminRouter);
