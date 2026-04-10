@@ -7,6 +7,7 @@ import {dirname} from "path"
 import { fileURLToPath } from "url"
 import {v4 as uuidv4} from "uuid"
 import fs from "fs/promises";
+import { devMode } from "../index.js"
 
 
 
@@ -14,11 +15,25 @@ import fs from "fs/promises";
 
 
 const router = express.Router()
+//for using normal storage
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = dirname(__filename);
+// const baseUploadPath = path.join(__dirname, "../uploads");
 
+/**
+ * for using google drive storage
+ * @returns 
+ */
+let baseUploadPath ;
+
+if(process.env.DEV_MODE == "true"){
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const baseUploadPath = path.join(__dirname, "../uploads");
-
+ baseUploadPath = path.join(__dirname, "../uploads");
+} else {
+ baseUploadPath = "/home/ec2-user/gdrive/uploads";
+}
+console.log(baseUploadPath)
 // File filter to allow only images and PDFs
 const fileFilter = (req, file, cb) => {
   // Check if req.user._id is available
