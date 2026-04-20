@@ -7,6 +7,8 @@ import { FaUser, FaHome, FaUsers, FaCheckCircle } from 'react-icons/fa';
 import ProgressSteps from '../../components/ProgressSteps';
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { FadeLoader } from "react-spinners";
+import { LoaderCircle } from "lucide-react";
 
 // تعريف سنوات وشهور وأيام الهجري
 const hijriYears: number[] = Array.from({length: 151}, (_, i) => 1350 + i); // 1350-1500
@@ -986,6 +988,7 @@ const SignFamily = () => {
     });
 
     try {
+      setIsSubmitting(true)
       const result = await updateUserData(formDataToSend);
       if (result.success) {
         hotToast({ type: "success", message: result.message as string });
@@ -1009,6 +1012,8 @@ const SignFamily = () => {
       }
     } catch (error) {
       hotToast({ type: "error", message: "حدث خطأ أثناء تحديث البيانات" });
+    } finally {
+      setIsSubmitting(false)
     }
   };
   // تحديث البيانات
@@ -2506,6 +2511,7 @@ const SignFamily = () => {
   const handleUpdateData = () => {
     setShowAlreadyRegistered(false);
   };
+    const [isSubmitting, setIsSubmitting ] = useState<boolean>(false) 
 
   // إذا كان المستخدم قد سجل بالفعل، اعرض popup
   if (showAlreadyRegistered) {
@@ -2640,9 +2646,10 @@ const SignFamily = () => {
             <button
               className={styles.submitBtn}
               onClick={handleSubmit}
+              disabled = {isSubmitting}
               type="submit"
             >
-              تسجيل
+             {isSubmitting ? <LoaderCircle className="animate-spin" /> :"تسجيل"} 
             </button>
           )}
         </div>
