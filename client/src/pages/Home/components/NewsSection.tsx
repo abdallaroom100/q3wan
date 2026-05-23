@@ -19,9 +19,9 @@ const NewsSection = () => (
             text: "لشهر  رمضان ١٤٤٧هـ",
           },
           {
-            img: "/img/lhom.jpeg",
-            title:"مع بداية الشهر الكريم",
-            text: "تم توزيع 120 ذبيحة",
+            img: "/img/nama.jpeg",
+            title:"دعمكم نماء وعطاء وصدقة وصله",
+            text: "ضاعف الله أجر كل من أنفق وبذل",
           },
         ].map(({ img, title, text }, i) => (
           <div className={styles.card} key={i}>
