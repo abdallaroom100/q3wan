@@ -31,7 +31,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
  baseUploadPath = path.join(__dirname, "../uploads");
 } else {
- baseUploadPath = "/home/ec2-user/gdrive/uploads";
+//  baseUploadPath = "/home/ec2-user/gdrive/uploads";
+ baseUploadPath = "/home/ubuntu/gdrive/uploads";
 }
 console.log(baseUploadPath)
 // File filter to allow only images and PDFs

@@ -45,7 +45,8 @@ if (process.env.DEV_MODE == "true") {
     
   app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 } else {
-  app.use("/uploads", express.static("/home/ec2-user/gdrive/uploads"));
+  // app.use("/uploads", express.static("/home/ec2-user/gdrive/uploads"));
+  app.use("/uploads", express.static("/home/ubuntu/gdrive/uploads"));
 }
 
 
