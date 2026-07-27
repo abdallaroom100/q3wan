@@ -11,7 +11,7 @@ export interface Housemate {
   name: string;
   birthDate: string;
   identityNumber: string;
-  gender: "ذكر" | "أنثى";
+  gender: "ذكر" | "مؤنث";
   kinship: string;
   studyLevel?: StudyLevel;
   studyGrade?: string;
@@ -43,7 +43,7 @@ export interface Beneficiary {
   email: string;
   identityNumber: string;
   nationality: string;
-  gender: "ذكر" | "أنثى";
+  gender: "ذكر" | "مؤنث";
   phone: string;
   birthDate: string;
   dateType: 'هجري' | 'ميلادي';

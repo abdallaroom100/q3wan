@@ -30,7 +30,7 @@ const CompanionsForm: React.FC<CompanionsFormProps> = ({ companions, setCompanio
           <label>الجنس</label>
           <select value={companion.gender} onChange={e => handleChange(idx, "gender", e.target.value)}>
             <option value="ذكر">ذكر</option>
-            <option value="أنثى">أنثى</option>
+            <option value="مؤنث">مؤنث</option>
           </select>
           <label>صلة القرابة</label>
           <input type="text" value={companion.kinship} onChange={e => handleChange(idx, "kinship", e.target.value)} />

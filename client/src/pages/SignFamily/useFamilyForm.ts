@@ -5,7 +5,7 @@ export type Housemate = {
   name: string;
   birthDate: string;
   identityNumber: string;
-  gender: 'ذكر' | 'أنثى';
+  gender: 'ذكر' | 'مؤنث';
   kinship: string;
 };
 
@@ -25,7 +25,7 @@ export interface UserData {
   email: string;
   identityNumber: string;
   nationality: string;
-  gender: 'ذكر' | 'أنثى';
+  gender: 'ذكر' | 'مؤنث';
   phone: string;
   birthDate: string;
   maritalStatus: string;

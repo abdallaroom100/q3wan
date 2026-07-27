@@ -95,7 +95,7 @@ const housematesSchema = new mongoose.Schema(
     name: { type: String, required: true }, // اسم الابن
     birthDate: { type: Date, required: true }, // تاريخ ميلاد الابن
     identityNumber: { type: String, required: true }, // رقم هوية الابن
-    gender: { type: String, enum: ["ذكر", "أنثى"], required: true },
+    gender: { type: String, enum: ["ذكر", "مؤنث"], required: true },
     kinship: { type: String, required: true }, // جنس الابن
   },
   { _id: false }
@@ -154,6 +154,11 @@ const facilitiesSchema = new mongoose.Schema({
   identityNumber:{
     type:Number,
     reuqired:true,
+  },
+  gender: {
+    type: String,
+    enum: ["ذكر", "مؤنث"],
+    default: "ذكر",
   },
   birthDate:{
     type:String,
@@ -280,7 +285,7 @@ const userSchema = new mongoose.Schema(
    },
     facilitiesInfo:[facilitiesSchema],
     hasAFamily: { type: Boolean, default: false },
-    gender: { type: String, enum: ["ذكر", "أنثى"] },
+    gender: { type: String, enum: ["ذكر", "مؤنث"] },
     rule: { type: String, default: "user", enum: ["user", "admin"] },
     phone: { type: String, required: true },
     maritalStatus: { type: String,

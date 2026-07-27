@@ -9,7 +9,7 @@ interface UserData {
   email: string;
   identityNumber: string;
   nationality: string;
-  gender: "ذكر" | "أنثى";
+  gender: "ذكر" | "مؤنث";
   phone: string;
   birthDate: string;
   maritalStatus: string;
@@ -23,7 +23,7 @@ interface UserData {
       name: string;
       birthDate: string;
       identityNumber: string;
-      gender: "ذكر" | "أنثى";
+      gender: "ذكر" | "مؤنث";
       kinship: string;
     }>;
     addtionalHomes?: Array<{
@@ -34,7 +34,7 @@ interface UserData {
         name: string;
         birthDate: string;
         identityNumber: string;
-        gender: "ذكر" | "أنثى";
+        gender: "ذكر" | "مؤنث";
         kinship: string;
       }>;
     }>;

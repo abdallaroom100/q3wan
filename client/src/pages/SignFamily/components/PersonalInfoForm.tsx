@@ -63,7 +63,7 @@ const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({ formData, setFormDa
           onChange={e => setFormData(prev => ({ ...prev, gender: e.target.value }))}
         >
           <option value="ذكر">ذكر</option>
-          <option value="أنثى">أنثى</option>
+          <option value="مؤنث">مؤنث</option>
         </select>
       </div>
       <div className={styles.formGroup}>

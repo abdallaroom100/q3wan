@@ -19,7 +19,7 @@ type Housemate = {
   name: string;
   birthDate: string;
   identityNumber: string;
-  gender: "ذكر" | "أنثى";
+  gender: "ذكر" | "مؤنث";
   kinship: string;
 };
 
@@ -44,7 +44,7 @@ interface UserData {
   email: string;
   identityNumber: string;
   nationality: string;
-  gender: "ذكر" | "أنثى";
+  gender: "ذكر" | "مؤنث";
   phone: string;
   birthDate: string;
   maritalStatus: string;
@@ -509,10 +509,11 @@ const SignFamily = ({
     }
 
     const formDataToSend = new FormData();
-    const housemateToSend = companions.map((h: any) => ({
+    const housemateToSend = companions.map((h: any, index: number) => ({
       name: String(h.name ?? ''),
       identityNumber: String(h.identityNumber ?? h.id ?? ''),
       birthDate: String(h.birthDate ?? ''),
+      gender: index < maleCount ? 'ذكر' : 'مؤنث',
       kinship: String(h.kinship ?? ''),
       dateType: String(h.dateType ?? ''),
       studyLevel: String(h.studyLevel ?? ''),
@@ -685,11 +686,11 @@ const SignFamily = ({
                   <input
                     type="radio"
                     name="gender"
-                    value="أنثى"
-                    checked={formData.gender === "أنثى"}
+                    value="مؤنث"
+                    checked={formData.gender === "مؤنث"}
                     onChange={handleChange}
                   />{" "}
-                  أنثى
+                  مؤنث
                 </label>
               </div>
             </div>

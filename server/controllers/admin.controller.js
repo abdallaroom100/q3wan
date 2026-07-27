@@ -7,6 +7,64 @@ import User from "../models/User.schema.js";
 import Report from "../models/Report.schema.js";
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
+
+const controllerDirectory = path.dirname(fileURLToPath(import.meta.url));
+
+const removeUploadedFiles = async (files) => {
+  if (!files) return;
+  await Promise.all(
+    Object.values(files).flat().map(async (file) => {
+      try {
+        await fs.promises.unlink(file.path);
+      } catch (error) {
+        if (error.code !== "ENOENT") {
+          console.error(`Failed to remove uploaded file ${file.path}:`, error);
+        }
+      }
+    }),
+  );
+};
+
+const parseJsonArray = (value, fieldName) => {
+  if (Array.isArray(value)) return value;
+  if (typeof value !== "string") throw new Error(`${fieldName} غير صالحة`);
+  const parsed = JSON.parse(value);
+  if (!Array.isArray(parsed)) throw new Error(`${fieldName} غير صالحة`);
+  return parsed;
+};
+
+const validateAdminCompanions = (companions) => {
+  for (let index = 0; index < companions.length; index += 1) {
+    const companion = companions[index];
+    const label = `المرافق رقم ${index + 1}`;
+    if (
+      !companion.name ||
+      !companion.identityNumber ||
+      !companion.birthDate ||
+      !companion.dateType ||
+      !companion.gender ||
+      !companion.kinship ||
+      !companion.studyLevel ||
+      !companion.healthStatus
+    ) return `بيانات ${label} غير مكتملة`;
+    if (!/^\d{10}$/.test(String(companion.identityNumber))) {
+      return `رقم هوية ${label} يجب أن يكون 10 أرقام`;
+    }
+    if (!["ذكر", "مؤنث"].includes(companion.gender)) return `جنس ${label} غير صالح`;
+    if (!["هجري", "ميلادي"].includes(companion.dateType)) {
+      return `نوع تاريخ ميلاد ${label} غير صالح`;
+    }
+    if (
+      ["ابتدائي", "متوسط", "ثانوي"].includes(companion.studyLevel) &&
+      !companion.studyGrade
+    ) return `الصف الدراسي لـ${label} مطلوب`;
+    if (companion.healthStatus === "غير سليم" && !companion.disabilityType) {
+      return `نوع الإعاقة لـ${label} مطلوب`;
+    }
+  }
+  return null;
+};
 
 // دالة لحساب العمر من تاريخ الميلاد (ميلادي أو هجري)
 function calculateAge(birthDate, dateType) {
@@ -303,8 +361,21 @@ export const deleteBeneficiary = async (req, res) => {
       return res.status(401).json({ error: "التقرير هذا غير موجود" });
     }
 
+    const isReviewerDeletion =
+      currentAdmin.rule === "reviewer" && currentReport.status === "under_review";
+    const isFinalDeletion =
+      currentReport.status === "done" &&
+      ["accepted_manager", "rejected_manager"].includes(currentReport.reportStatus);
+    if (!isReviewerDeletion && !isFinalDeletion) {
+      return res.status(403).json({
+        error: "الحذف الكلي متاح فقط بعد الاعتماد الكلي أو الرفض الكلي",
+      });
+    }
+
     // حذف مجلد الملفات المرفوعة للمستخدم
-    const uploadsDir = path.join(process.cwd(), 'uploads');
+    const uploadsDir = process.env.DEV_MODE === "true"
+      ? path.join(controllerDirectory, "../uploads")
+      : "/home/ubuntu/gdrive/uploads";
     const userFolderPath = path.join(uploadsDir, userId);
     
     if (fs.existsSync(userFolderPath)) {
@@ -397,7 +468,18 @@ export const getDeletedReports = async (req, res) => {
 export const editBeneficiaryData = async (req, res) => {
   try {
     const { reportId } = req.params;
-    
+    let housemates;
+    let incomeSources;
+    try {
+      housemates = parseJsonArray(req.body.housemates, "بيانات المرافقين");
+      incomeSources = req.body.incomeSources
+        ? parseJsonArray(req.body.incomeSources, "مصادر الدخل")
+        : null;
+    } catch (error) {
+      await removeUploadedFiles(req.files);
+      return res.status(400).json({ error: error.message });
+    }
+
     const {
       firstName,
       secondName,
@@ -417,7 +499,6 @@ export const editBeneficiaryData = async (req, res) => {
       rentAmount,
       housingType,
       bankName,
-      housemates,
     } = req.body;
 
     if (
@@ -438,56 +519,67 @@ export const editBeneficiaryData = async (req, res) => {
       !housingType ||
       !bankName
     ) {
+      await removeUploadedFiles(req.files);
       return res
         .status(400)
         .json({ error: "برجاء ادخال جميع البيانات المطلوبه " });
     }
-    
-    if (String(identityNumber).length !== 10 && isNaN(Number(identityNumber))) {
+
+    if (!/^\d{10}$/.test(String(identityNumber))) {
+      await removeUploadedFiles(req.files);
       return res.status(400).json({ error: "رقم المعرق غير صالح" });
     }
-    if (String(phone).length !== 9 && isNaN(Number(identityNumber))) {
+    if (!/^\d{9,10}$/.test(String(phone))) {
+      await removeUploadedFiles(req.files);
       return res.status(400).json({ error: "برجاء ادخال رقم هاتف صالح" });
     }
-    if (gender == "ذكر" || gender == "مؤنث") {
+    if (gender == "ذكر" || gender == "مؤنث" ) {
     } else {
+      await removeUploadedFiles(req.files);
       return res.status(400).json({ error: "برجاء ادخال قيمة صالح للجنس" });
     }
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(birthDate)) {
+    if (!/^\d{4}-\d{1,2}-\d{1,2}$/.test(birthDate)) {
+      await removeUploadedFiles(req.files);
       return res.status(400).json({ error: "برجاء ادخال تاريخ ميلاد صالح" });
     }
     if (jobStatus == "موظف" || jobStatus == "عاطل") {
-    } else
+    } else {
+      await removeUploadedFiles(req.files);
       return res
         .status(400)
         .json({ error: "برجاء ادخال حاله العمل من الاختيارات المتاحه" });
+    }
 
     if (housingType == "إيجار" && !rentAmount) {
+      await removeUploadedFiles(req.files);
       return res.status(400).json({ error: "يجب ادخال قيمه لمبلغ الايجار " });
     }
     if (housingType == "إيجار" && rentAmount <= 0) {
+      await removeUploadedFiles(req.files);
       return res
         .status(400)
         .json({ error: "يجب ادخال قيمه صالحه لمبلغ الايجار " });
     }
     if (healthStatus == "غير سليم" && !disabilityType) {
+      await removeUploadedFiles(req.files);
       return res.status(400).json({ error: "برجاء ادخال نوع الاعاقة" });
     }
 
-    
-    console.log(!Array.isArray(housemates))
-    if (!Array.isArray(housemates)) {
-      return res
-      .status(400)
-      .json({ error: "برجاء ادخال قيمة صالحة لحقول بيانات المرافقين" });
+    const companionsError = validateAdminCompanions(housemates);
+    if (companionsError) {
+      await removeUploadedFiles(req.files);
+      return res.status(400).json({ error: companionsError });
     }
+
     const currentReport = await Report.findById(reportId)
-    const reportOwner = await User.findById(currentReport.user._id)
     if(!currentReport){
-      return res.status(401).json({error:"التقرير غير موجود"})
+      await removeUploadedFiles(req.files);
+      return res.status(404).json({error:"التقرير غير موجود"})
     }
-    if(housemates?.length !== reportOwner.facilitiesInfo?.length){
-      return res.status(400).json({error:"عدد المرافقين غير متطابق"})
+    const reportOwner = await User.findById(currentReport.user)
+    if (!reportOwner) {
+      await removeUploadedFiles(req.files);
+      return res.status(404).json({ error: "المستفيد غير موجود" });
     }
 
     reportOwner.firstName = firstName;
@@ -503,17 +595,56 @@ export const editBeneficiaryData = async (req, res) => {
     reportOwner.cityOfResidence = cityOfResidence;
     reportOwner.jobStatus = jobStatus;
     reportOwner.healthStatus = healthStatus;
-    reportOwner.disabilityType = disabilityType;
+    reportOwner.disabilityType = healthStatus === "غير سليم" ? disabilityType : "";
     reportOwner.district = district;
-    reportOwner.rentAmount = rentAmount;
+    reportOwner.rentAmount = housingType === "إيجار" ? Number(rentAmount) : 0;
     reportOwner.housingType = housingType;
     reportOwner.bankName = bankName;
-    reportOwner.facilitiesInfo = housemates
+    reportOwner.facilitiesInfo = housemates;
+    reportOwner.numberOfFacilities = housemates.length;
+    reportOwner.numberOfMales = housemates.filter(
+      (companion) => companion.gender === "ذكر",
+    ).length;
+    reportOwner.numberOfFemales =
+      housemates.length - reportOwner.numberOfMales;
+
+    const files = req.files || {};
+    const primaryAttachments = [
+      ["idImagePath", "idImagePath"],
+      ["familyCardFile", "familyCardFile"],
+      ["ibanImage", "ibanImage"],
+      ["rentContractFile", "rentImage"],
+    ];
+    for (const [fileField, modelField] of primaryAttachments) {
+      const uploadedFile = files[fileField]?.[0];
+      if (!uploadedFile) continue;
+      const folderName = path.basename(path.dirname(uploadedFile.path));
+      reportOwner[modelField] =
+        `${req.protocol}://${req.get("host")}/uploads/${req.beneficiaryUserId}/${folderName}/${uploadedFile.filename}`;
+    }
+
+    if (incomeSources) {
+      reportOwner.incomeSources = incomeSources.map((source, index) => {
+        const uploadedFile = files[`incomeSources[${index}][sourceImage]`]?.[0];
+        if (!uploadedFile) return source;
+        return {
+          ...source,
+          sourceImage:
+            `${req.protocol}://${req.get("host")}/uploads/${req.beneficiaryUserId}/incomeSources/source-${index}/${uploadedFile.filename}`,
+        };
+      });
+    }
+
     await reportOwner.save();
-  return res.status(200).json({success:true,message:"تم تحديث بيانات بنجاح",user:reportOwner})
+    return res.status(200).json({
+      success: true,
+      message: "تم تحديث البيانات بنجاح",
+      user: reportOwner,
+    })
   } catch (error) {
-    console.log("error in edit beneficiary data");
-    console.log(error.message);
+    await removeUploadedFiles(req.files);
+    console.log("error in edit beneficiary data", error);
+    return res.status(500).json({ error: "حدث خطأ أثناء تحديث بيانات المستفيد" });
   }
 };
 // committee abilities

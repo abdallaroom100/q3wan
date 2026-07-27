@@ -1,4 +1,5 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
+import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import styles from "./BeneficiaryDetails.module.css";
 import { Beneficiary, RequestHistory } from "../Dashboard/types";
@@ -38,7 +39,7 @@ const useIsMobile = () => {
 const BeneficiaryDetailsPage = () => {
    const history = useNavigate()
   const { id } = useParams<{ id: string }>();
-  const { error, loading, reportDetails,fullReport } = useGetCurrentReportData(id || "");
+  const { loading, reportDetails,fullReport } = useGetCurrentReportData(id || "");
   const navigate = useNavigate();
   const [beneficiary, setBeneficiary] = useState<Beneficiary | null>(null);
   const [editedBeneficiary, setEditedBeneficiary] = useState<Beneficiary | null>(null);
@@ -51,17 +52,69 @@ const BeneficiaryDetailsPage = () => {
   const [currentAdmin, setCurrentAdmin] = useState<any>(null);
   const [approveComment, setApproveComment] = useState('');
   const [rejectComment, setRejectComment] = useState('');
+  const [selectedAttachments, setSelectedAttachments] = useState<Record<string, File>>({});
   
   // جميع hooks يجب أن تكون في أعلى الكومبوننت
-  const {confirmCurrentReport,confirmLoading,isConfirmed,confirmReportError} = useConfirmCurrentReport()
-  const {reportLoading,reportError, editedUser,editReport} = useEditReportData()
-  const {acceptCommitteeToReport,isAccepted,acceptCommitteeError} = useAcceptCommitteeReport()
-  const {rejectCommitteeToReport,isRejected,rejectCommitteeError} = useRejectCommitteeToReport()
-  const {deleteBeneficiary,isDeleted,deleteBeneficiaryError} = useDeleteBeneficiary()
-  const {rejectManagerReport,rejectManagerError,isManagerReject,rejectManagerLoading} = useRejectManagerReport()
-  const {acceptManagerLoading,acceptManagerReport,isManagerAccept,acceptManagerError} = useAcceptManagerReport()
+  const {confirmCurrentReport,confirmLoading,isConfirmed} = useConfirmCurrentReport()
+  const {reportLoading,editReport} = useEditReportData()
+  const {acceptCommitteeToReport,isAccepted} = useAcceptCommitteeReport()
+  const {rejectCommitteeToReport,isRejected} = useRejectCommitteeToReport()
+  const {deleteLoading,deleteBeneficiary,isDeleted,deleteBeneficiaryError} = useDeleteBeneficiary()
+  const {rejectManagerReport,isManagerReject,rejectManagerLoading} = useRejectManagerReport()
+  const {acceptManagerLoading,acceptManagerReport,isManagerAccept} = useAcceptManagerReport()
   const { deleteTemporaryLoading, deleteTemporaryBeneficiary, isTemporaryDeleted, deleteTemporaryError } = useDeleteTemporaryBeneficiary();
   const [showTempDeletePopup, setShowTempDeletePopup] = useState(false);
+  const [showFinalDeletePopup, setShowFinalDeletePopup] = useState(false);
+  const lastBackendToast = useRef({ message: "", shownAt: 0 });
+
+  useEffect(() => {
+    const interceptorId = axios.interceptors.response.use(
+      (response) => response,
+      (requestError) => {
+        const responseData = requestError.response?.data;
+        const responseMessage =
+          typeof responseData === "string"
+            ? responseData
+            : responseData?.error ??
+              responseData?.message ??
+              responseData?.errors;
+
+        let message = "";
+        if (typeof responseMessage === "string") {
+          message = responseMessage;
+        } else if (Array.isArray(responseMessage)) {
+          message = responseMessage
+            .map((item) => typeof item === "string" ? item : item?.message)
+            .filter(Boolean)
+            .join("، ");
+        } else if (responseMessage && typeof responseMessage === "object") {
+          message = Object.values(responseMessage)
+            .map((item: any) => typeof item === "string" ? item : item?.message)
+            .filter(Boolean)
+            .join("، ");
+        }
+
+        if (!message) {
+          message = requestError.response
+            ? `حدث خطأ في الخادم (${requestError.response.status})`
+            : "تعذر الاتصال بالخادم";
+        }
+
+        const now = Date.now();
+        const isDuplicate =
+          lastBackendToast.current.message === message &&
+          now - lastBackendToast.current.shownAt < 1500;
+        if (!isDuplicate) {
+          lastBackendToast.current = { message, shownAt: now };
+          hotToast({ type: "error", message, duration: 4000 });
+        }
+
+        return Promise.reject(requestError);
+      },
+    );
+
+    return () => axios.interceptors.response.eject(interceptorId);
+  }, []);
   
   // الحصول على دور المستخدم الحالي
   useEffect(() => {
@@ -87,13 +140,6 @@ const BeneficiaryDetailsPage = () => {
       }, 250);
     }
   }, [isConfirmed, currentAdmin?.rule, history]);
-
-  // مراقبة أخطاء الاعتماد
-  useEffect(() => {
-    if (confirmReportError) {
-      hotToast({type: "error", message: confirmReportError});
-    }
-  }, [confirmReportError]);
 
   // مراقبة حالة القبول من اللجنة
   useEffect(() => {
@@ -121,26 +167,6 @@ const BeneficiaryDetailsPage = () => {
     }
   }, [isDeleted, navigate]);
 
-  // مراقبة أخطاء اللجنة
-  useEffect(() => {
-    if (acceptCommitteeError) {
-      hotToast({type:"error",message:acceptCommitteeError})
-    }
-  }, [acceptCommitteeError]);
-
-  useEffect(() => {
-    if (rejectCommitteeError) {
-      hotToast({type:"error",message:rejectCommitteeError})
-    }
-  }, [rejectCommitteeError]);
-
-  // مراقبة أخطاء الحذف
-  useEffect(() => {
-    if (deleteBeneficiaryError) {
-      hotToast({type:"error",message:deleteBeneficiaryError})
-    }
-  }, [deleteBeneficiaryError]);
-
   // مراقبة حالة الاعتماد من المدير
   useEffect(() => {
     if (isManagerAccept) {
@@ -161,19 +187,6 @@ const BeneficiaryDetailsPage = () => {
     }
   }, [isManagerReject, navigate]);
 
-  // مراقبة أخطاء المدير
-  useEffect(() => {
-    if (acceptManagerError) {
-      hotToast({type:"error",message:acceptManagerError})
-    }
-  }, [acceptManagerError]);
-
-  useEffect(() => {
-    if (rejectManagerError) {
-      hotToast({type:"error",message:rejectManagerError})
-    }
-  }, [rejectManagerError]);
-
   useEffect(() => {
     if (isTemporaryDeleted) {
       hotToast({type:"success",message:"تم حذف المستفيد مؤقتا"})
@@ -182,12 +195,6 @@ const BeneficiaryDetailsPage = () => {
       }, 260);
     }
   }, [isTemporaryDeleted, navigate]);
-
-  useEffect(() => {
-    if (deleteTemporaryError) {
-      hotToast({type:"error",message:deleteTemporaryError})
-    }
-  }, [deleteTemporaryError]);
 
   // تحديد أسماء الأزرار حسب الدور
   const getButtonLabels = () => {
@@ -216,6 +223,9 @@ const BeneficiaryDetailsPage = () => {
   };
 
   const buttonLabels = getButtonLabels();
+  const isFinalManagerDecision =
+    fullReport?.status === "done" &&
+    ["accepted_manager", "rejected_manager"].includes(fullReport?.reportStatus);
 
   const mapReportDetailsToBeneficiary = (data: any): Beneficiary => {
     return {
@@ -247,11 +257,11 @@ const BeneficiaryDetailsPage = () => {
       ibanImage: data.ibanImage || "",
       numberOfFacilities: data.numberOfFacilities || 0,
       numberOfMales: data.numberOfMales || 0,
-      housemates: (data.facilitiesInfo || []).map((h: any) => ({
+      housemates: (data.facilitiesInfo || []).map((h: any, index: number) => ({
         name: h.name || "",
         birthDate: h.birthDate || "",
         identityNumber: h.identityNumber?.toString() || "",
-        gender: h.gender || "",
+        gender: h.gender || (index < (data.numberOfMales || 0) ? "ذكر" : "مؤنث"),
         kinship: h.kinship || "",
         studyLevel: h.studyLevel || "",
         studyGrade: h.studyGrade ?? "",
@@ -350,6 +360,55 @@ const BeneficiaryDetailsPage = () => {
     setEditedBeneficiary({ ...editedBeneficiary, [field]: value });
   };
 
+  const updateHousemate = (index: number, values: Partial<Beneficiary["housemates"][number]>) => {
+    if (!editedBeneficiary) return;
+    setEditedBeneficiary({
+      ...editedBeneficiary,
+      housemates: editedBeneficiary.housemates.map((housemate, housemateIndex) =>
+        housemateIndex === index ? { ...housemate, ...values } : housemate
+      ),
+    });
+  };
+
+  const addHousemate = () => {
+    if (!editedBeneficiary) return;
+    setEditedBeneficiary({
+      ...editedBeneficiary,
+      housemates: [
+        ...editedBeneficiary.housemates,
+        {
+          name: "",
+          identityNumber: "",
+          birthDate: "",
+          dateType: "ميلادي",
+          gender: "ذكر",
+          kinship: "",
+          studyLevel: undefined,
+          studyGrade: "",
+          healthStatus: "سليم",
+        },
+      ],
+    });
+  };
+
+  const removeHousemate = (index: number) => {
+    if (!editedBeneficiary) return;
+    setEditedBeneficiary({
+      ...editedBeneficiary,
+      housemates: editedBeneficiary.housemates.filter((_, housemateIndex) => housemateIndex !== index),
+    });
+    setEditingField(null);
+  };
+
+  const selectAttachment = (field: string, file?: File) => {
+    setSelectedAttachments((current) => {
+      const next = { ...current };
+      if (file) next[field] = file;
+      else delete next[field];
+      return next;
+    });
+  };
+
   const editableFields: (keyof Beneficiary)[] = [
     'firstName', 'secondName', 'thirdName', 'lastName', 'identityNumber', 'phone', 'gender', 'birthDate',
     'maritalStatus', 'nationality', 'cityOfResidence', 'jobStatus', 'healthStatus', 'disabilityType',
@@ -360,7 +419,8 @@ const BeneficiaryDetailsPage = () => {
     editableFields.some(
       field => JSON.stringify(beneficiary[field]) !== JSON.stringify(editedBeneficiary[field])
     ) ||
-    JSON.stringify(beneficiary.housemates) !== JSON.stringify(editedBeneficiary.housemates)
+    JSON.stringify(beneficiary.housemates) !== JSON.stringify(editedBeneficiary.housemates) ||
+    Object.keys(selectedAttachments).length > 0
   );
 
   const saudiBanks = [
@@ -390,9 +450,10 @@ const BeneficiaryDetailsPage = () => {
     if (!editedBeneficiary.thirdName) return 'الاسم الثالث مطلوب.';
     if (!editedBeneficiary.lastName) return 'اسم العائلة مطلوب.';
     if (!/^[0-9]{10}$/.test(editedBeneficiary.identityNumber)) return 'رقم الهوية يجب أن يكون 10 أرقام.';
-    if (!/^[0-9]{9}$/.test(editedBeneficiary.phone)) return 'رقم الجوال يجب أن يكون 9 أرقام.';
+    if (!/^[0-9]{9,10}$/.test(editedBeneficiary.phone)) return 'رقم الجوال يجب أن يتكون من 9 أو 10 أرقام.';
+    console.log(editedBeneficiary.birthDate)
     if (!editedBeneficiary.gender) return 'الجنس مطلوب.';
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(editedBeneficiary.birthDate)) return 'تاريخ الميلاد يجب أن يكون بالشكل yyyy-mm-dd';
+    if (!/^\d{4}-\d{1,2}-\d{1,2}$/.test(editedBeneficiary.birthDate)) return 'خطأ في صيغة تاريخ الميلاد';
     if (!editedBeneficiary.maritalStatus) return 'الحالة الاجتماعية مطلوبة.';
     if (!editedBeneficiary.healthStatus) return 'الحالة الصحية مطلوبة.';
     if (editedBeneficiary.healthStatus === 'غير سليم' && !editedBeneficiary.disabilityType) return 'نوع الإعاقة مطلوب إذا كانت الحالة الصحية غير سليم.';
@@ -411,6 +472,9 @@ const BeneficiaryDetailsPage = () => {
       
       if (processedName.split(/\s+/).length < 4) return `اسم المرافق رقم ${i + 1} يجب أن يكون رباعي.`;
       if (!/^[0-9]{10}$/.test(h.identityNumber)) return `رقم هوية المرافق رقم ${i + 1} يجب أن يكون 10 أرقام.`;
+      if (!h.birthDate) return `تاريخ ميلاد المرافق رقم ${i + 1} مطلوب.`;
+      if (!h.dateType) return `نوع تاريخ ميلاد المرافق رقم ${i + 1} مطلوب.`;
+      if (!h.gender) return `جنس المرافق رقم ${i + 1} مطلوب.`;
       if (!h.kinship) return `صلة القرابة للمرافق رقم ${i + 1} مطلوبة.`;
       if (!h.studyLevel) return `المرحلة الدراسية للمرافق رقم ${i + 1} مطلوبة.`;
       if (["ابتدائي","متوسط","ثانوي"].includes(h.studyLevel ?? "") && !h.studyGrade) return `صف المرافق رقم ${i + 1} مطلوب.`;
@@ -421,26 +485,29 @@ const BeneficiaryDetailsPage = () => {
   };
 
   const handleSaveEdits = async () => {
-    console.log(editedBeneficiary)
     const error = validateEdits();
     if (error) {
       hotToast({type:"error",message:error})
       return;
     }
     setSaveError(null);
-    await editReport({beneficiaryData:editedBeneficiary,reportId:id})
-    
-    // تحديث البيانات المحلية بعد الحفظ الناجح
-    if (!reportError && editedBeneficiary) {
-      setTimeout(() => {
-        setBeneficiary(editedBeneficiary)
-      }, 350);
+    const updatedUser = await editReport({
+      beneficiaryData: editedBeneficiary,
+      reportId: id,
+      attachments: selectedAttachments,
+    });
+
+    if (updatedUser) {
+      const mapped = mapReportDetailsToBeneficiary(updatedUser);
+      setBeneficiary(mapped);
+      setEditedBeneficiary(mapped);
+      setSelectedAttachments({});
     }
   };
 
   const genderOptions = [
     { value: 'ذكر', label: 'ذكر' },
-    { value: 'أنثى', label: 'أنثى' }
+    { value: 'مؤنث', label: 'مؤنث' }
   ];
   const healthStatusOptions = [
     { value: 'سليم', label: 'سليم' },
@@ -535,10 +602,6 @@ const BeneficiaryDetailsPage = () => {
     if (beneficiary?.id) {
       await acceptManagerReport({userId: beneficiary.id})
     }
-    if(acceptManagerError){
-      hotToast({type:"error",message:acceptManagerError})
-        
-      }
    if(isManagerAccept){
     hotToast({type:"success",message:"تم اعتماد المتسفيد كليا"})
     navigate("/dashboard")
@@ -552,10 +615,6 @@ const BeneficiaryDetailsPage = () => {
     console.log('رفض كلي من المدير', beneficiary?.id);
     if (beneficiary?.id) {
       await rejectManagerReport({userId: beneficiary.id})
-    }
-    if(rejectManagerError){
-    hotToast({type:"error",message:rejectManagerError})
-      
     }
     if(isManagerReject){
     hotToast({type:"success",message:"تم رفض المتسفيد كليا"})
@@ -618,14 +677,30 @@ const BeneficiaryDetailsPage = () => {
     await deleteTemporaryBeneficiary(beneficiary?.id);
     setShowTempDeletePopup(false);
   };
+  const confirmFinalDelete = async () => {
+    await deleteBeneficiary(beneficiary?.id);
+    setShowFinalDeletePopup(false);
+  };
+
+  const popupIsPdf = popupImage
+    ? popupImage.split("?")[0].toLowerCase().endsWith(".pdf")
+    : false;
 
   return (
     <div className={styles.pageWrapper}>
       {popupImage && (
         <div className={styles.popupOverlay} onClick={() => setPopupImage(null)}>
-          <div className={styles.popupContent} onClick={e => e.stopPropagation()}>
-            <img loading="lazy" src={popupImage} alt="مصدر الدخل" className={styles.popupImage} />
-            <button className={styles.closePopupButton} onClick={() => setPopupImage(null)}>إغلاق</button>
+          <div className={styles.attachmentViewerContent} onClick={e => e.stopPropagation()}>
+            <div className={styles.popupToolbar}>
+              <button className={styles.closePopupButton} onClick={() => setPopupImage(null)}>إغلاق</button>
+            </div>
+            <div className={styles.popupViewport}>
+              {popupIsPdf ? (
+                <iframe src={popupImage} title="عرض المرفق" className={styles.popupPdf} />
+              ) : (
+                <img src={popupImage} alt="المرفق" className={styles.popupImage} />
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -1727,10 +1802,14 @@ const BeneficiaryDetailsPage = () => {
                 <span className={styles.infoLabel}>عقد الإيجار</span>
                 <span className={styles.infoValue}>
                   {beneficiary.rentContractFile ? (
-                    <a href={beneficiary.rentContractFile} target="_blank" rel="noopener noreferrer" className={styles.fileLink}>
+                    <button
+                      type="button"
+                      onClick={() => setPopupImage(beneficiary.rentContractFile!)}
+                      className={styles.fileLink}
+                    >
                       <span className={styles.linkIcon}>📄</span>
                       عرض العقد
-                    </a>
+                    </button>
                   ) : (
                     <span className={styles.noFile}>غير متوفر</span>
                   )}
@@ -1865,9 +1944,86 @@ const BeneficiaryDetailsPage = () => {
         <div className={styles.card}>
           <div className={styles.cardHeader}>
             <h3 className={styles.cardTitle}>
-              <span className={styles.cardIcon}>👨‍👩‍👧‍👦</span>
-              المرافقين ({beneficiary.housemates.length} أشخاص)
+              <span className={styles.cardIcon}>📎</span>
+              تعديل المرفقات
             </h3>
+          </div>
+          <div className={styles.attachmentsGrid}>
+            {[
+              { field: "idImagePath", label: "صورة الهوية", url: beneficiary.idImagePath },
+              { field: "familyCardFile", label: "كارت العائلة", url: beneficiary.familyCardFile },
+              { field: "ibanImage", label: "صورة الآيبان", url: beneficiary.ibanImage },
+              { field: "rentContractFile", label: "عقد الإيجار", url: beneficiary.rentContractFile },
+            ].map(({ field, label, url }) => (
+              <div className={styles.attachmentEditor} key={field}>
+                <span className={styles.infoLabel}>{label}</span>
+                {url ? (
+                  <button type="button" className={styles.fileLink} onClick={() => setPopupImage(url)}>
+                    عرض المرفق الحالي
+                  </button>
+                ) : (
+                  <span className={styles.noFile}>لا يوجد مرفق حالي</span>
+                )}
+                <label className={styles.uploadButton}>
+                  {selectedAttachments[field] ? "تغيير الملف المختار" : "اختيار ملف جديد"}
+                  <input
+                    type="file"
+                    accept=".jpg,.jpeg,.png,.pdf"
+                    onChange={(event) => selectAttachment(field, event.target.files?.[0])}
+                  />
+                </label>
+                {selectedAttachments[field] && (
+                  <div className={styles.selectedFile}>
+                    <span>{selectedAttachments[field].name}</span>
+                    <button type="button" onClick={() => selectAttachment(field)}>إلغاء</button>
+                  </div>
+                )}
+              </div>
+            ))}
+            {beneficiary.incomeSources.map((source, index) => {
+              const field = `incomeSources[${index}][sourceImage]`;
+              return (
+                <div className={styles.attachmentEditor} key={field}>
+                  <span className={styles.infoLabel}>مرفق مصدر الدخل: {source.sourceType}</span>
+                  {source.sourceImage ? (
+                    <button
+                      type="button"
+                      className={styles.fileLink}
+                      onClick={() => setPopupImage(source.sourceImage)}
+                    >
+                      عرض المرفق الحالي
+                    </button>
+                  ) : (
+                    <span className={styles.noFile}>لا يوجد مرفق حالي</span>
+                  )}
+                  <label className={styles.uploadButton}>
+                    {selectedAttachments[field] ? "تغيير الملف المختار" : "اختيار ملف جديد"}
+                    <input
+                      type="file"
+                      accept=".jpg,.jpeg,.png,.pdf"
+                      onChange={(event) => selectAttachment(field, event.target.files?.[0])}
+                    />
+                  </label>
+                  {selectedAttachments[field] && (
+                    <div className={styles.selectedFile}>
+                      <span>{selectedAttachments[field].name}</span>
+                      <button type="button" onClick={() => selectAttachment(field)}>إلغاء</button>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        <div className={styles.card}>
+          <div className={styles.cardHeader}>
+            <h3 className={styles.cardTitle}>
+              <span className={styles.cardIcon}>👨‍👩‍👧‍👦</span>
+              المرافقين ({editedBeneficiary?.housemates.length || 0} أشخاص)
+            </h3>
+            <button type="button" className={styles.addCompanionButton} onClick={addHousemate}>
+              + إضافة مرافق
+            </button>
           </div>
           <div className={styles.tableContainer}>
             <table className={styles.table}>
@@ -1877,11 +2033,13 @@ const BeneficiaryDetailsPage = () => {
                   <th>الاسم</th>
                   <th>رقم الهوية</th>
                   <th>تاريخ الميلاد</th>
+                  <th>الجنس</th>
                   <th>صلة القرابة</th>
                   <th>المرحلة الدراسية</th>
                   <th>الصف</th>
                   <th>الحالة الصحية</th>
                   <th>نوع الإعاقة</th>
+                  <th>إجراء</th>
                 </tr>
               </thead>
               <tbody>
@@ -1944,7 +2102,40 @@ const BeneficiaryDetailsPage = () => {
                         </span>
                       )}
                     </td>
-                    <td>{formatDate(housemate.birthDate)} ({housemate.dateType})</td>
+                    <td>
+                      <div className={styles.dateEditor}>
+                        <input
+                          type={housemate.dateType === "ميلادي" ? "date" : "text"}
+                          value={housemate.birthDate}
+                          placeholder="yyyy-mm-dd"
+                          onChange={(event) => updateHousemate(index, { birthDate: event.target.value })}
+                          className={styles.editInput}
+                        />
+                        <select
+                          value={housemate.dateType || "ميلادي"}
+                          onChange={(event) => updateHousemate(index, {
+                            dateType: event.target.value as "هجري" | "ميلادي",
+                            birthDate: "",
+                          })}
+                          className={styles.editInput}
+                        >
+                          <option value="ميلادي">ميلادي</option>
+                          <option value="هجري">هجري</option>
+                        </select>
+                      </div>
+                    </td>
+                    <td>
+                      <select
+                        value={housemate.gender || "ذكر"}
+                        onChange={(event) => updateHousemate(index, {
+                          gender: event.target.value as "ذكر" | "مؤنث",
+                        })}
+                        className={styles.editInput}
+                      >
+                        <option value="ذكر">ذكر</option>
+                        <option value="مؤنث">مؤنث</option>
+                      </select>
+                    </td>
                     <td style={{ position: 'relative' }}>
                       {editingField === `kinship-${index}` ? (
                         <input
@@ -2009,7 +2200,7 @@ const BeneficiaryDetailsPage = () => {
                       )}
                     </td>
                     <td style={{ position: 'relative' }}>
-                      {(['ابتدائي','متوسط','ثانوي'].includes(housemate.studyLevel ?? '')) ? (
+                      {!['ابتدائي','متوسط','ثانوي'].includes(housemate.studyLevel ?? '') ? (
                         <span className={styles.infoValue}>-</span>
                       ) : editingField === `studyGrade-${index}` ? (
                         <select
@@ -2034,8 +2225,8 @@ const BeneficiaryDetailsPage = () => {
                         </select>
                       ) : (
                         <span className={styles.infoValue}>
-                          {housemate.studyLevel === 'جامعي' ? '-' : (housemate.studyGrade || '-')}
-                          {housemate.studyLevel !== 'جامعي' && (
+                          {housemate.studyGrade || '-'}
+                          {['ابتدائي','متوسط','ثانوي'].includes(housemate.studyLevel ?? '') && (
                             <span
                               className={`edit-icon ${styles.editIcon}`}
                               onClick={() => setEditingField(`studyGrade-${index}`)}
@@ -2110,6 +2301,15 @@ const BeneficiaryDetailsPage = () => {
                         <span className={styles.infoValue}>-</span>
                       )}
                     </td>
+                    <td>
+                      <button
+                        type="button"
+                        className={styles.removeCompanionButton}
+                        onClick={() => removeHousemate(index)}
+                      >
+                        حذف
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -2159,11 +2359,30 @@ const BeneficiaryDetailsPage = () => {
             </table>
           </div>
         </div>
+        {hasEdits && (
+          <div className={styles.card}>
+            <div className={styles.actionButtons}>
+              <button
+                className={styles.saveButton}
+                onClick={handleSaveEdits}
+                disabled={reportLoading}
+              >
+                <span className={styles.buttonIcon}>💾</span>
+                <span className={styles.buttonText}>
+                  {reportLoading ? "جاري الحفظ..." : "حفظ تعديلات البيانات والمرفقات"}
+                </span>
+              </button>
+            </div>
+            {saveError && (
+              <div className={styles.errorMsg}>{saveError}</div>
+            )}
+          </div>
+        )}
         {/* كارت الإجراءات يظهر فقط إذا كان هناك إجراء متاح لهذا الدور */}
         {(
           (currentAdmin?.rule === 'reviewer' && fullReport?.status === 'under_review') ||
           (currentAdmin?.rule === 'committee' && fullReport?.status === 'under_committee') ||
-          (currentAdmin?.rule === 'manager')
+          (currentAdmin?.rule === 'manager' && fullReport?.status === 'under_manager')
         ) && (
           <div className={styles.card}>
             <div className={styles.cardHeader}>
@@ -2173,32 +2392,6 @@ const BeneficiaryDetailsPage = () => {
               </h3>
             </div>
             <div className={styles.actionButtons}>
-              {hasEdits && (
-                <button 
-                  className={styles.saveButton} 
-                  onClick={async () => await handleSaveEdits()}
-                  disabled={reportLoading}
-                >
-                  {reportLoading ? (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <div style={{ 
-                        width: '16px', 
-                        height: '16px', 
-                        border: '2px solid transparent', 
-                        borderTop: '2px solid white', 
-                        borderRadius: '50%', 
-                        animation: 'spin 1s linear infinite' 
-                      }}></div>
-                      جاري الحفظ...
-                    </div>
-                  ) : (
-                    <>
-                      <span className={styles.buttonIcon}>💾</span>
-                      <span className={styles.buttonText}>حفظ التعديلات</span>
-                    </>
-                  )}
-                </button>
-              )}
               {/* أزرار الإجراءات حسب الدور والحالة */}
               {currentAdmin?.rule === 'reviewer' && fullReport?.status === 'under_review' && (
                 <>
@@ -2228,7 +2421,7 @@ const BeneficiaryDetailsPage = () => {
                   </button>
                 </>
               )}
-              {currentAdmin?.rule === 'manager' && (
+              {currentAdmin?.rule === 'manager' && fullReport?.status === 'under_manager' && (
                 <>
                   <button className={styles.approveButton} style={{background:'#22c55e'}} onClick={() => {setConfirmAction('approve'); setShowConfirmPopup(true);}}>
                     <span className={styles.buttonIcon}>✔</span>
@@ -2241,9 +2434,26 @@ const BeneficiaryDetailsPage = () => {
                 </>
               )}
             </div>
-            {saveError && (
-              <div style={{ color: 'red', marginTop: 8, textAlign: 'center' }}>{saveError}</div>
-            )}
+          </div>
+        )}
+        {isFinalManagerDecision && (
+          <div className={styles.card}>
+            <div className={styles.finalDeleteSection}>
+              <p>
+                نتيجة الطلب النهائية:{" "}
+                <strong>
+                  {fullReport?.reportStatus === "accepted_manager" ? "اعتماد كلي" : "رفض كلي"}
+                </strong>
+              </p>
+              <button
+                type="button"
+                className={styles.finalDeleteButton}
+                onClick={() => setShowFinalDeletePopup(true)}
+                disabled={deleteLoading}
+              >
+                🗑️ حذف المستفيد كليًا
+              </button>
+            </div>
           </div>
         )}
         {/* {!printing && (
@@ -2302,6 +2512,37 @@ const BeneficiaryDetailsPage = () => {
                 نعم، حذف مؤقت
               </button>
               <button onClick={() => setShowTempDeletePopup(false)} className={styles.cancelButton}>
+                إلغاء
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {showFinalDeletePopup && (
+        <div className={styles.confirmPopupOverlay} onClick={() => setShowFinalDeletePopup(false)}>
+          <div className={styles.confirmPopupContent} onClick={(event) => event.stopPropagation()}>
+            <h3 className={styles.confirmPopupTitle}>تأكيد الحذف الكلي</h3>
+            <p className={styles.confirmPopupMessage}>
+              سيتم حذف بيانات المستفيد والتقرير وجميع مرفقاته نهائيًا. هل تريد المتابعة؟
+            </p>
+            {deleteBeneficiaryError && (
+              <div className={styles.errorMsg}>{deleteBeneficiaryError}</div>
+            )}
+            <div className={styles.confirmPopupButtons}>
+              <button
+                type="button"
+                className={`${styles.confirmButton} ${styles.confirmButtonReject}`}
+                onClick={confirmFinalDelete}
+                disabled={deleteLoading}
+              >
+                {deleteLoading ? "جاري الحذف..." : "نعم، حذف كلي"}
+              </button>
+              <button
+                type="button"
+                className={styles.cancelButton}
+                onClick={() => setShowFinalDeletePopup(false)}
+                disabled={deleteLoading}
+              >
                 إلغاء
               </button>
             </div>

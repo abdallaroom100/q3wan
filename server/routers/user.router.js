@@ -1,176 +1,176 @@
-import express from "express"
-import { protectRoute } from "../utils/protectedRoute.js"
-import { checkUpdatePassword, createAdmin, deleteUser, findUser, forgetPassword, getAllUsers, getCurrentUser, loginAdmin, loginUser, logOut, signUpUser, subscribe, testUpdate, updatePageProtected, updateUser } from "../controllers/user.controller.js"
-import multer from "multer" 
-import path from "path"
-import {dirname} from "path"
-import { fileURLToPath } from "url"
-import {v4 as uuidv4} from "uuid"
-import fs from "fs/promises";
-import { devMode } from "../index.js"
+  import express from "express"
+  import { protectRoute } from "../utils/protectedRoute.js"
+  import { checkUpdatePassword, createAdmin, deleteUser, findUser, forgetPassword, getAllUsers, getCurrentUser, loginAdmin, loginUser, logOut, signUpUser, subscribe, testUpdate, updatePageProtected, updateUser } from "../controllers/user.controller.js"
+  import multer from "multer" 
+  import path from "path"
+  import {dirname} from "path"
+  import { fileURLToPath } from "url"
+  import {v4 as uuidv4} from "uuid"
+  import fs from "fs/promises";
+  import { devMode } from "../index.js"
 
 
 
 
 
 
-const router = express.Router()
-//for using normal storage
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = dirname(__filename);
-// const baseUploadPath = path.join(__dirname, "../uploads");
+  const router = express.Router()
+  //for using normal storage
+  // const __filename = fileURLToPath(import.meta.url);
+  // const __dirname = dirname(__filename);
+  // const baseUploadPath = path.join(__dirname, "../uploads");
 
-/**
- * for using google drive storage
- * @returns 
- */
-let baseUploadPath ;
+  /**
+   * for using google drive storage
+   * @returns 
+   */
+  let baseUploadPath ;
 
-if(process.env.DEV_MODE == "true"){
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
- baseUploadPath = path.join(__dirname, "../uploads");
-} else {
-//  baseUploadPath = "/home/ec2-user/gdrive/uploads";
- baseUploadPath = "/home/ubuntu/gdrive/uploads";
-}
-console.log(baseUploadPath)
-// File filter to allow only images and PDFs
-const fileFilter = (req, file, cb) => {
-  // Check if req.user._id is available
-  if (!req?.userId) {
-    return cb(new Error("User ID is missing. Authentication required."), false);
-  }
-  const allowedTypes = ["image/jpeg", "image/png", "application/pdf"];
-  if (allowedTypes.includes(file.mimetype)) {
-    cb(null, true);
+  if(process.env.DEV_MODE == "true"){
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = dirname(__filename);
+  baseUploadPath = path.join(__dirname, "../uploads");
   } else {
-    cb(new Error("Only images (JPEG, PNG) and PDFs are allowed"), false);
+  //  baseUploadPath = "/home/ec2-user/gdrive/uploads";
+  baseUploadPath = "/home/ubuntu/gdrive/uploads";
   }
-};
+  console.log(baseUploadPath)
+  // File filter to allow only images and PDFs
+  const fileFilter = (req, file, cb) => {
+    // Check if req.user._id is available
+    if (!req?.userId) {
+      return cb(new Error("User ID is missing. Authentication required."), false);
+    }
+    const allowedTypes = ["image/jpeg", "image/png", "application/pdf"];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only images (JPEG, PNG) and PDFs are allowed"), false);
+    }
+  };
 
-// Multer storage configuration
-const storage = multer.diskStorage({
-  destination: async (req, file, cb) => {
-    const userId = req.userId.toString(); // Must be defined due to fileFilter
-    let subFolder = "";
+  // Multer storage configuration
+  const storage = multer.diskStorage({
+    destination: async (req, file, cb) => {
+      const userId = req.userId.toString(); // Must be defined due to fileFilter
+      let subFolder = "";
 
-    // Determine subfolder based on fieldname
-    if (file.fieldname === "idImagePath") {
-      subFolder = "identity";
-    } else if (file.fieldname === "familyCardFile") {
-      subFolder = "familyCard";
-    } else if (file.fieldname === "ibanImage") {
-      subFolder = "iban";
-    } else if (file.fieldname === "rentContractFile") {
-      subFolder = "rent";
-    } else if (file.fieldname.startsWith("incomeSources[")) {
-      subFolder = "incomeSources";
-      const match = file.fieldname.match(/incomeSources\[(\d+)\]\[sourceImage\]/);
-      if (match) {
-        const index = parseInt(match[1]);
-        let incomeSourcesArr = [];
-        if (typeof req.body.incomeSources === 'string') {
-          try {
-            incomeSourcesArr = JSON.parse(req.body.incomeSources);
-          } catch (e) {
-            incomeSourcesArr = [];
-          }
-        } else if (typeof req.body.incomeSources === 'object' && req.body.incomeSources !== null) {
-          // جرب تقرأ من المفتاح الفاضي
-          if (req.body.incomeSources['']) {
+      // Determine subfolder based on fieldname
+      if (file.fieldname === "idImagePath") {
+        subFolder = "identity";
+      } else if (file.fieldname === "familyCardFile") {
+        subFolder = "familyCard";
+      } else if (file.fieldname === "ibanImage") {
+        subFolder = "iban";
+      } else if (file.fieldname === "rentContractFile") {
+        subFolder = "rent";
+      } else if (file.fieldname.startsWith("incomeSources[")) {
+        subFolder = "incomeSources";
+        const match = file.fieldname.match(/incomeSources\[(\d+)\]\[sourceImage\]/);
+        if (match) {
+          const index = parseInt(match[1]);
+          let incomeSourcesArr = [];
+          if (typeof req.body.incomeSources === 'string') {
             try {
-              incomeSourcesArr = JSON.parse(req.body.incomeSources['']);
+              incomeSourcesArr = JSON.parse(req.body.incomeSources);
             } catch (e) {
               incomeSourcesArr = [];
             }
-          } else {
-            incomeSourcesArr = Object.values(req.body.incomeSources);
+          } else if (typeof req.body.incomeSources === 'object' && req.body.incomeSources !== null) {
+            // جرب تقرأ من المفتاح الفاضي
+            if (req.body.incomeSources['']) {
+              try {
+                incomeSourcesArr = JSON.parse(req.body.incomeSources['']);
+              } catch (e) {
+                incomeSourcesArr = [];
+              }
+            } else {
+              incomeSourcesArr = Object.values(req.body.incomeSources);
+            }
           }
+          const sourceType = incomeSourcesArr[index]?.sourceType;
+          console.log('incomeSourcesArr:', incomeSourcesArr);
+          console.log('index:', index, 'sourceType:', sourceType);
+          subFolder = path.join(subFolder, sourceType || "unknownSource");
         }
-        const sourceType = incomeSourcesArr[index]?.sourceType;
-        console.log('incomeSourcesArr:', incomeSourcesArr);
-        console.log('index:', index, 'sourceType:', sourceType);
-        subFolder = path.join(subFolder, sourceType || "unknownSource");
       }
-    }
 
-    const destination = path.join(baseUploadPath, userId, subFolder);
+      const destination = path.join(baseUploadPath, userId, subFolder);
 
-    try {
-      // Create directory if it doesn't exist
-      await fs.mkdir(destination, { recursive: true });
-      // Delete existing files in the folder to ensure only one file
-      const existingFiles = await fs.readdir(destination);
-      for (const existingFile of existingFiles) {
-        await fs.unlink(path.join(destination, existingFile));
+      try {
+        // Create directory if it doesn't exist
+        await fs.mkdir(destination, { recursive: true });
+        // Delete existing files in the folder to ensure only one file
+        const existingFiles = await fs.readdir(destination);
+        for (const existingFile of existingFiles) {
+          await fs.unlink(path.join(destination, existingFile));
+        }
+        cb(null, destination);
+      } catch (error) {
+        cb(error, null);
       }
-      cb(null, destination);
-    } catch (error) {
-      cb(error, null);
-    }
-  },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, `${uuidv4()}${ext}`);
-  },
-});
+    },
+    filename: (req, file, cb) => {
+      const ext = path.extname(file.originalname);
+      cb(null, `${uuidv4()}${ext}`);
+    },
+  });
 
-// Multer middleware
-const upload = multer({
-  storage,
-  fileFilter,
-  limits: { fileSize: 200 * 1024 * 1024 } // 200MB, // 50MB limit
-}).fields([
-  { name: "idImagePath", maxCount: 1 },
-  { name: "familyCardFile", maxCount: 1 },
-  { name: "ibanImage", maxCount: 1 },
-  { name: "rentContractFile", maxCount: 1 },
-  { name: "incomeSources[0][sourceImage]", maxCount: 1 },
-  { name: "incomeSources[1][sourceImage]", maxCount: 1 },
-  { name: "incomeSources[2][sourceImage]", maxCount: 1 },
-  { name: "incomeSources[3][sourceImage]", maxCount: 1 },
-]);
+  // Multer middleware
+  const upload = multer({
+    storage,
+    fileFilter,
+    limits: { fileSize: 200 * 1024 * 1024 } // 200MB, // 50MB limit
+  }).fields([
+    { name: "idImagePath", maxCount: 1 },
+    { name: "familyCardFile", maxCount: 1 },
+    { name: "ibanImage", maxCount: 1 },
+    { name: "rentContractFile", maxCount: 1 },
+    { name: "incomeSources[0][sourceImage]", maxCount: 1 },
+    { name: "incomeSources[1][sourceImage]", maxCount: 1 },
+    { name: "incomeSources[2][sourceImage]", maxCount: 1 },
+    { name: "incomeSources[3][sourceImage]", maxCount: 1 },
+  ]);
 
-router.patch("/testupdate",protectRoute,upload,testUpdate)
+  router.patch("/testupdate",protectRoute,upload,testUpdate)
 
-router.post("/signup",signUpUser)
-router.post("/login",loginUser)
+  router.post("/signup",signUpUser)
+  router.post("/login",loginUser)
 
-router.post("/createAdmin",createAdmin)
-router.post("/loginAdmin",loginAdmin)
-router.post("/subscribe/:id",protectRoute,subscribe)
-router.get("/",getAllUsers)
-router.get("/me",protectRoute,getCurrentUser)
-router.get("/find/:userId",findUser)
+  router.post("/createAdmin",createAdmin)
+  router.post("/loginAdmin",loginAdmin)
+  router.post("/subscribe/:id",protectRoute,subscribe)
+  router.get("/",getAllUsers)
+  router.get("/me",protectRoute,getCurrentUser)
+  router.get("/find/:userId",findUser)
 
-
- 
-
- 
-router.post("/forgetPassword",forgetPassword)
-router.post('/updatePassword',checkUpdatePassword)
-router.post('/updateprotect',updatePageProtected)
-
-
-
-router.post("/forget",forgetPassword)
-router.post("/checkforget",updatePageProtected)
-router.post("/updatePassword",checkUpdatePassword)
-
-
-
-
-router.delete("/delete/:userId",protectRoute,deleteUser)
-
-router.post("/logout",protectRoute,logOut)
-
-export default router
 
   
-   
+
+  
+  router.post("/forgetPassword",forgetPassword)
+  router.post('/updatePassword',checkUpdatePassword)
+  router.post('/updateprotect',updatePageProtected)
+
+
+
+  router.post("/forget",forgetPassword)
+  router.post("/checkforget",updatePageProtected)
+  router.post("/updatePassword",checkUpdatePassword)
 
 
 
 
-// router.get("/me",protectRoute,getCurrentUser)
+  router.delete("/delete/:userId",protectRoute,deleteUser)
+
+  router.post("/logout",protectRoute,logOut)
+
+  export default router
+
+    
+    
+
+
+
+
+  // router.get("/me",protectRoute,getCurrentUser)
