@@ -876,7 +876,7 @@
 
 .attachmentsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
   gap: 16px;
   padding: 20px;
 }
@@ -925,6 +925,7 @@
   background: #dc2626;
   color: #fff;
   padding: 7px 10px;
+  min-width: 120px;
   cursor: pointer;
   font-weight: 600;
 }
