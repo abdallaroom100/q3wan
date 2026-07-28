@@ -9,15 +9,16 @@ const NewsSection = () => (
       <div className={styles.cards} style={{direction:"rtl"}}>
         {[
           {
-            img: "/img/saif.jpeg",
-            title: "بالأرقام حصاد وإنجازات" ,
-            text: "نضع بين أيديكم ثمار العطاء",
+            img: "/img/aytam.jpg",
+            title:"بفضل الله ثم بدعمكم تم تحويل مبلغ كفالة الايتام لشهر يوليو 2026م",
+            // text: "ضاعف الله أجر كل من أنفق وبذل",
           },
           {
-            img: "/img/ramadan.jpeg",
-            title: "تم توزيع السلال الغذائية",
-            text: "لشهر  رمضان ١٤٤٧هـ",
-          },
+            img: "/img/salla.jpg",
+            // title: "تم توزيع السلال الغذائية",
+            title: "مشروع الحقيبة المدرسية لنرتقي بأيتامنا في سلم العلم",
+            // text: "لشهر  رمضان ١٤٤٧هـ",
+          }, 
           {
             img: "/img/nama.jpeg",
             title:"دعمكم نماء وعطاء وصدقة وصله",
@@ -25,7 +26,7 @@ const NewsSection = () => (
           },
         ].map(({ img, title, text }, i) => (
           <div className={styles.card} key={i}>
-            <span className={styles.badge}>{i == 1  ? "جديدنا" : "جديد"}</span>
+            <span className={styles.badge}>{i == 1  ? "جديدنا" : "جديدنا"}</span>
             <img style={{objectFit: i == 0  ?'fill':"unset"}} className={styles.cardImg} src={img} alt={`خبر ${i + 1}`}  />
             <div className={styles.cardContent}>
               <h2 className={styles.cardTitle + ' ' + styles.centerCardTitle}>{title}</h2>
