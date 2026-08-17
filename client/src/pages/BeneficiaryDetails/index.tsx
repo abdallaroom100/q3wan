@@ -370,6 +370,16 @@ const BeneficiaryDetailsPage = () => {
     });
   };
 
+  const updateIncomeSourceAmount = (index: number, sourceAmount: string) => {
+    if (!editedBeneficiary) return;
+    setEditedBeneficiary({
+      ...editedBeneficiary,
+      incomeSources: editedBeneficiary.incomeSources.map((source, sourceIndex) =>
+        sourceIndex === index ? { ...source, sourceAmount } : source
+      ),
+    });
+  };
+
   const addHousemate = () => {
     if (!editedBeneficiary) return;
     setEditedBeneficiary({
@@ -420,6 +430,7 @@ const BeneficiaryDetailsPage = () => {
       field => JSON.stringify(beneficiary[field]) !== JSON.stringify(editedBeneficiary[field])
     ) ||
     JSON.stringify(beneficiary.housemates) !== JSON.stringify(editedBeneficiary.housemates) ||
+    JSON.stringify(beneficiary.incomeSources) !== JSON.stringify(editedBeneficiary.incomeSources) ||
     Object.keys(selectedAttachments).length > 0
   );
 
@@ -461,6 +472,13 @@ const BeneficiaryDetailsPage = () => {
     if (!editedBeneficiary.district) return 'الحي مطلوب.';
     if (beneficiary?.housingType === 'إيجار' && !editedBeneficiary.rentAmount) return 'مبلغ الإيجار مطلوب.';
     if (!saudiBanks.includes(editedBeneficiary.bankName || '')) return 'يرجى اختيار اسم البنك من القائمة.';
+    for (let i = 0; i < editedBeneficiary.incomeSources.length; i++) {
+      const source = editedBeneficiary.incomeSources[i];
+      const amount = Number(source.sourceAmount);
+      if (!String(source.sourceAmount).trim() || !Number.isFinite(amount) || amount <= 0) {
+        return `مبلغ مصدر الدخل (${source.sourceType}) يجب أن يكون رقمًا أكبر من صفر.`;
+      }
+    }
     // فحص بيانات المرافقين
     for (let i = 0; i < editedBeneficiary.housemates.length; i++) {
       const h = editedBeneficiary.housemates[i];
@@ -2322,6 +2340,7 @@ const BeneficiaryDetailsPage = () => {
               <span className={styles.cardIcon}>💰</span>
               مصادر الدخل
             </h3>
+            <p className={styles.cardHint}>استخدم علامة التعديل بجوار المبلغ، ثم احفظ التغييرات من الزر أسفل الجدول.</p>
           </div>
           <div className={styles.tableContainer}>
             <table className={styles.table}>
@@ -2334,11 +2353,51 @@ const BeneficiaryDetailsPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {beneficiary.incomeSources.map((source, index) => (
-                  <tr key={index}>
+                {editedBeneficiary?.incomeSources.map((source, index) => (
+                  <tr key={`${source.sourceType}-${index}`}>
                     <td>{index + 1}</td>
                     <td>{source.sourceType}</td>
-                    <td>{source.sourceAmount} ريال</td>
+                    <td>
+                      <div className={styles.incomeAmountEditor}>
+                        {editingField === `incomeAmount-${index}` ? (
+                          <>
+                            <input
+                              type="number"
+                              min="0.01"
+                              step="0.01"
+                              inputMode="decimal"
+                              value={source.sourceAmount}
+                              autoFocus
+                              onChange={(event) => updateIncomeSourceAmount(index, event.target.value)}
+                              onBlur={() => setEditingField(null)}
+                              onKeyDown={(event) => {
+                                if (event.key === 'Enter' || event.key === 'Escape') {
+                                  setEditingField(null);
+                                }
+                              }}
+                              className={styles.incomeAmountInput}
+                              aria-label={`مبلغ مصدر الدخل: ${source.sourceType}`}
+                            />
+                            <span className={styles.incomeCurrency}>ريال</span>
+                          </>
+                        ) : (
+                          <>
+                            <span className={styles.incomeAmountValue}>
+                              {source.sourceAmount} ريال
+                            </span>
+                            <button
+                              type="button"
+                              className={styles.incomeEditButton}
+                              onClick={() => setEditingField(`incomeAmount-${index}`)}
+                              aria-label={`تعديل مبلغ مصدر الدخل: ${source.sourceType}`}
+                              title="تعديل المبلغ"
+                            >
+                              <span aria-hidden="true">✏️</span>
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </td>
                     <td>
                       {source.sourceImage ? (
                         <button

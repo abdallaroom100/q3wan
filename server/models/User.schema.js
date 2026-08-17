@@ -137,7 +137,7 @@ const incomeSourceSchema = new mongoose.Schema({
   sourceAmount:{
     type:Number,
     required:true,
-   
+    min: [0.01, "مبلغ مصدر الدخل يجب أن يكون أكبر من صفر"],
   },
   sourceImage:{
     type:String,

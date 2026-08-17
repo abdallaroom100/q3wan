@@ -946,6 +946,88 @@
   min-width: 160px;
 }
 
+.cardHint {
+  margin: 0.45rem 0 0;
+  color: #6b7280;
+  font-size: 0.82rem;
+}
+
+.incomeAmountEditor {
+  display: inline-flex;
+  min-width: 12rem;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.incomeAmountValue {
+  color: #26265c;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.incomeEditButton {
+  display: inline-grid;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  place-items: center;
+  color: #3a3d6c;
+  background: rgba(58, 61, 108, 0.09);
+  border: 1px solid rgba(58, 61, 108, 0.18);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateX(-0.25rem);
+  transition: opacity 160ms ease, transform 160ms ease, background-color 160ms ease;
+}
+
+.incomeAmountEditor:hover .incomeEditButton,
+.incomeAmountEditor:focus-within .incomeEditButton {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.incomeEditButton:hover {
+  background: rgba(58, 61, 108, 0.16);
+}
+
+.incomeEditButton:focus-visible {
+  opacity: 1;
+  outline: 3px solid rgba(58, 61, 108, 0.22);
+  outline-offset: 2px;
+  transform: translateX(0);
+}
+
+.incomeAmountInput {
+  width: 8.5rem;
+  min-height: 2.65rem;
+  padding: 0.45rem 0.75rem;
+  color: #26265c;
+  background: #fff;
+  border: 1px solid #c7cadc;
+  border-radius: 0.55rem;
+  font-weight: 700;
+  text-align: right;
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.incomeAmountInput:hover {
+  border-color: #77799f;
+}
+
+.incomeAmountInput:focus-visible {
+  outline: none;
+  border-color: #3a3d6c;
+  box-shadow: 0 0 0 3px rgba(58, 61, 108, 0.16);
+}
+
+.incomeCurrency {
+  color: #52566f;
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 @media (max-width: 767px) {
   .attachmentsGrid {
     grid-template-columns: 1fr;
@@ -955,5 +1037,20 @@
   .addCompanionButton {
     width: 100%;
     margin-top: 10px;
+  }
+
+  .incomeAmountEditor {
+    min-width: 9.5rem;
+  }
+
+  .incomeAmountInput {
+    width: 6.5rem;
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .incomeEditButton {
+    opacity: 1;
+    transform: none;
   }
 }

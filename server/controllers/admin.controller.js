@@ -66,6 +66,34 @@ const validateAdminCompanions = (companions) => {
   return null;
 };
 
+const normalizeAdminIncomeSources = (incomeSources, existingIncomeSources) => {
+  if (incomeSources.length !== existingIncomeSources.length) {
+    throw new Error("لا يمكن تغيير عدد مصادر الدخل من لوحة التحكم");
+  }
+
+  return existingIncomeSources.map((existingSource, index) => {
+    const incomingSource = incomeSources[index];
+    const currentSource = existingSource.toObject
+      ? existingSource.toObject()
+      : existingSource;
+
+    if (!incomingSource || incomingSource.sourceType !== currentSource.sourceType) {
+      throw new Error(`نوع مصدر الدخل رقم ${index + 1} غير صالح`);
+    }
+
+    const sourceAmount = Number(incomingSource.sourceAmount);
+    if (!Number.isFinite(sourceAmount) || sourceAmount <= 0) {
+      throw new Error(`مبلغ مصدر الدخل رقم ${index + 1} يجب أن يكون رقمًا أكبر من صفر`);
+    }
+
+    return {
+      sourceType: currentSource.sourceType,
+      sourceAmount,
+      sourceImage: currentSource.sourceImage,
+    };
+  });
+};
+
 // دالة لحساب العمر من تاريخ الميلاد (ميلادي أو هجري)
 function calculateAge(birthDate, dateType) {
   if (!birthDate || !dateType) return '';
@@ -582,6 +610,19 @@ export const editBeneficiaryData = async (req, res) => {
       return res.status(404).json({ error: "المستفيد غير موجود" });
     }
 
+    let normalizedIncomeSources = null;
+    if (incomeSources) {
+      try {
+        normalizedIncomeSources = normalizeAdminIncomeSources(
+          incomeSources,
+          reportOwner.incomeSources || [],
+        );
+      } catch (error) {
+        await removeUploadedFiles(req.files);
+        return res.status(400).json({ error: error.message });
+      }
+    }
+
     reportOwner.firstName = firstName;
     reportOwner.secondName = secondName;
     reportOwner.thirdName = thirdName;
@@ -623,8 +664,8 @@ export const editBeneficiaryData = async (req, res) => {
         `${req.protocol}://${req.get("host")}/uploads/${req.beneficiaryUserId}/${folderName}/${uploadedFile.filename}`;
     }
 
-    if (incomeSources) {
-      reportOwner.incomeSources = incomeSources.map((source, index) => {
+    if (normalizedIncomeSources) {
+      reportOwner.incomeSources = normalizedIncomeSources.map((source, index) => {
         const uploadedFile = files[`incomeSources[${index}][sourceImage]`]?.[0];
         if (!uploadedFile) return source;
         return {
