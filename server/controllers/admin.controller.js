@@ -101,8 +101,8 @@ const validateAdminCompanions = (companions) => {
 };
 
 const normalizeAdminIncomeSources = (incomeSources, existingIncomeSources, files) => {
-  if (incomeSources.length < 1 || incomeSources.length > allowedIncomeSourceTypes.length) {
-    throw new Error("يجب أن يحتوي المستفيد على مصدر دخل واحد على الأقل وبحد أقصى أربعة مصادر");
+  if (incomeSources.length > allowedIncomeSourceTypes.length) {
+    throw new Error("لا يمكن إضافة أكثر من أربعة مصادر دخل");
   }
 
   const existingById = new Map(

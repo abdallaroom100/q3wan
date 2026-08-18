@@ -419,10 +419,6 @@ const BeneficiaryDetailsPage = () => {
 
   const removeIncomeSource = (index: number) => {
     if (!editedBeneficiary) return;
-    if (editedBeneficiary.incomeSources.length <= 1) {
-      hotToast({ type: "error", message: "يجب الإبقاء على مصدر دخل واحد على الأقل" });
-      return;
-    }
     const sourceKey = getIncomeSourceKey(editedBeneficiary.incomeSources[index], index);
     setEditedBeneficiary({
       ...editedBeneficiary,
@@ -538,7 +534,6 @@ const BeneficiaryDetailsPage = () => {
     if (!editedBeneficiary.district) return 'الحي مطلوب.';
     if (beneficiary?.housingType === 'إيجار' && !editedBeneficiary.rentAmount) return 'مبلغ الإيجار مطلوب.';
     if (!saudiBanks.includes(editedBeneficiary.bankName || '')) return 'يرجى اختيار اسم البنك من القائمة.';
-    if (editedBeneficiary.incomeSources.length < 1) return 'يجب إضافة مصدر دخل واحد على الأقل.';
     const usedIncomeTypes = new Set<string>();
     for (let i = 0; i < editedBeneficiary.incomeSources.length; i++) {
       const source = editedBeneficiary.incomeSources[i];
@@ -2432,6 +2427,13 @@ const BeneficiaryDetailsPage = () => {
                 </tr>
               </thead>
               <tbody>
+                {editedBeneficiary?.incomeSources.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className={styles.emptyIncomeSources}>
+                      لا توجد مصادر دخل مسجلة. يمكن إضافة مصدر من القائمة أعلاه عند الحاجة.
+                    </td>
+                  </tr>
+                )}
                 {editedBeneficiary?.incomeSources.map((source, index) => {
                   const sourceKey = getIncomeSourceKey(source, index);
                   const selectedFile = incomeSourceFiles[sourceKey];
@@ -2558,8 +2560,7 @@ const BeneficiaryDetailsPage = () => {
                         type="button"
                         className={styles.removeIncomeButton}
                         onClick={() => removeIncomeSource(index)}
-                        disabled={editedBeneficiary.incomeSources.length <= 1}
-                        title={editedBeneficiary.incomeSources.length <= 1 ? "يجب الإبقاء على مصدر واحد" : "حذف المصدر"}
+                        title="حذف المصدر"
                         aria-label={`حذف مصدر الدخل: ${source.sourceType}`}
                       >
                         حذف

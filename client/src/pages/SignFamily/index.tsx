@@ -1012,7 +1012,7 @@ const SignFamily = ({
             )}
             <div className={styles.inputGroup} style={{ gridColumn: 'span 3' }}>
               <label style={{ fontWeight: 'bold', fontSize: 17, color: '#2c5282', marginBottom: 10, display: 'block' }}>
-                اختر مصادر الدخل السنوية
+                اختر مصادر الدخل السنوية (اختياري)
               </label>
               <div className={styles.incomeSourcesRow} style={{ marginBottom: '20px' }}>
                 {incomeOptions.map((opt) => {

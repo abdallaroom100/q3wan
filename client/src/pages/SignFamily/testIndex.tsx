@@ -196,7 +196,6 @@ function validateStep2(formData: UserData, incomeSources: IncomeSource[]) {
     if (!formData.rentContractFile && !userRentImage) return { valid: false, message: 'يرجى إرفاق صورة عقد الإيجار' };
   }
   // مصادر الدخل
-  if (!incomeSources || incomeSources.length === 0) return { valid: false, message: 'يرجى اختيار مصدر دخل واحد على الأقل' };
   for (let i = 0; i < incomeSources.length; i++) {
     const src = incomeSources[i];
     if (!src.sourceAmount) return { valid: false, message: `يرجى ملء مبلغ الدخل لمصدر الدخل (${src.sourceType})` };
@@ -1569,7 +1568,7 @@ const SignFamily = () => {
                 marginBottom: isMobile ? '8px' : '10px', 
                 display: 'block' 
               }}>
-                اختر مصادر الدخل السنوية
+                اختر مصادر الدخل السنوية (اختياري)
               </label>
               <div className={styles.incomeSourcesRow} style={{ 
                 marginBottom: isMobile ? '16px' : '20px',
