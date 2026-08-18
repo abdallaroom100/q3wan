@@ -10,6 +10,15 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 const controllerDirectory = path.dirname(fileURLToPath(import.meta.url));
+const adminUploadRoot = process.env.DEV_MODE === "true"
+  ? path.join(controllerDirectory, "../uploads")
+  : "/home/ubuntu/gdrive/uploads";
+const allowedIncomeSourceTypes = [
+  "راتب عادي",
+  "راتب تقاعدي",
+  "ضمان اجتماعي",
+  "حساب مواطن",
+];
 
 const removeUploadedFiles = async (files) => {
   if (!files) return;
@@ -24,6 +33,31 @@ const removeUploadedFiles = async (files) => {
       }
     }),
   );
+};
+
+const removeStoredIncomeFiles = async (fileUrls, beneficiaryUserId) => {
+  const beneficiaryRoot = path.resolve(adminUploadRoot, String(beneficiaryUserId));
+  await Promise.all(fileUrls.map(async (fileUrl) => {
+    if (!fileUrl) return;
+    try {
+      const pathname = new URL(fileUrl).pathname;
+      const uploadsMarker = "/uploads/";
+      const markerIndex = pathname.indexOf(uploadsMarker);
+      if (markerIndex === -1) return;
+      const relativeParts = pathname
+        .slice(markerIndex + uploadsMarker.length)
+        .split("/")
+        .filter(Boolean)
+        .map((part) => decodeURIComponent(part));
+      const storedPath = path.resolve(adminUploadRoot, ...relativeParts);
+      if (!storedPath.startsWith(`${beneficiaryRoot}${path.sep}`)) return;
+      await fs.promises.unlink(storedPath);
+    } catch (error) {
+      if (error.code !== "ENOENT") {
+        console.error(`Failed to remove stored income file ${fileUrl}:`, error);
+      }
+    }
+  }));
 };
 
 const parseJsonArray = (value, fieldName) => {
@@ -66,30 +100,49 @@ const validateAdminCompanions = (companions) => {
   return null;
 };
 
-const normalizeAdminIncomeSources = (incomeSources, existingIncomeSources) => {
-  if (incomeSources.length !== existingIncomeSources.length) {
-    throw new Error("لا يمكن تغيير عدد مصادر الدخل من لوحة التحكم");
+const normalizeAdminIncomeSources = (incomeSources, existingIncomeSources, files) => {
+  if (incomeSources.length < 1 || incomeSources.length > allowedIncomeSourceTypes.length) {
+    throw new Error("يجب أن يحتوي المستفيد على مصدر دخل واحد على الأقل وبحد أقصى أربعة مصادر");
   }
 
-  return existingIncomeSources.map((existingSource, index) => {
-    const incomingSource = incomeSources[index];
-    const currentSource = existingSource.toObject
-      ? existingSource.toObject()
-      : existingSource;
+  const existingById = new Map(
+    existingIncomeSources.map((source) => [String(source._id), source]),
+  );
+  const usedIds = new Set();
+  const usedTypes = new Set();
 
-    if (!incomingSource || incomingSource.sourceType !== currentSource.sourceType) {
+  return incomeSources.map((incomingSource, index) => {
+    const sourceType = String(incomingSource?.sourceType || "").trim();
+    if (!allowedIncomeSourceTypes.includes(sourceType)) {
       throw new Error(`نوع مصدر الدخل رقم ${index + 1} غير صالح`);
     }
+    if (usedTypes.has(sourceType)) {
+      throw new Error(`لا يمكن تكرار مصدر الدخل (${sourceType})`);
+    }
+    usedTypes.add(sourceType);
 
     const sourceAmount = Number(incomingSource.sourceAmount);
     if (!Number.isFinite(sourceAmount) || sourceAmount <= 0) {
       throw new Error(`مبلغ مصدر الدخل رقم ${index + 1} يجب أن يكون رقمًا أكبر من صفر`);
     }
 
+    const sourceId = incomingSource._id ? String(incomingSource._id) : null;
+    const existingSource = sourceId ? existingById.get(sourceId) : null;
+    if (sourceId && (!existingSource || usedIds.has(sourceId))) {
+      throw new Error(`معرف مصدر الدخل رقم ${index + 1} غير صالح`);
+    }
+    if (sourceId) usedIds.add(sourceId);
+
+    const uploadedFile = files[`incomeSources[${index}][sourceImage]`]?.[0];
+    if (!existingSource?.sourceImage && !uploadedFile) {
+      throw new Error(`صورة مصدر الدخل (${sourceType}) مطلوبة`);
+    }
+
     return {
-      sourceType: currentSource.sourceType,
+      ...(existingSource ? { _id: existingSource._id } : {}),
+      sourceType,
       sourceAmount,
-      sourceImage: currentSource.sourceImage,
+      sourceImage: existingSource?.sourceImage || "",
     };
   });
 };
@@ -610,12 +663,14 @@ export const editBeneficiaryData = async (req, res) => {
       return res.status(404).json({ error: "المستفيد غير موجود" });
     }
 
+    const files = req.files || {};
     let normalizedIncomeSources = null;
     if (incomeSources) {
       try {
         normalizedIncomeSources = normalizeAdminIncomeSources(
           incomeSources,
           reportOwner.incomeSources || [],
+          files,
         );
       } catch (error) {
         await removeUploadedFiles(req.files);
@@ -649,7 +704,6 @@ export const editBeneficiaryData = async (req, res) => {
     reportOwner.numberOfFemales =
       housemates.length - reportOwner.numberOfMales;
 
-    const files = req.files || {};
     const primaryAttachments = [
       ["idImagePath", "idImagePath"],
       ["familyCardFile", "familyCardFile"],
@@ -664,7 +718,11 @@ export const editBeneficiaryData = async (req, res) => {
         `${req.protocol}://${req.get("host")}/uploads/${req.beneficiaryUserId}/${folderName}/${uploadedFile.filename}`;
     }
 
+    let obsoleteIncomeImages = [];
     if (normalizedIncomeSources) {
+      const previousIncomeImages = (reportOwner.incomeSources || [])
+        .map((source) => source.sourceImage)
+        .filter(Boolean);
       reportOwner.incomeSources = normalizedIncomeSources.map((source, index) => {
         const uploadedFile = files[`incomeSources[${index}][sourceImage]`]?.[0];
         if (!uploadedFile) return source;
@@ -674,9 +732,16 @@ export const editBeneficiaryData = async (req, res) => {
             `${req.protocol}://${req.get("host")}/uploads/${req.beneficiaryUserId}/incomeSources/source-${index}/${uploadedFile.filename}`,
         };
       });
+      const retainedIncomeImages = new Set(
+        reportOwner.incomeSources.map((source) => source.sourceImage).filter(Boolean),
+      );
+      obsoleteIncomeImages = previousIncomeImages.filter(
+        (imageUrl) => !retainedIncomeImages.has(imageUrl),
+      );
     }
 
     await reportOwner.save();
+    await removeStoredIncomeFiles(obsoleteIncomeImages, req.beneficiaryUserId);
     return res.status(200).json({
       success: true,
       message: "تم تحديث البيانات بنجاح",

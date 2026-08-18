@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import styles from "./BeneficiaryDetails.module.css";
-import { Beneficiary, RequestHistory } from "../Dashboard/types";
+import { Beneficiary, IncomeSource } from "../Dashboard/types";
 import { useGetCurrentReportData } from "../Dashboard/hooks/useGetCurrentReportData";
 import { MoonLoader } from "react-spinners";
 import Select from 'react-select';
@@ -25,6 +25,16 @@ type StudyLevel =
   | "جامعي"
   | "متخرج"
   | "غير متعلم";
+
+const incomeSourceTypes = [
+  "راتب عادي",
+  "راتب تقاعدي",
+  "ضمان اجتماعي",
+  "حساب مواطن",
+] as const;
+
+const getIncomeSourceKey = (source: IncomeSource, index: number) =>
+  source._id || source.clientId || `income-source-${index}`;
 
 const useIsMobile = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -53,6 +63,7 @@ const BeneficiaryDetailsPage = () => {
   const [approveComment, setApproveComment] = useState('');
   const [rejectComment, setRejectComment] = useState('');
   const [selectedAttachments, setSelectedAttachments] = useState<Record<string, File>>({});
+  const [incomeSourceFiles, setIncomeSourceFiles] = useState<Record<string, File>>({});
   
   // جميع hooks يجب أن تكون في أعلى الكومبوننت
   const {confirmCurrentReport,confirmLoading,isConfirmed} = useConfirmCurrentReport()
@@ -270,6 +281,8 @@ const BeneficiaryDetailsPage = () => {
         dateType: h.dateType || "ميلادي",
       })),
       incomeSources: (data.incomeSources || []).map((s: any) => ({
+        _id: s._id?.toString(),
+        clientId: s._id?.toString(),
         sourceType: s.sourceType || "",
         sourceAmount: s.sourceAmount?.toString() || "",
         sourceImage: s.sourceImage || null,
@@ -380,6 +393,58 @@ const BeneficiaryDetailsPage = () => {
     });
   };
 
+  const updateIncomeSourceType = (index: number, sourceType: string) => {
+    if (!editedBeneficiary) return;
+    setEditedBeneficiary({
+      ...editedBeneficiary,
+      incomeSources: editedBeneficiary.incomeSources.map((source, sourceIndex) =>
+        sourceIndex === index ? { ...source, sourceType } : source
+      ),
+    });
+  };
+
+  const addIncomeSource = (sourceType: string) => {
+    if (!editedBeneficiary || !sourceType) return;
+    if (editedBeneficiary.incomeSources.some((source) => source.sourceType === sourceType)) return;
+    const clientId = `new-income-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    setEditedBeneficiary({
+      ...editedBeneficiary,
+      incomeSources: [
+        ...editedBeneficiary.incomeSources,
+        { clientId, sourceType, sourceAmount: "", sourceImage: null },
+      ],
+    });
+    setEditingField(`incomeAmount-${clientId}`);
+  };
+
+  const removeIncomeSource = (index: number) => {
+    if (!editedBeneficiary) return;
+    if (editedBeneficiary.incomeSources.length <= 1) {
+      hotToast({ type: "error", message: "يجب الإبقاء على مصدر دخل واحد على الأقل" });
+      return;
+    }
+    const sourceKey = getIncomeSourceKey(editedBeneficiary.incomeSources[index], index);
+    setEditedBeneficiary({
+      ...editedBeneficiary,
+      incomeSources: editedBeneficiary.incomeSources.filter((_, sourceIndex) => sourceIndex !== index),
+    });
+    setIncomeSourceFiles((current) => {
+      const next = { ...current };
+      delete next[sourceKey];
+      return next;
+    });
+    setEditingField(null);
+  };
+
+  const selectIncomeSourceFile = (sourceKey: string, file?: File) => {
+    setIncomeSourceFiles((current) => {
+      const next = { ...current };
+      if (file) next[sourceKey] = file;
+      else delete next[sourceKey];
+      return next;
+    });
+  };
+
   const addHousemate = () => {
     if (!editedBeneficiary) return;
     setEditedBeneficiary({
@@ -431,7 +496,8 @@ const BeneficiaryDetailsPage = () => {
     ) ||
     JSON.stringify(beneficiary.housemates) !== JSON.stringify(editedBeneficiary.housemates) ||
     JSON.stringify(beneficiary.incomeSources) !== JSON.stringify(editedBeneficiary.incomeSources) ||
-    Object.keys(selectedAttachments).length > 0
+    Object.keys(selectedAttachments).length > 0 ||
+    Object.keys(incomeSourceFiles).length > 0
   );
 
   const saudiBanks = [
@@ -472,11 +538,24 @@ const BeneficiaryDetailsPage = () => {
     if (!editedBeneficiary.district) return 'الحي مطلوب.';
     if (beneficiary?.housingType === 'إيجار' && !editedBeneficiary.rentAmount) return 'مبلغ الإيجار مطلوب.';
     if (!saudiBanks.includes(editedBeneficiary.bankName || '')) return 'يرجى اختيار اسم البنك من القائمة.';
+    if (editedBeneficiary.incomeSources.length < 1) return 'يجب إضافة مصدر دخل واحد على الأقل.';
+    const usedIncomeTypes = new Set<string>();
     for (let i = 0; i < editedBeneficiary.incomeSources.length; i++) {
       const source = editedBeneficiary.incomeSources[i];
+      if (!incomeSourceTypes.includes(source.sourceType as typeof incomeSourceTypes[number])) {
+        return `نوع مصدر الدخل رقم ${i + 1} غير صالح.`;
+      }
+      if (usedIncomeTypes.has(source.sourceType)) {
+        return `لا يمكن تكرار مصدر الدخل (${source.sourceType}).`;
+      }
+      usedIncomeTypes.add(source.sourceType);
       const amount = Number(source.sourceAmount);
       if (!String(source.sourceAmount).trim() || !Number.isFinite(amount) || amount <= 0) {
         return `مبلغ مصدر الدخل (${source.sourceType}) يجب أن يكون رقمًا أكبر من صفر.`;
+      }
+      const sourceKey = getIncomeSourceKey(source, i);
+      if (!source.sourceImage && !incomeSourceFiles[sourceKey]) {
+        return `صورة مصدر الدخل (${source.sourceType}) مطلوبة.`;
       }
     }
     // فحص بيانات المرافقين
@@ -509,10 +588,18 @@ const BeneficiaryDetailsPage = () => {
       return;
     }
     setSaveError(null);
+    const incomeAttachments = editedBeneficiary!.incomeSources.reduce<Record<string, File>>(
+      (attachments, source, index) => {
+        const file = incomeSourceFiles[getIncomeSourceKey(source, index)];
+        if (file) attachments[`incomeSources[${index}][sourceImage]`] = file;
+        return attachments;
+      },
+      {},
+    );
     const updatedUser = await editReport({
       beneficiaryData: editedBeneficiary,
       reportId: id,
-      attachments: selectedAttachments,
+      attachments: { ...selectedAttachments, ...incomeAttachments },
     });
 
     if (updatedUser) {
@@ -520,6 +607,7 @@ const BeneficiaryDetailsPage = () => {
       setBeneficiary(mapped);
       setEditedBeneficiary(mapped);
       setSelectedAttachments({});
+      setIncomeSourceFiles({});
     }
   };
 
@@ -1998,39 +2086,6 @@ const BeneficiaryDetailsPage = () => {
                 )}
               </div>
             ))}
-            {beneficiary.incomeSources.map((source, index) => {
-              const field = `incomeSources[${index}][sourceImage]`;
-              return (
-                <div className={styles.attachmentEditor} key={field}>
-                  <span className={styles.infoLabel}>مرفق مصدر الدخل: {source.sourceType}</span>
-                  {source.sourceImage ? (
-                    <button
-                      type="button"
-                      className={styles.fileLink}
-                      onClick={() => setPopupImage(source.sourceImage)}
-                    >
-                      عرض المرفق الحالي
-                    </button>
-                  ) : (
-                    <span className={styles.noFile}>لا يوجد مرفق حالي</span>
-                  )}
-                  <label className={styles.uploadButton}>
-                    {selectedAttachments[field] ? "تغيير الملف المختار" : "اختيار ملف جديد"}
-                    <input
-                      type="file"
-                      accept=".jpg,.jpeg,.png,.pdf"
-                      onChange={(event) => selectAttachment(field, event.target.files?.[0])}
-                    />
-                  </label>
-                  {selectedAttachments[field] && (
-                    <div className={styles.selectedFile}>
-                      <span>{selectedAttachments[field].name}</span>
-                      <button type="button" onClick={() => selectAttachment(field)}>إلغاء</button>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
           </div>
         </div>
         <div className={styles.card}>
@@ -2335,31 +2390,91 @@ const BeneficiaryDetailsPage = () => {
           </div>
         </div>
         <div className={styles.card}>
-          <div className={styles.cardHeader}>
-            <h3 className={styles.cardTitle}>
-              <span className={styles.cardIcon}>💰</span>
-              مصادر الدخل
-            </h3>
-            <p className={styles.cardHint}>استخدم علامة التعديل بجوار المبلغ، ثم احفظ التغييرات من الزر أسفل الجدول.</p>
+          <div className={`${styles.cardHeader} ${styles.incomeHeader}`}>
+            <div>
+              <h3 className={styles.cardTitle}>
+                <span className={styles.cardIcon}>💰</span>
+                مصادر الدخل
+              </h3>
+              <p className={styles.cardHint}>يمكن إضافة المصادر الناقصة وتعديل بياناتها وصورها أو حذفها.</p>
+            </div>
+            <label className={styles.addIncomeControl}>
+              <span>إضافة مصدر دخل</span>
+              <select
+                defaultValue=""
+                disabled={!editedBeneficiary || editedBeneficiary.incomeSources.length >= incomeSourceTypes.length}
+                onChange={(event) => {
+                  addIncomeSource(event.target.value);
+                  event.target.value = "";
+                }}
+                aria-label="اختيار مصدر دخل جديد"
+              >
+                <option value="" disabled>
+                  {editedBeneficiary?.incomeSources.length === incomeSourceTypes.length
+                    ? "تمت إضافة جميع المصادر"
+                    : "اختر المصدر"}
+                </option>
+                {incomeSourceTypes
+                  .filter((type) => !editedBeneficiary?.incomeSources.some((source) => source.sourceType === type))
+                  .map((type) => <option value={type} key={type}>{type}</option>)}
+              </select>
+            </label>
           </div>
           <div className={styles.tableContainer}>
-            <table className={styles.table}>
+            <table className={`${styles.table} ${styles.incomeTable}`}>
               <thead>
                 <tr>
                   <th>#</th>
                   <th>نوع المصدر</th>
                   <th>المبلغ</th>
                   <th>صورة الدخل</th>
+                  <th>إجراء</th>
                 </tr>
               </thead>
               <tbody>
-                {editedBeneficiary?.incomeSources.map((source, index) => (
-                  <tr key={`${source.sourceType}-${index}`}>
+                {editedBeneficiary?.incomeSources.map((source, index) => {
+                  const sourceKey = getIncomeSourceKey(source, index);
+                  const selectedFile = incomeSourceFiles[sourceKey];
+                  return (
+                  <tr key={sourceKey}>
                     <td>{index + 1}</td>
-                    <td>{source.sourceType}</td>
+                    <td>
+                      <div className={styles.incomeEditableValue}>
+                        {editingField === `incomeType-${sourceKey}` ? (
+                          <select
+                            value={source.sourceType}
+                            autoFocus
+                            className={styles.incomeTypeSelect}
+                            onChange={(event) => {
+                              updateIncomeSourceType(index, event.target.value);
+                              setEditingField(null);
+                            }}
+                            onBlur={() => setEditingField(null)}
+                            aria-label={`نوع مصدر الدخل رقم ${index + 1}`}
+                          >
+                            {incomeSourceTypes
+                              .filter((type) => type === source.sourceType || !editedBeneficiary.incomeSources.some((item) => item.sourceType === type))
+                              .map((type) => <option value={type} key={type}>{type}</option>)}
+                          </select>
+                        ) : (
+                          <>
+                            <span>{source.sourceType}</span>
+                            <button
+                              type="button"
+                              className={styles.incomeEditButton}
+                              onClick={() => setEditingField(`incomeType-${sourceKey}`)}
+                              aria-label={`تعديل نوع مصدر الدخل: ${source.sourceType}`}
+                              title="تعديل نوع المصدر"
+                            >
+                              <span aria-hidden="true">✏️</span>
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </td>
                     <td>
                       <div className={styles.incomeAmountEditor}>
-                        {editingField === `incomeAmount-${index}` ? (
+                        {editingField === `incomeAmount-${sourceKey}` ? (
                           <>
                             <input
                               type="number"
@@ -2388,7 +2503,7 @@ const BeneficiaryDetailsPage = () => {
                             <button
                               type="button"
                               className={styles.incomeEditButton}
-                              onClick={() => setEditingField(`incomeAmount-${index}`)}
+                              onClick={() => setEditingField(`incomeAmount-${sourceKey}`)}
                               aria-label={`تعديل مبلغ مصدر الدخل: ${source.sourceType}`}
                               title="تعديل المبلغ"
                             >
@@ -2399,21 +2514,59 @@ const BeneficiaryDetailsPage = () => {
                       </div>
                     </td>
                     <td>
-                      {source.sourceImage ? (
-                        <button
-                          type="button"
-                          className={styles.fileLink}
-                          onClick={() => setPopupImage(source.sourceImage!)}
-                        >
-                          <span className={styles.linkIcon}>📷</span>
-                          عرض الصورة
-                        </button>
-                      ) : (
-                        <span className={styles.noFile}>غير متوفر</span>
-                      )}
+                      <div className={styles.incomeFileEditor}>
+                        {source.sourceImage && !selectedFile && (
+                          <button
+                            type="button"
+                            className={styles.fileLink}
+                            onClick={() => setPopupImage(source.sourceImage!)}
+                          >
+                            <span className={styles.linkIcon}>📷</span>
+                            عرض الصورة
+                          </button>
+                        )}
+                        {selectedFile && (
+                          <div className={styles.incomeSelectedFile} title={selectedFile.name}>
+                            <span>ملف جديد: {selectedFile.name}</span>
+                            <button
+                              type="button"
+                              onClick={() => selectIncomeSourceFile(sourceKey)}
+                              aria-label={`إلغاء الصورة الجديدة لمصدر ${source.sourceType}`}
+                            >
+                              إلغاء
+                            </button>
+                          </div>
+                        )}
+                        {!source.sourceImage && !selectedFile && (
+                          <span className={styles.noFile}>الصورة مطلوبة</span>
+                        )}
+                        <label className={styles.incomeUploadButton}>
+                          {source.sourceImage || selectedFile ? "استبدال الصورة" : "إضافة صورة"}
+                          <input
+                            type="file"
+                            accept=".jpg,.jpeg,.png,.pdf"
+                            onChange={(event) => {
+                              selectIncomeSourceFile(sourceKey, event.target.files?.[0]);
+                              event.target.value = "";
+                            }}
+                          />
+                        </label>
+                      </div>
+                    </td>
+                    <td>
+                      <button
+                        type="button"
+                        className={styles.removeIncomeButton}
+                        onClick={() => removeIncomeSource(index)}
+                        disabled={editedBeneficiary.incomeSources.length <= 1}
+                        title={editedBeneficiary.incomeSources.length <= 1 ? "يجب الإبقاء على مصدر واحد" : "حذف المصدر"}
+                        aria-label={`حذف مصدر الدخل: ${source.sourceType}`}
+                      >
+                        حذف
+                      </button>
                     </td>
                   </tr>
-                ))}
+                );})}
               </tbody>
             </table>
           </div>

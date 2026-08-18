@@ -952,11 +952,70 @@
   font-size: 0.82rem;
 }
 
+.incomeHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.25rem;
+}
+
+.addIncomeControl {
+  display: grid;
+  min-width: 13rem;
+  gap: 0.4rem;
+  color: #26265c;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.addIncomeControl select,
+.incomeTypeSelect {
+  min-height: 2.65rem;
+  padding: 0.45rem 0.75rem;
+  color: #26265c;
+  background: #fff;
+  border: 1px solid #c7cadc;
+  border-radius: 0.55rem;
+  font: inherit;
+  cursor: pointer;
+}
+
+.addIncomeControl select:focus-visible,
+.incomeTypeSelect:focus-visible {
+  outline: none;
+  border-color: #26265c;
+  box-shadow: 0 0 0 3px rgba(38, 38, 92, 0.16);
+}
+
+.addIncomeControl select:disabled {
+  color: #8b8da3;
+  background: #f0f1f6;
+  cursor: not-allowed;
+}
+
+.incomeTable {
+  min-width: 920px;
+}
+
+.incomeEditableValue,
 .incomeAmountEditor {
   display: inline-flex;
   min-width: 12rem;
   align-items: center;
   gap: 0.55rem;
+}
+
+.incomeEditableValue {
+  color: #26265c;
+  font-weight: 700;
+}
+
+.incomeTypeSelect {
+  width: 11rem;
+}
+
+.incomeAmountEditor {
+  min-width: 10.5rem;
 }
 
 .incomeAmountValue {
@@ -982,7 +1041,9 @@
 }
 
 .incomeAmountEditor:hover .incomeEditButton,
-.incomeAmountEditor:focus-within .incomeEditButton {
+.incomeAmountEditor:focus-within .incomeEditButton,
+.incomeEditableValue:hover .incomeEditButton,
+.incomeEditableValue:focus-within .incomeEditButton {
   opacity: 1;
   transform: translateX(0);
 }
@@ -1028,6 +1089,101 @@
   white-space: nowrap;
 }
 
+.incomeFileEditor {
+  display: flex;
+  min-width: 13rem;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.incomeUploadButton {
+  display: inline-flex;
+  min-height: 2.35rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem 0.8rem;
+  color: #fff;
+  background: #26265c;
+  border-radius: 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 160ms ease, transform 160ms ease;
+}
+
+.incomeUploadButton:hover {
+  background: #3a3d6c;
+  transform: translateY(-1px);
+}
+
+.incomeUploadButton:focus-within {
+  outline: 3px solid rgba(38, 38, 92, 0.2);
+  outline-offset: 2px;
+}
+
+.incomeUploadButton input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.incomeSelectedFile {
+  display: flex;
+  max-width: 15rem;
+  align-items: center;
+  gap: 0.5rem;
+  color: #444762;
+  font-size: 0.75rem;
+}
+
+.incomeSelectedFile span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.incomeSelectedFile button {
+  padding: 0;
+  color: #a32020;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.removeIncomeButton {
+  min-height: 2.35rem;
+  padding: 0.4rem 0.85rem;
+  color: #a32020;
+  background: #fff5f5;
+  border: 1px solid #efc6c6;
+  border-radius: 0.5rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: color 160ms ease, background-color 160ms ease;
+}
+
+.removeIncomeButton:hover:not(:disabled) {
+  color: #fff;
+  background: #a32020;
+}
+
+.removeIncomeButton:focus-visible {
+  outline: 3px solid rgba(163, 32, 32, 0.2);
+  outline-offset: 2px;
+}
+
+.removeIncomeButton:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 @media (max-width: 767px) {
   .attachmentsGrid {
     grid-template-columns: 1fr;
@@ -1037,6 +1193,15 @@
   .addCompanionButton {
     width: 100%;
     margin-top: 10px;
+  }
+
+  .incomeHeader {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .addIncomeControl {
+    width: 100%;
   }
 
   .incomeAmountEditor {
@@ -1052,5 +1217,13 @@
   .incomeEditButton {
     opacity: 1;
     transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .incomeEditButton,
+  .incomeUploadButton,
+  .removeIncomeButton {
+    transition: none;
   }
 }

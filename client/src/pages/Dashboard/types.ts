@@ -28,6 +28,8 @@ export interface Home {
 }
 
 export interface IncomeSource {
+  _id?: string;
+  clientId?: string;
   sourceType: string;
   sourceAmount: string;
   sourceImage: string | null;
@@ -111,4 +113,4 @@ export interface AdminData {
   currentPassword: string;
   newPassword: string;
   confirmPassword: string;
-} 
+}
