@@ -203,14 +203,14 @@ export const testUpdate = async (req, res) => {
     }
 
     // Check for duplicate identityNumber
-    const checkUser = await User.findOne({
-      identityNumber,
-      _id: { $ne: req.userId },
-    });
-    if (checkUser) {
-      await deleteUploadedFiles(req.files);
-      return res.status(400).json({ error: "رقم الهوية هذا مستخدم من قبل" });
-    }
+    // const checkUser = await User.findOne({
+    //   identityNumber,
+    //   _id: { $ne: req.userId },
+    // });
+    // if (checkUser) {
+    //   await deleteUploadedFiles(req.files);
+    //   return res.status(400).json({ error: "رقم الهوية هذا مستخدم من قبل" });
+    // }
 
     // Parse nested fields
     let homeData;
@@ -567,10 +567,10 @@ export const signUpUser = async (req, res) => {
         .json({ error: "رقم الهوية يجب أن يكون أرقام فقط" });
     }
 
-    const checkUserIdentityNumber = await User.findOne({ identityNumber });
-    if (checkUserIdentityNumber) {
-      return res.status(400).json({ error: "رقم الهوية هذا مستخدم من قبل" });
-    }
+    // const checkUserIdentityNumber = await User.findOne({ identityNumber });
+    // if (checkUserIdentityNumber) {
+    //   return res.status(400).json({ error: "رقم الهوية هذا مستخدم من قبل" });
+    // }
 
     if (password.length <= 8) {
       return res

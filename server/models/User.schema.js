@@ -1,92 +1,4 @@
-// import mongoose from "mongoose";
 
-// const Schema = mongoose.Schema;
-
-// const escortSchema = new Schema({
-//   fullName: {
-//     type: String,
-//     required: true,
-//   },
-//   identityNumber: {
-//     type: Number,
-//     required: true,
-//   },
-//   gender: {
-//     type: String,
-//     required: true,
-//     enum: ["ذكر", "مؤنث"],
-//   },
-//   kinship:{
-//     type:String,
-//     required:true,
-//   }
-// });
-// const userSchema = new Schema(
-//   {
-//     fullName: {
-//       type: String,
-//       required: true,
-//     },
-//     email: {
-//       type: String,
-//       required: true,
-//       unique: true,
-//     },
-//     password: {
-//       type: String,
-//       required: true,
-//     },
-//     updateToken: {
-//       type: String,
-//     },
-//     gender: {
-//       type: String,
-//       required: true,
-//       enum: ["male", "female"],
-//     },
-//     phone: {
-//       type: String,
-//       required: true,
-//     },
-//     nationality: {
-//       type: String,
-//       required: true,
-//     },
-//     identityNumber: {
-//       type: Number,
-//       required: true,
-//     },
-//     identityImage: {
-//       type: String,
-//       required: true,
-//     },
-//     birthDate: {
-//       type: Date,
-//       required: true,
-//     },
-//     MarityStatus: {
-//       type: String,
-//       required: true,
-//     },
-//     role: {
-//       type: String,
-//       required: true,
-//       enum: ["admin", "user"],
-//     },
-//     cityOfResidence: {
-//       type: String,
-//       required: true,
-//     },
-//     escorts: escortSchema,
-
-//   },
-//   {
-//     timestamps: true,
-//   }
-// );
-// const User = mongoose.model("q3wanUser", userSchema);
-
-// export default User;
 
 import mongoose from "mongoose";
 
@@ -201,7 +113,7 @@ const userSchema = new mongoose.Schema(
     thirdName: { type: String, required: true },
     lastName: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    identityNumber: { type: String, unique: true },
+    identityNumber: { type: String },
     nationality: { type: String, default: "" },
     password: { type: String, required: true },
     birthDatetype: {
