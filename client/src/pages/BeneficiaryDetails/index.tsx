@@ -373,6 +373,15 @@ const BeneficiaryDetailsPage = () => {
     setEditedBeneficiary({ ...editedBeneficiary, [field]: value });
   };
 
+  const updateHousingType = (housingType: Beneficiary["housingType"]) => {
+    if (!editedBeneficiary) return;
+    setEditedBeneficiary({ ...editedBeneficiary, housingType });
+    if (housingType === "ملك") {
+      selectAttachment("rentContractFile");
+    }
+    setEditingField(null);
+  };
+
   const updateHousemate = (index: number, values: Partial<Beneficiary["housemates"][number]>) => {
     if (!editedBeneficiary) return;
     setEditedBeneficiary({
@@ -483,7 +492,7 @@ const BeneficiaryDetailsPage = () => {
   const editableFields: (keyof Beneficiary)[] = [
     'firstName', 'secondName', 'thirdName', 'lastName', 'identityNumber', 'phone', 'gender', 'birthDate',
     'maritalStatus', 'nationality', 'cityOfResidence', 'jobStatus', 'healthStatus', 'disabilityType',
-    'district', 'rentAmount', 'bankName'
+    'district', 'housingType', 'rentAmount', 'bankName'
   ];
 
   const hasEdits = beneficiary && editedBeneficiary && (
@@ -532,7 +541,15 @@ const BeneficiaryDetailsPage = () => {
     if (editedBeneficiary.healthStatus === 'غير سليم' && !editedBeneficiary.disabilityType) return 'نوع الإعاقة مطلوب إذا كانت الحالة الصحية غير سليم.';
     if (!editedBeneficiary.cityOfResidence) return 'المدينة مطلوبة.';
     if (!editedBeneficiary.district) return 'الحي مطلوب.';
-    if (beneficiary?.housingType === 'إيجار' && !editedBeneficiary.rentAmount) return 'مبلغ الإيجار مطلوب.';
+    if (!['ملك', 'إيجار'].includes(editedBeneficiary.housingType)) return 'يرجى اختيار نوع السكن.';
+    if (editedBeneficiary.housingType === 'إيجار') {
+      const rentAmount = Number(editedBeneficiary.rentAmount);
+      if (!String(editedBeneficiary.rentAmount || '').trim()) return 'مبلغ الإيجار مطلوب.';
+      if (!Number.isFinite(rentAmount) || rentAmount <= 0) return 'مبلغ الإيجار يجب أن يكون رقمًا أكبر من صفر.';
+      if (!editedBeneficiary.rentContractFile && !selectedAttachments.rentContractFile) {
+        return 'عقد الإيجار مطلوب عند اختيار نوع السكن إيجار.';
+      }
+    }
     if (!saudiBanks.includes(editedBeneficiary.bankName || '')) return 'يرجى اختيار اسم البنك من القائمة.';
     const usedIncomeTypes = new Set<string>();
     for (let i = 0; i < editedBeneficiary.incomeSources.length; i++) {
@@ -1851,9 +1868,49 @@ const BeneficiaryDetailsPage = () => {
               </div>
               <div className={styles.infoItem} style={{ position: 'relative' }}>
                 <span className={styles.infoLabel}>نوع السكن</span>
-                <span className={styles.infoValue}>{beneficiary.housingType}</span>
+                <span
+                  className={styles.infoValue}
+                  style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}
+                  onMouseEnter={e => {
+                    const icon = e.currentTarget.querySelector('.edit-icon') as HTMLElement;
+                    if (icon) icon.style.visibility = 'visible';
+                  }}
+                  onMouseLeave={e => {
+                    const icon = e.currentTarget.querySelector('.edit-icon') as HTMLElement;
+                    if (icon) icon.style.visibility = 'hidden';
+                  }}
+                >
+                  {editingField === 'housingType' ? (
+                    <select
+                      value={editedBeneficiary?.housingType || ''}
+                      autoFocus
+                      onChange={event => updateHousingType(event.target.value as Beneficiary['housingType'])}
+                      onBlur={() => setEditingField(null)}
+                      className={styles.housingTypeSelect}
+                      aria-label="نوع السكن"
+                    >
+                      <option value="ملك">ملك</option>
+                      <option value="إيجار">إيجار</option>
+                    </select>
+                  ) : (
+                    <span className={styles.editableField}>{editedBeneficiary?.housingType}</span>
+                  )}
+                  <span
+                    className={`edit-icon ${styles.editIcon}`}
+                    style={{
+                      marginRight: 8,
+                      cursor: 'pointer',
+                      visibility: 'hidden',
+                      position: 'static',
+                      display: 'inline-block',
+                    }}
+                    onClick={() => setEditingField('housingType')}
+                  >
+                    ✏️
+                  </span>
+                </span>
               </div>
-              {beneficiary.housingType === "إيجار" && (
+              {editedBeneficiary?.housingType === "إيجار" && (
                 <div className={styles.infoItem} style={{ position: 'relative' }}>
                   <span className={styles.infoLabel}>مبلغ الإيجار</span>
                   <span
@@ -1870,7 +1927,10 @@ const BeneficiaryDetailsPage = () => {
                   >
                     {editingField === 'rentAmount' ? (
                       <input
-                        type="text"
+                        type="number"
+                        min="0.01"
+                        step="0.01"
+                        inputMode="decimal"
                         value={editedBeneficiary?.rentAmount || ''}
                         autoFocus
                         onChange={e => handleEditChange('rentAmount', e.target.value)}
@@ -1899,23 +1959,29 @@ const BeneficiaryDetailsPage = () => {
                   </span>
                 </div>
               )}
-              <div className={styles.infoItem} style={{ position: 'relative' }}>
-                <span className={styles.infoLabel}>عقد الإيجار</span>
-                <span className={styles.infoValue}>
-                  {beneficiary.rentContractFile ? (
-                    <button
-                      type="button"
-                      onClick={() => setPopupImage(beneficiary.rentContractFile!)}
-                      className={styles.fileLink}
-                    >
-                      <span className={styles.linkIcon}>📄</span>
-                      عرض العقد
-                    </button>
-                  ) : (
-                    <span className={styles.noFile}>غير متوفر</span>
-                  )}
-                </span>
-              </div>
+              {editedBeneficiary?.housingType === "إيجار" && (
+                <div className={styles.infoItem} style={{ position: 'relative' }}>
+                  <span className={styles.infoLabel}>عقد الإيجار</span>
+                  <span className={styles.infoValue}>
+                    {selectedAttachments.rentContractFile ? (
+                      <span className={styles.selectedRentContract}>
+                        تم اختيار: {selectedAttachments.rentContractFile.name}
+                      </span>
+                    ) : editedBeneficiary.rentContractFile ? (
+                      <button
+                        type="button"
+                        onClick={() => setPopupImage(editedBeneficiary.rentContractFile!)}
+                        className={styles.fileLink}
+                      >
+                        <span className={styles.linkIcon}>📄</span>
+                        عرض العقد
+                      </button>
+                    ) : (
+                      <span className={styles.noFile}>مطلوب إرفاق عقد</span>
+                    )}
+                  </span>
+                </div>
+              )}
               {beneficiary.familyCardFile && (
                 <div className={styles.infoItem}>
                   <span className={styles.infoLabel}>كارت العائلة</span>
@@ -2054,7 +2120,9 @@ const BeneficiaryDetailsPage = () => {
               { field: "idImagePath", label: "صورة الهوية", url: beneficiary.idImagePath },
               { field: "familyCardFile", label: "كارت العائلة", url: beneficiary.familyCardFile },
               { field: "ibanImage", label: "صورة الآيبان", url: beneficiary.ibanImage },
-              { field: "rentContractFile", label: "عقد الإيجار", url: beneficiary.rentContractFile },
+              ...(editedBeneficiary?.housingType === "إيجار"
+                ? [{ field: "rentContractFile", label: "عقد الإيجار", url: editedBeneficiary.rentContractFile }]
+                : []),
             ].map(({ field, label, url }) => (
               <div className={styles.attachmentEditor} key={field}>
                 <span className={styles.infoLabel}>{label}</span>

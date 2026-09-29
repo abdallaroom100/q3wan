@@ -191,6 +191,30 @@
   visibility: visible;
 }
 
+.housingTypeSelect {
+  min-width: 8rem;
+  min-height: 2.65rem;
+  padding: 0.45rem 0.75rem;
+  color: #26265c;
+  background: #fff;
+  border: 1px solid #c7cadc;
+  border-radius: 0.55rem;
+  font: inherit;
+  cursor: pointer;
+}
+
+.housingTypeSelect:focus-visible {
+  outline: none;
+  border-color: #26265c;
+  box-shadow: 0 0 0 3px rgba(38, 38, 92, 0.16);
+}
+
+.selectedRentContract {
+  color: #26265c;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
 /* File Links */
 .fileLink {
   color: rgb(58, 61, 108);
