@@ -34,29 +34,10 @@ const deleteUploadedFiles = async (files) => {
   }
 };
 
-// Helper function to delete old file
-const deleteOldFile = async (oldFilePath) => {
-  if (!oldFilePath) return;
-  try {
-    let relativePath = oldFilePath;
-    // لو المسار URL أو فيه /uploads/ خذ فقط الجزء بعد uploads/
-    if (oldFilePath.startsWith('http')) {
-      const uploadsIndex = oldFilePath.indexOf('/uploads/');
-      if (uploadsIndex !== -1) {
-        relativePath = oldFilePath.substring(uploadsIndex + '/uploads/'.length);
-      }
-    } else if (oldFilePath.includes('/uploads/')) {
-      relativePath = oldFilePath.split('/uploads/')[1];
-    }
-    const filePath = path.join(baseUploadPath, relativePath);
-    await fs.promises.access(filePath);
-    await fs.promises.unlink(filePath);
-  } catch (error) {
-    if (error.code !== "ENOENT") {
-      console.error(`Failed to delete old file ${oldFilePath}:`, error);
-    }
-  }
-};
+// حذف الملفات القديمة معطّل للحفاظ على بيانات المستخدم ومرفقاته.
+// const deleteOldFile = async (oldFilePath) => {
+//   ...
+// };
 
 // Helper function to validate home data
 const validateHomeData = (homeData) => {
@@ -291,9 +272,10 @@ export const testUpdate = async (req, res) => {
 
     // Handle idImagePath
     if (files["idImagePath"]) {
-      if (existUser.idImagePath) {
-        await deleteOldFile(existUser.idImagePath);
-      }
+      // نحتفظ بالمرفق القديم ضمن ملفات المستخدم.
+      // if (existUser.idImagePath) {
+      //   await deleteOldFile(existUser.idImagePath);
+      // }
       finalIdImagePath = `${req.protocol}://${req.get("host")}/uploads/${
         req.userId
       }/identity/${files["idImagePath"][0].filename}`;
@@ -301,9 +283,10 @@ export const testUpdate = async (req, res) => {
 
     // Handle familyCardFile
     if (files["familyCardFile"]) {
-      if (existUser.familyCardFile) {
-        await deleteOldFile(existUser.familyCardFile);
-      }
+      // نحتفظ بالمرفق القديم ضمن ملفات المستخدم.
+      // if (existUser.familyCardFile) {
+      //   await deleteOldFile(existUser.familyCardFile);
+      // }
       finalFamilyCardFile = `${req.protocol}://${req.get("host")}/uploads/${
         req.userId
       }/familyCard/${files["familyCardFile"][0].filename}`;
@@ -311,9 +294,10 @@ export const testUpdate = async (req, res) => {
 
     // Handle ibanImage
     if (files["ibanImage"]) {
-      if (existUser.ibanImage) {
-        await deleteOldFile(existUser.ibanImage);
-      }
+      // نحتفظ بالمرفق القديم ضمن ملفات المستخدم.
+      // if (existUser.ibanImage) {
+      //   await deleteOldFile(existUser.ibanImage);
+      // }
       finalIbanImage = `${req.protocol}://${req.get("host")}/uploads/${
         req.userId
       }/iban/${files["ibanImage"][0].filename}`;
@@ -321,9 +305,10 @@ export const testUpdate = async (req, res) => {
 
     // Handle rentImage
     if (files["rentContractFile"]) {
-      if (existUser.rentImage) {
-        await deleteOldFile(existUser.rentImage);
-      }
+      // نحتفظ بالمرفق القديم ضمن ملفات المستخدم.
+      // if (existUser.rentImage) {
+      //   await deleteOldFile(existUser.rentImage);
+      // }
       finalRentImage = `${req.protocol}://${req.get("host")}/uploads/${
         req.userId
       }/rent/${files["rentContractFile"][0].filename}`;
@@ -340,13 +325,14 @@ export const testUpdate = async (req, res) => {
         const folderName = encodeURIComponent(src.sourceType);
         // إذا تم رفع صورة جديدة
         if (files[fieldName]) {
-          const incomeSourceDir = path.join(baseUploadPath, req.userId.toString(), 'incomeSources', folderName);
-          try {
-            const existingFiles = await fs.promises.readdir(incomeSourceDir);
-            for (const file of existingFiles) {
-              await fs.promises.unlink(path.join(incomeSourceDir, file));
-            }
-          } catch (e) {}
+          // نحتفظ بصور مصدر الدخل القديمة ضمن ملفات المستخدم.
+          // const incomeSourceDir = path.join(baseUploadPath, req.userId.toString(), 'incomeSources', folderName);
+          // try {
+          //   const existingFiles = await fs.promises.readdir(incomeSourceDir);
+          //   for (const file of existingFiles) {
+          //     await fs.promises.unlink(path.join(incomeSourceDir, file));
+          //   }
+          // } catch (e) {}
           finalSourceImage = `${req.protocol}://${req.get("host")}/uploads/${req.userId}/incomeSources/${folderName}/${files[fieldName][0].filename}`;
         } else if (finalSourceImage) {
           // لو القيمة القديمة ليست URL كامل، ابنِ المسار الكامل تلقائيًا
@@ -368,13 +354,14 @@ export const testUpdate = async (req, res) => {
         let finalSourceImage = src.sourceImage;
         const folderName = encodeURIComponent(src.sourceType);
         if (files[fieldName]) {
-          const incomeSourceDir = path.join(baseUploadPath, req.userId.toString(), 'incomeSources', folderName);
-          try {
-            const existingFiles = await fs.promises.readdir(incomeSourceDir);
-            for (const file of existingFiles) {
-              await fs.promises.unlink(path.join(incomeSourceDir, file));
-            }
-          } catch (e) {}
+          // نحتفظ بصور مصدر الدخل القديمة ضمن ملفات المستخدم.
+          // const incomeSourceDir = path.join(baseUploadPath, req.userId.toString(), 'incomeSources', folderName);
+          // try {
+          //   const existingFiles = await fs.promises.readdir(incomeSourceDir);
+          //   for (const file of existingFiles) {
+          //     await fs.promises.unlink(path.join(incomeSourceDir, file));
+          //   }
+          // } catch (e) {}
           finalSourceImage = `${req.protocol}://${req.get("host")}/uploads/${req.userId}/incomeSources/${folderName}/${files[fieldName][0].filename}`;
         } else if (finalSourceImage) {
           if (!finalSourceImage.startsWith('http')) {
@@ -649,15 +636,16 @@ export const deleteUser = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({ error: "المعرف غير صالح" });
     }
-    const user = await User.findByIdAndDelete(userId, {
-      new: true,
-    });
+    const user = await User.findById(userId);
     if (!user) {
       return res.status(401).json({ error: "المستخدم غير موجود" });
     }
-    return res
-      .status(200)
-      .json({ message: "تم حذف المستخدم بنجاح", success: true });
+    // حذف سجل المستخدم نفسه معطّل للحفاظ على بياناته.
+    // await User.findByIdAndDelete(userId);
+    return res.status(403).json({
+      error: "حذف بيانات المستخدم معطّل",
+      success: false,
+    });
   } catch (error) {
     console.log(`error in delete user function`);
     console.log(error.message);
@@ -943,8 +931,6 @@ export const checkUpdatePassword = async (req, res) => {
     console.log(error);
   }
 };
-
-
 
 
 

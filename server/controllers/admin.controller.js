@@ -35,30 +35,10 @@ const removeUploadedFiles = async (files) => {
   );
 };
 
-const removeStoredIncomeFiles = async (fileUrls, beneficiaryUserId) => {
-  const beneficiaryRoot = path.resolve(adminUploadRoot, String(beneficiaryUserId));
-  await Promise.all(fileUrls.map(async (fileUrl) => {
-    if (!fileUrl) return;
-    try {
-      const pathname = new URL(fileUrl).pathname;
-      const uploadsMarker = "/uploads/";
-      const markerIndex = pathname.indexOf(uploadsMarker);
-      if (markerIndex === -1) return;
-      const relativeParts = pathname
-        .slice(markerIndex + uploadsMarker.length)
-        .split("/")
-        .filter(Boolean)
-        .map((part) => decodeURIComponent(part));
-      const storedPath = path.resolve(adminUploadRoot, ...relativeParts);
-      if (!storedPath.startsWith(`${beneficiaryRoot}${path.sep}`)) return;
-      await fs.promises.unlink(storedPath);
-    } catch (error) {
-      if (error.code !== "ENOENT") {
-        console.error(`Failed to remove stored income file ${fileUrl}:`, error);
-      }
-    }
-  }));
-};
+// حذف ملفات مصادر الدخل القديمة معطّل للحفاظ على مرفقات المستخدم.
+// const removeStoredIncomeFiles = async (fileUrls, beneficiaryUserId) => {
+//   ...
+// };
 
 const parseJsonArray = (value, fieldName) => {
   if (Array.isArray(value)) return value;
@@ -453,20 +433,21 @@ export const deleteBeneficiary = async (req, res) => {
       });
     }
 
-    // حذف مجلد الملفات المرفوعة للمستخدم
-    const uploadsDir = process.env.DEV_MODE === "true"
-      ? path.join(controllerDirectory, "../uploads")
-      : "/home/ubuntu/gdrive/uploads";
-    const userFolderPath = path.join(uploadsDir, userId);
-    
-    if (fs.existsSync(userFolderPath)) {
-      fs.rmSync(userFolderPath, { recursive: true, force: true });
-      console.log(`تم حذف مجلد المستخدم: ${userFolderPath}`);
-    }
+    // نحتفظ بسجل المستخدم وكل مرفقاته عند حذف التقرير.
+    // const uploadsDir = process.env.DEV_MODE === "true"
+    //   ? path.join(controllerDirectory, "../uploads")
+    //   : "/home/ubuntu/gdrive/uploads";
+    // const userFolderPath = path.join(uploadsDir, userId);
+    // if (fs.existsSync(userFolderPath)) {
+    //   fs.rmSync(userFolderPath, { recursive: true, force: true });
+    // }
+    // await User.findByIdAndDelete(userId);
 
-    await User.findByIdAndDelete(userId);
     await Report.deleteOne({user:userId});
-    res.status(200).json({ success: true, message: "تم حذف بيانات المستفيد" });
+    res.status(200).json({
+      success: true,
+      message: "تم حذف تقرير المستفيد مع الاحتفاظ ببيانات المستخدم ومرفقاته",
+    });
   } catch (error) {
     console.log(error.message);
     console.log("error in reject beneficiary");
@@ -741,7 +722,8 @@ export const editBeneficiaryData = async (req, res) => {
     }
 
     await reportOwner.save();
-    await removeStoredIncomeFiles(obsoleteIncomeImages, req.beneficiaryUserId);
+    // نحتفظ بالملفات القديمة ضمن بيانات المستخدم.
+    // await removeStoredIncomeFiles(obsoleteIncomeImages, req.beneficiaryUserId);
     return res.status(200).json({
       success: true,
       message: "تم تحديث البيانات بنجاح",

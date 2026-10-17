@@ -171,7 +171,7 @@ const BeneficiaryDetailsPage = () => {
   // مراقبة حالة الحذف
   useEffect(() => {
     if (isDeleted) {
-      hotToast({type:"success",message:"تم حذف المستفيد بنجاح"})
+      hotToast({type:"success",message:"تم حذف تق-رير المستفيد مع الاحتفاظ ببياناته"})
       setTimeout(() => {
         navigate("/dashboard")
       }, 300);
@@ -2732,7 +2732,7 @@ const BeneficiaryDetailsPage = () => {
                 onClick={() => setShowFinalDeletePopup(true)}
                 disabled={deleteLoading}
               >
-                🗑️ حذف المستفيد كليًا
+                🗑️ حذف تقرير المستفيد
               </button>
             </div>
           </div>
@@ -2802,9 +2802,9 @@ const BeneficiaryDetailsPage = () => {
       {showFinalDeletePopup && (
         <div className={styles.confirmPopupOverlay} onClick={() => setShowFinalDeletePopup(false)}>
           <div className={styles.confirmPopupContent} onClick={(event) => event.stopPropagation()}>
-            <h3 className={styles.confirmPopupTitle}>تأكيد الحذف الكلي</h3>
+            <h3 className={styles.confirmPopupTitle}>تأكيد حذف التقرير</h3>
             <p className={styles.confirmPopupMessage}>
-              سيتم حذف بيانات المستفيد والتقرير وجميع مرفقاته نهائيًا. هل تريد المتابعة؟
+              سيتم حذف تقرير المستفيد فقط، مع الاحتفاظ بحساب المستخدم وكل بياناته ومرفقاته. هل تريد المتابعة؟
             </p>
             {deleteBeneficiaryError && (
               <div className={styles.errorMsg}>{deleteBeneficiaryError}</div>
@@ -2816,7 +2816,7 @@ const BeneficiaryDetailsPage = () => {
                 onClick={confirmFinalDelete}
                 disabled={deleteLoading}
               >
-                {deleteLoading ? "جاري الحذف..." : "نعم، حذف كلي"}
+                {deleteLoading ? "جاري حذف التقرير..." : "نعم، حذف التقرير"}
               </button>
               <button
                 type="button"

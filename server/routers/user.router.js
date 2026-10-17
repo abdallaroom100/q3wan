@@ -100,11 +100,11 @@
       try {
         // Create directory if it doesn't exist
         await fs.mkdir(destination, { recursive: true });
-        // Delete existing files in the folder to ensure only one file
-        const existingFiles = await fs.readdir(destination);
-        for (const existingFile of existingFiles) {
-          await fs.unlink(path.join(destination, existingFile));
-        }
+        // نحتفظ بكل ملفات المستخدم القديمة عند رفع ملف جديد.
+        // const existingFiles = await fs.readdir(destination);
+        // for (const existingFile of existingFiles) {
+        //   await fs.unlink(path.join(destination, existingFile));
+        // }
         cb(null, destination);
       } catch (error) {
         cb(error, null);
